@@ -1339,11 +1339,6 @@ function buildIntroHTML() {
       </svg>
     </div>
 
-    <!-- Logo en el intro card -->
-    <div style="margin-bottom:14px;">
-      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:28px;width:auto;object-fit:contain;display:block;">
-    </div>
-
     <!-- Header: texto + brújula -->
     <div class="intro-header-row" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative;width:100%;">
       <div class="welcome-text-container" style="width:100%;padding-right:80px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;position:relative;z-index:1;">
@@ -1700,8 +1695,10 @@ function render() {
     </div>` : ''}
   `;
 
-  if      (isIntro)   html += buildIntroHTML();
-  else if (isBlock)   html += buildBlockHTML(blk, blockIdx);
+  if (isIntro) {
+    html += `<img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:34px;width:auto;display:block;margin:0 auto 20px;filter:drop-shadow(0 2px 8px rgba(122,44,158,0.15));">`;
+    html += buildIntroHTML();
+  } else if (isBlock)   html += buildBlockHTML(blk, blockIdx);
   else if (isTarea)   html += buildTareaHTML();
   else if (isResumen) html += buildResumenHTML();
   else if (isClose)   html += buildCloseHTML();
