@@ -913,8 +913,19 @@ try { _sesionId = localStorage.getItem(SESSION_KEY); } catch(e) {}
 async function trackOpen() {
   if (!CLIENT_NAME) return;
   try {
+    // Si el enlace trae un sid (creado al generar el link), usarlo directamente
+    const sidFromUrl = new URLSearchParams(window.location.search).get('sid');
+    if (sidFromUrl) {
+      _sesionId = sidFromUrl;
+      localStorage.setItem(SESSION_KEY, _sesionId);
+      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
+      });
+      return;
+    }
     if (_sesionId) {
-      // Sesión existente: actualizar último acceso
       fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
         method: 'PATCH',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },

@@ -720,6 +720,8 @@ function buildList() {
       let badge, color, bg;
       if (enviado) {
         badge = '✓ Enviado'; color = '#3DAB7A'; bg = 'rgba(61,171,122,.1)';
+      } else if (paso === -1) {
+        badge = '📤 Generado'; color = '#9A95AD'; bg = 'rgba(154,149,173,.1)';
       } else if (paso === 0) {
         badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)';
       } else if (paso >= 1 && paso <= 5) {
@@ -939,11 +941,12 @@ window.selGenero = function(g) {
   actualizarLink();
 };
 
-function buildLink() {
+function buildLink(sid) {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
   if (!nombre) return '';
   let url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
   if (_generoSeleccionado) url += '&genero=' + _generoSeleccionado;
+  if (sid) url += '&sid=' + sid;
   return url;
 }
 
@@ -956,17 +959,32 @@ window.actualizarLink = function() {
   preview.style.display = 'block';
 };
 
-window.copiarLink = function() {
-  const url = buildLink();
-  if (!url) { alert('Escribe el nombre del cliente primero.'); return; }
+window.copiarLink = async function() {
+  const nombre = (document.getElementById('link-nombre')?.value || '').trim();
+  if (!nombre) { alert('Escribe el nombre del cliente primero.'); return; }
+  const btn = document.querySelector('[onclick="copiarLink()"]');
+
+  // Crear registro en link_sesiones (estado: generado, no abierto)
+  let sid = null;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ cliente: nombre, ultimo_paso: -1 })
+    });
+    if (res.ok) { const data = await res.json(); sid = data[0]?.id || null; }
+  } catch(e) {}
+
+  const url = buildLink(sid);
   navigator.clipboard.writeText(url).then(() => {
-    const btn = document.querySelector('[onclick="copiarLink()"]');
     if (btn) {
       const orig = btn.innerHTML;
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
       btn.style.color = '#3DAB7A'; btn.style.borderColor = '#3DAB7A';
       setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
     }
+    // Recargar sesiones para mostrar el nuevo estado
+    fetchRecords();
   });
 };
 
