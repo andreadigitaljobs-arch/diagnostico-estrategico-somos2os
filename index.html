@@ -562,12 +562,6 @@ window.dismissIntro = function() {
 // Sistema de partículas interactivas en el Canvas
 window.introParticlesActive = true;
 document.addEventListener("DOMContentLoaded", () => {
-  if (sessionStorage.getItem('somos2os_intro_shown') === 'true') {
-    const intro = document.getElementById('intro-screen');
-    if (intro) intro.style.display = 'none';
-    window.introParticlesActive = false;
-    return;
-  }
 
   const canvas = document.getElementById('particles-canvas');
   if (!canvas) return;
@@ -772,7 +766,7 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    S.step    = raw.step    || 0;
+    S.step    = 0; // Siempre forzar el inicio en el paso 0 (bienvenida)
     S.answers = raw.answers || {};
     S.tarea   = raw.tarea   || {};
   } catch(e) {}
