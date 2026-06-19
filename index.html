@@ -1248,21 +1248,6 @@ window.continueAnyway = function(step) {
   else executeGo(step);
 };
 
-// ── VOZ ───────────────────────────────────────────────────────────────────────
-window.startVoiceInput = function(id) {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Tu navegador no soporta entrada de voz. Usa Chrome en Android.'); return; }
-  const r = new SR(); r.lang = 'es-ES'; r.continuous = false; r.interimResults = false;
-  const btn = document.getElementById('vbtn-' + id);
-  if (btn) { btn.style.color = '#E05555'; btn.style.background = 'rgba(224,85,85,.12)'; }
-  r.onresult = e => {
-    const txt = e.results[0][0].transcript;
-    const ta = document.querySelector(`textarea[data-qid="${id}"]`);
-    if (ta) { ta.value = (ta.value ? ta.value + ' ' : '') + txt; ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; updateAnswer(id, ta.value); }
-  };
-  r.onend = r.onerror = () => { if (btn) { btn.style.color=''; btn.style.background=''; } };
-  r.start();
-};
 
 window.openWhatsApp = function() {
   const text = '¡Hola chicos! Aquí les mando la info y archivos para mi Diagnóstico Estratégico.';
@@ -1473,14 +1458,7 @@ function buildBlockHTML(blk, bi) {
       </div>`;
     } else {
       const val = esc(stored || '');
-      inputHTML = `
-      <div style="position:relative;">
-        <textarea class="q-textarea" data-qid="${id}" rows="2" placeholder="Escribe tu respuesta…" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)">${val}</textarea>
-        <button id="vbtn-${id}" type="button" onclick="startVoiceInput('${id}')" title="Dictar respuesta por voz" style="position:absolute;right:10px;bottom:10px;background:rgba(122,44,158,.07);border:none;border-radius:8px;padding:5px 7px;cursor:pointer;color:#7A2C9E;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:inherit;transition:all .2s;" onmouseover="this.style.background='rgba(122,44,158,.14)'" onmouseout="this.style.background='rgba(122,44,158,.07)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          Voz
-        </button>
-      </div>`;
+      inputHTML = `<textarea class="q-textarea" data-qid="${id}" rows="2" placeholder="Escribe tu respuesta…" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)">${val}</textarea>`;
     }
 
     return `
