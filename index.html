@@ -1036,6 +1036,10 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    // Si el enlace tiene un nombre distinto al guardado, empezar desde 0
+    if (CLIENT_NAME && raw.clienteName && raw.clienteName !== CLIENT_NAME) {
+      return; // estado vacío, step 0
+    }
     S.step       = raw.step       || 0;
     S.maxStep    = raw.maxStep    || raw.step || 0;
     S.answers    = raw.answers    || {};
@@ -1047,6 +1051,7 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      clienteName: CLIENT_NAME,
       step: S.step, maxStep: S.maxStep, answers: S.answers, tarea: S.tarea, tareaLinks: S.tareaLinks
     }));
   } catch(e) {}
