@@ -190,7 +190,7 @@
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
         border-radius: 20px !important;
-        padding: 24px 20px !important;
+        padding: 20px 18px 18px !important;
         box-shadow: 0 8px 32px rgba(60, 40, 120, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         max-width: 100% !important;
@@ -328,12 +328,12 @@
 
     /* Animaciones globales de Entrada y Salida de componentes */
     @keyframes screenFadeIn {
-      from { opacity: 0; transform: translateY(18px) scale(0.98); filter: blur(4px); }
-      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes screenFadeOut {
-      from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-      to { opacity: 0; transform: translateY(-18px) scale(0.98); filter: blur(4px); }
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-18px) scale(0.98); }
     }
 
     .animate-enter {
