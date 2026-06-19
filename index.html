@@ -1099,7 +1099,7 @@ function buildBlockHTML(blk, bi) {
       </div>`;
     } else {
       const val = esc(stored || '');
-      inputHTML = `<textarea class="q-textarea" rows="2" placeholder="Escribe tu respuesta…" oninput="updateAnswer('${id}', this.value)">${val}</textarea>`;
+      inputHTML = `<textarea class="q-textarea" rows="2" placeholder="Escribe tu respuesta…" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; updateAnswer('${id}', this.value)">${val}</textarea>`;
     }
 
     return `
@@ -1217,6 +1217,12 @@ function render() {
   if (activeCard && !activeCard.classList.contains('animate-leave')) {
     activeCard.classList.add('animate-enter');
   }
+
+  // Ajustar la altura de todos los textareas cargados según su contenido
+  document.querySelectorAll('.q-textarea').forEach(ta => {
+    ta.style.height = 'auto';
+    ta.style.height = (ta.scrollHeight) + 'px';
+  });
 }
 
 // ─── INICIO ───────────────────────────────────────────────────────────────────
