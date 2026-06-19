@@ -583,6 +583,15 @@
   </div>
 </div>
 
+<script>
+// Ocultar intro inmediatamente si el usuario ya avanzó (evita flash en recarga)
+try {
+  var _st = JSON.parse(localStorage.getItem('somos2os_diagnostico_v1'));
+  if (_st && _st.step > 0) {
+    document.getElementById('intro-screen').style.display = 'none';
+  }
+} catch(e) {}
+</script>
 
 <header id="main-header" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 72px; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(230, 226, 242, 0.6); z-index: 1000; transition: all 0.3s ease;">
   <div style="width: 100%; max-width: 860px; height: 100%; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">

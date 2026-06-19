@@ -276,7 +276,7 @@ function formatDate(iso) {
 
 function countAnswered(answers) {
   if (!answers) return 0;
-  return Object.values(answers).filter(v => v !== '' && v !== undefined && v !== null).length;
+  return Object.entries(answers).filter(([k, v]) => !k.startsWith('_') && v !== '' && v !== undefined && v !== null).length;
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
