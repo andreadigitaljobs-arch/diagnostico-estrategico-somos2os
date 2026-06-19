@@ -174,6 +174,7 @@ let S = {
   auth: false,
   loading: false,
   records: [],
+  sesiones: [],
   selected: null,
   error: null
 };
@@ -182,12 +183,15 @@ let S = {
 async function fetchRecords() {
   S.loading = true; render();
   try {
-    const res = await fetch(
-      SUPABASE_URL + '/rest/v1/diagnosticos?select=*&order=created_at.desc',
-      { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } }
-    );
-    if (!res.ok) throw new Error('Error ' + res.status);
-    S.records = await res.json();
+    const [resD, resS] = await Promise.all([
+      fetch(SUPABASE_URL + '/rest/v1/diagnosticos?select=*&order=created_at.desc',
+        { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } }),
+      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?select=*&order=ultimo_acceso.desc',
+        { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } })
+    ]);
+    if (!resD.ok) throw new Error('Error ' + resD.status);
+    S.records = await resD.json();
+    S.sesiones = resS.ok ? await resS.json() : [];
     S.error = null;
   } catch(e) {
     S.error = 'No se pudieron cargar las respuestas. Verifica la conexión.';
@@ -258,6 +262,54 @@ window.deleteRecord = async function(id) {
     await fetchRecords();
   } catch(e) {
     alert('No se pudo eliminar el registro.');
+  }
+};
+
+// ─── RENOMBRAR CLIENTE ────────────────────────────────────────────────────────
+window.editarNombre = function(id, currentName) {
+  const overlay = document.createElement('div');
+  overlay.id = 'rename-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(35,29,58,.5);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:30px 28px;width:100%;max-width:420px;box-shadow:0 30px 80px -20px rgba(60,40,120,.3);">
+      <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#231D3A;margin:0 0 6px;">Cambiar nombre</h3>
+      <p style="font-size:13px;color:#9A95AD;margin:0 0 18px;">Este cambio solo aplica en el dashboard, no afecta las respuestas.</p>
+      <input id="rename-input" type="text" value="${esc(currentName)}" placeholder="Nombre del cliente…"
+        style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:15px;border-radius:12px;border:1.5px solid #E6E3F2;background:#FBFAFE;font-family:inherit;outline:none;margin-bottom:16px;"
+        onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'"
+        onkeydown="if(event.key==='Enter')guardarNombre('${id}');if(event.key==='Escape')document.getElementById('rename-modal').remove()">
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="document.getElementById('rename-modal').remove()" class="btn-secondary">Cancelar</button>
+        <button onclick="guardarNombre('${id}')" style="padding:10px 20px;background:linear-gradient(120deg,#2E72D8,#7A2C9E);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('rename-input')?.focus(), 50);
+};
+
+window.guardarNombre = async function(id) {
+  const input = document.getElementById('rename-input');
+  const newName = input?.value?.trim();
+  if (!newName) return;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_SERVICE,
+        'Authorization': 'Bearer ' + SUPABASE_SERVICE,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ cliente: newName })
+    });
+    if (!res.ok) throw new Error();
+    const r = S.records.find(r => r.id === id);
+    if (r) r.cliente = newName;
+    if (S.selected?.id === id) S.selected.cliente = newName;
+    document.getElementById('rename-modal')?.remove();
+    render();
+  } catch(e) {
+    alert('No se pudo actualizar el nombre.');
   }
 };
 
@@ -655,7 +707,49 @@ function buildList() {
 
   const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
 
-  return wrap(header + linkCard + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
+  // ── Sección de seguimiento de sesiones ──
+  const BLOCK_NAMES = ['Negocio', 'Captación', 'Comunicación', 'Tecnología', 'Visión'];
+  const sesionesHTML = S.sesiones.length === 0 ? '' : (() => {
+    const rows = S.sesiones.map(ses => {
+      const paso = ses.ultimo_paso || 0;
+      const enviado = ses.enviado;
+      let badge, color, bg;
+      if (enviado) {
+        badge = '✓ Enviado'; color = '#3DAB7A'; bg = 'rgba(61,171,122,.1)';
+      } else if (paso === 0) {
+        badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)';
+      } else if (paso >= 1 && paso <= 5) {
+        badge = `⏳ Bloque ${paso}/5 · ${BLOCK_NAMES[paso-1]||''}`; color = '#2E72D8'; bg = 'rgba(46,114,216,.1)';
+      } else {
+        badge = '📋 Casi listo'; color = '#6A38B0'; bg = 'rgba(106,56,176,.1)';
+      }
+      const pct = Math.min(100, Math.round((paso / 8) * 100));
+      const cuando = ses.ultimo_acceso ? (() => {
+        const diff = Math.round((Date.now() - new Date(ses.ultimo_acceso)) / 60000);
+        if (diff < 1) return 'ahora';
+        if (diff < 60) return `hace ${diff} min`;
+        if (diff < 1440) return `hace ${Math.round(diff/60)}h`;
+        return `hace ${Math.round(diff/1440)}d`;
+      })() : '—';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEF8;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
+          <div style="font-size:11.5px;color:#B6B2C9;margin-top:2px;">${cuando}</div>
+        </div>
+        <div style="height:4px;width:80px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+        </div>
+        <div style="font-size:11.5px;font-weight:700;color:${color};background:${bg};padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0;">${badge}</div>
+      </div>`;
+    }).join('');
+    return `<div class="mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:20px 24px;border:1px solid #ECE9F7;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Seguimiento de sesiones</div>
+      <div style="font-size:12px;color:#C2BDCF;margin-bottom:14px;">Clientes que abrieron su enlace personalizado</div>
+      ${rows}
+    </div>`;
+  })();
+
+  return wrap(header + linkCard + sesionesHTML + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
 }
 
 // ── DETALLE ──
@@ -788,7 +882,12 @@ function buildDetail() {
     <!-- Info del cliente -->
     <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
       <div class="pill-soft" style="margin-bottom:14px;">Diagnóstico Estratégico · Sesión 1</div>
-      <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+        <button onclick="editarNombre('${r.id}','${esc(r.cliente || '')}')" title="Cambiar nombre" style="flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid #E6E3F2;background:#FBFAFE;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9A95AD;transition:all .15s;" onmouseover="this.style.borderColor='#7A2C9E';this.style.color='#7A2C9E'" onmouseout="this.style.borderColor='#E6E3F2';this.style.color='#9A95AD'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+      </div>
       <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
       <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:10px;">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s ease;"></div>

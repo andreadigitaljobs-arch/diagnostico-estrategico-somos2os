@@ -900,6 +900,54 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const COACH_EMAIL  = 'hola@somos2os.studio';
 const COACH_WHATSAPP = '584122985067'; // Número de WhatsApp del equipo
 const STORAGE_KEY  = 'somos2os_diagnostico_v1';
+const SESSION_KEY  = 'somos2os_sesion_id';
+
+// ─── SEGUIMIENTO DE SESIÓN ────────────────────────────────────────────────────
+let _sesionId = null;
+try { _sesionId = localStorage.getItem(SESSION_KEY); } catch(e) {}
+
+async function trackOpen() {
+  if (!CLIENT_NAME) return;
+  try {
+    if (_sesionId) {
+      // Sesión existente: actualizar último acceso
+      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ultimo_acceso: new Date().toISOString() })
+      });
+      return;
+    }
+    const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ cliente: CLIENT_NAME, ultimo_paso: 0 })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      _sesionId = data[0]?.id || null;
+      if (_sesionId) localStorage.setItem(SESSION_KEY, _sesionId);
+    }
+  } catch(e) {}
+}
+
+function trackStep(step) {
+  if (!_sesionId) return;
+  fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ultimo_paso: step, ultimo_acceso: new Date().toISOString() })
+  }).catch(() => {});
+}
+
+function trackEnviado() {
+  if (!_sesionId) return;
+  fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ enviado: true, ultimo_paso: 9 })
+  }).catch(() => {});
+}
 
 // ─── DATOS ────────────────────────────────────────────────────────────────────
 const BLOCKS = [
@@ -1073,6 +1121,7 @@ window.go = function(step) {
 function executeGo(step) {
   S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
   if (S.step > S.maxStep) S.maxStep = S.step;
+  trackStep(S.step);
   saveState();
   render();
   
@@ -1157,6 +1206,7 @@ window.sendEmail = async function() {
       });
       if (res.ok) {
         S.sent = true;
+        trackEnviado();
         saveState();
         render();
       } else {
@@ -1728,6 +1778,7 @@ function render() {
 // ─── INICIO ───────────────────────────────────────────────────────────────────
 loadState();
 render();
+trackOpen();
 </script>
 <!-- Toast de autoguardado -->
 <div id="save-toast" style="position:fixed;bottom:88px;right:16px;background:rgba(46,114,216,.92);color:#fff;padding:8px 14px;border-radius:99px;font-size:12.5px;font-weight:600;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;pointer-events:none;z-index:9998;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(46,114,216,.25);">
