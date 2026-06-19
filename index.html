@@ -577,7 +577,7 @@
       <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías Logo" class="intro-title-logo" style="height:100%;width:100%;object-fit:contain;filter:brightness(0) invert(1);">
       <div class="logo-shine" style="position:absolute;top:0;left:-150%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 4s ease-in-out infinite;animation-delay:2.5s;"></div>
     </div>
-    <div class="intro-heading">¡Hola, Daniela!</div>
+    <div class="intro-heading" id="intro-saludo">¡Hola!</div>
     <div class="intro-phrase">Tu diferenciador no es lo que haces, es el cómo lo haces. Prepárate para descubrir la verdadera potencia de tu marca personal.</div>
     <div class="intro-btn">
       <button onclick="dismissIntro()" class="intro-btn-action">
@@ -588,6 +588,15 @@
 </div>
 
 <script>
+// Personalizar saludo con ?cliente= en la URL
+try {
+  const _nombre = new URLSearchParams(window.location.search).get('cliente');
+  if (_nombre) {
+    const _el = document.getElementById('intro-saludo');
+    if (_el) _el.textContent = '¡Hola, ' + _nombre + '!';
+  }
+} catch(e) {}
+
 // Ocultar intro inmediatamente si el usuario ya avanzó (evita flash en recarga)
 try {
   var _st = JSON.parse(localStorage.getItem('somos2os_diagnostico_v1'));
