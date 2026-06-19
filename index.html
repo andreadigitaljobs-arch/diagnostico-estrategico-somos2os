@@ -352,9 +352,34 @@
       z-index: 0;
     }
 
+    .intro-bg-glow-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,44,158,0.25) 0%, rgba(90,69,196,0) 70%);
+      filter: blur(60px);
+      animation: pulseGlow2 15s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+      bottom: -100px;
+      right: -100px;
+    }
+
     @keyframes pulseGlow {
       0% { transform: scale(0.8) translate(-30px, -30px); opacity: 0.6; }
       100% { transform: scale(1.1) translate(30px, 30px); opacity: 0.9; }
+    }
+
+    @keyframes pulseGlow2 {
+      0% { transform: scale(0.9) translate(40px, 40px); opacity: 0.5; }
+      100% { transform: scale(1.2) translate(-40px, -40px); opacity: 0.8; }
+    }
+
+    @keyframes shine {
+      0% { left: -150%; }
+      50% { left: -150%; }
+      100% { left: 150%; }
     }
 
     .intro-title {
@@ -488,8 +513,12 @@
 <div id="intro-screen" class="intro-overlay">
   <canvas id="particles-canvas"></canvas>
   <div class="intro-bg-glow"></div>
+  <div class="intro-bg-glow-2"></div>
   <div class="intro-content-wrap">
-    <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías Logo" class="intro-title-logo" style="height:96px;width:auto;margin-bottom:24px;filter:brightness(0) invert(1);opacity:0;transform:translateY(20px);animation:fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.3s;">
+    <div class="logo-wrapper" style="position:relative;display:inline-block;overflow:hidden;border-radius:50%;margin-bottom:24px;opacity:0;transform:translateY(20px);animation:fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;animation-delay:0.3s;height:96px;width:96px;">
+      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías Logo" class="intro-title-logo" style="height:100%;width:100%;object-fit:contain;filter:brightness(0) invert(1);">
+      <div class="logo-shine" style="position:absolute;top:0;left:-150%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 4s ease-in-out infinite;animation-delay:2.5s;"></div>
+    </div>
     <div class="intro-heading">¡Hola, Daniela!</div>
     <div class="intro-phrase">Tu diferenciador no es lo que haces, es el cómo lo haces. Prepárate para descubrir la verdadera potencia de tu marca personal.</div>
     <div class="intro-btn">
