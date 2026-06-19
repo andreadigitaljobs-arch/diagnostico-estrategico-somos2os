@@ -153,15 +153,16 @@
         background-size: cover !important;
         min-height: 100vh !important;
         min-height: 100dvh !important; /* excluye barra del navegador */
-        padding: 36px 16px 48px !important;
+        padding: 28px 16px 48px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-start !important; /* alinea desde arriba, no centra */
+        justify-content: center !important;
         align-items: center !important;
       }
       .form-wrap.has-header {
         padding-top: 96px !important;
         padding-bottom: 100px !important;
+        justify-content: flex-start !important;
       }
       /* Eliminar .form-header justify-content override para permitir space-between en bloques */
       .form-header {
@@ -170,19 +171,29 @@
       .form-logo {
         height: 32px !important;
       }
-      /* Brújula en móvil: dentro de los límites del card para no ser cortada por overflow-x:hidden */
+      /* Brújula en móvil: fluye debajo del texto (no absoluta, no superpuesta) */
+      .intro-header-row {
+        flex-direction: column !important;
+        align-items: center !important;
+        margin-bottom: 14px !important;
+      }
+      .intro-header-row .welcome-text-container {
+        padding-right: 0 !important;
+        width: 100% !important;
+      }
       .floating-compass {
-        position: absolute !important;
-        right: 6px !important;
-        top: -8px !important;
-        width: 92px !important;
-        height: 92px !important;
-        z-index: 2 !important;
-        pointer-events: none !important;
-        opacity: 0.88 !important;
+        position: static !important;
+        width: 76px !important;
+        height: 76px !important;
+        opacity: 0.92 !important;
+        margin: 10px auto 0 !important;
+        align-self: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
       .floating-compass img {
-        filter: drop-shadow(0 8px 16px rgba(122,44,158,0.28)) !important;
+        filter: drop-shadow(0 8px 16px rgba(122,44,158,0.3)) !important;
       }
       .form-card {
         background: rgba(255, 255, 255, 0.85) !important;
@@ -1323,7 +1334,7 @@ function buildIntroHTML() {
     </div>
 
     <!-- Layout principal de la tarjeta: Títulos -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;width:100%;">
+    <div class="intro-header-row" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;width:100%;">
       <div class="welcome-text-container" style="width:100%;padding-right:75px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;position:relative;z-index:1;">
         
         <div style="display:inline-flex;align-items:center;justify-content:flex-start;margin-bottom:10px;width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.1s;">
