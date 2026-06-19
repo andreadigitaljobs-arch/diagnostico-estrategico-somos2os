@@ -14,9 +14,19 @@
     html, body { margin: 0; padding: 0; overflow-x: hidden; max-width: 100vw; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #F4F3FB;
+      background: url('assets/background.png') no-repeat center center fixed;
+      background-size: cover;
       color: #1C1830;
       -webkit-font-smoothing: antialiased;
+    }
+
+    /* Desktop: cards get glassmorphism over photo bg */
+    .card-pad {
+      background: rgba(255, 255, 255, 0.82) !important;
+      backdrop-filter: blur(18px) !important;
+      -webkit-backdrop-filter: blur(18px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.55) !important;
+      box-shadow: 0 8px 32px rgba(60, 40, 120, 0.13) !important;
     }
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background: #D8D4EA; border-radius: 8px; }
@@ -150,9 +160,13 @@ const BLOCKS = [
   ]}
 ];
 const TAREA_LABELS = [
-  'Perfil de Instagram','Perfil de LinkedIn (si tiene)','Página web (si existe)',
-  'WhatsApp Business','Materiales de presentación','Servicios actuales y precios',
-  'Ejemplos de contenido previo'
+  { label: 'Perfil de Instagram', key: true },
+  { label: 'Perfil de LinkedIn (si tiene)' },
+  { label: 'Página web (si existe)' },
+  { label: 'WhatsApp Business', key: true },
+  { label: 'Materiales de presentación' },
+  { label: 'Servicios actuales y precios', key: true },
+  { label: 'Ejemplos de contenido previo' }
 ];
 
 // ─── ESTADO ───────────────────────────────────────────────────────────────────
@@ -223,6 +237,28 @@ window.openRecord = function(id) {
 window.closeRecord = function() {
   S.selected = null; render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.deleteRecord = async function(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este diagnóstico? Esta acción no se puede deshacer.')) return;
+  
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + id, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_SERVICE,
+        'Authorization': 'Bearer ' + SUPABASE_SERVICE
+      }
+    });
+    if (!res.ok) throw new Error('Error ' + res.status);
+    
+    if (S.selected && S.selected.id === id) {
+      S.selected = null;
+    }
+    await fetchRecords();
+  } catch(e) {
+    alert('No se pudo eliminar el registro.');
+  }
 };
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
@@ -641,8 +677,8 @@ function buildDetail() {
         </div>`;
       } else {
         answerHTML = empty
-          ? `<p style="margin:0;font-size:15px;color:#C2BDD3;font-style:italic;">(sin respuesta)</p>`
-          : `<p style="margin:0;font-size:15.5px;line-height:1.6;color:#2C2742;white-space:pre-wrap;">${esc(String(val))}</p>`;
+          ? `<div style="background:#FDFDFD;border:1.5px dashed #E5E1F2;border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p></div>`
+          : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid #7A2C9E;border-radius:8px 14px 14px 8px;padding:14px 18px;box-shadow:0 2px 10px rgba(60,40,120,0.02);"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`;
       }
 
       return `
@@ -667,12 +703,44 @@ function buildDetail() {
     </div>`;
   }).join('');
 
-  const tareaHTML = TAREA_LABELS.map((label, i) => {
+  const tareaHTML = TAREA_LABELS.map((item, i) => {
+    const label = typeof item === 'string' ? item : item.label;
+    const isKey = typeof item === 'object' && item.key;
     const on = !!tarea[i];
+    
+    // Get link value from S.answers._tareaLinks
+    const tareaLinks = answers._tareaLinks || {};
+    const linkVal = tareaLinks[i] || '';
+    
+    let linkHTML = '';
+    if (on && linkVal.trim()) {
+      const isUrl = /^(https?:\/\/)/i.test(linkVal.trim());
+      if (isUrl) {
+        linkHTML = `
+          <div style="margin-top:8px; margin-left:34px;">
+            <a href="${esc(linkVal.trim())}" target="_blank" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:12.5px;text-decoration:none;border-color:#7A2C9E;color:#7A2C9E;background:rgba(122,44,158,0.03);border-radius:8px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              Ver enlace cargado
+            </a>
+          </div>`;
+      } else {
+        linkHTML = `
+          <div style="margin-top:8px; margin-left:34px; font-size:13px; color:#5A5470; background:#F7F6FC; border:1px solid #ECE9F7; border-radius:8px; padding:8px 12px; white-space:pre-wrap; line-height:1.4;">
+            ${esc(linkVal)}
+          </div>`;
+      }
+    }
+
+    const badgeHTML = isKey ? `<span style="font-size:11px;font-weight:700;color:#7A2C9E;background:rgba(122,44,158,0.08);padding:3px 10px;border-radius:99px;margin-left:auto;letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;font-family:'Sora',sans-serif;">Recomendado</span>` : '';
+
     return `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1.5px solid ${on ? '#7A2C9E' : '#E6E3F2'};background:${on ? 'linear-gradient(135deg,rgba(46,114,216,.07),rgba(122,44,158,.07))' : '#FBFAFE'};">
-      <div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:${on ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#fff'};border:2px solid ${on ? '#7A2C9E' : '#CFC9E3'};color:#fff;font-size:13px;font-weight:800;">${on ? '✓' : ''}</div>
-      <span style="font-size:15px;font-weight:600;color:${on ? '#2C2742' : '#9A95AD'};">${esc(label)}</span>
+    <div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:12px;border:1.5px solid ${on ? '#7A2C9E' : '#E6E3F2'};background:${on ? 'linear-gradient(135deg,rgba(46,114,216,.07),rgba(122,44,158,.07))' : '#FBFAFE'};">
+      <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap;">
+        <div style="flex:none;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:${on ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#fff'};border:2px solid ${on ? '#7A2C9E' : '#CFC9E3'};color:#fff;font-size:13px;font-weight:800;">${on ? '✓' : ''}</div>
+        <span style="font-size:15px;font-weight:600;color:${on ? '#2C2742' : '#9A95AD'};">${esc(label)}</span>
+        ${badgeHTML}
+      </div>
+      ${linkHTML}
     </div>`;
   }).join('');
 
@@ -689,7 +757,11 @@ function buildDetail() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span class="dash-btn-text">Volver a la lista</span>
         </button>
-        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+        <button onclick="deleteRecord('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          <span class="dash-btn-text">Eliminar diagnóstico</span>
+        </button>
+        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#6B6680;border-color:#ECE9F7;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
           <span class="dash-btn-text">Cerrar sesión</span>
         </button>
@@ -728,8 +800,6 @@ function buildDetail() {
 function wrap(content) {
   return `
   <div class="mob-wrap" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
-    background:radial-gradient(900px 520px at 12% -8%,rgba(46,114,216,.16),transparent 60%),
-    radial-gradient(900px 560px at 92% 6%,rgba(122,44,158,.16),transparent 60%),#F4F3FB;
     padding:24px 16px 64px;">
     ${content}
   </div>`;

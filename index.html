@@ -963,10 +963,10 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    S.step       = raw.step       || 0; // Reanudar en el paso donde se quedó el usuario
+    S.step       = raw.step       || 0; 
     S.answers    = raw.answers    || {};
     S.tarea      = raw.tarea      || {};
-    S.tareaLinks = raw.tareaLinks || {};
+    S.tareaLinks = raw.tareaLinks || S.answers._tareaLinks || {};
   } catch(e) {}
 }
 
@@ -1069,6 +1069,10 @@ window.toggleTarea = function(i) {
 
 window.updateTareaLink = function(i, val) {
   S.tareaLinks[i] = val;
+  if (!S.answers._tareaLinks) {
+    S.answers._tareaLinks = {};
+  }
+  S.answers._tareaLinks[i] = val;
   saveState();
 };
 
@@ -1093,7 +1097,7 @@ window.sendEmail = async function() {
         body: JSON.stringify({
           cliente: 'Daniela Harrington',
           fecha:   new Date().toISOString(),
-          answers: S.answers,
+          answers: { ...S.answers, _tareaLinks: S.tareaLinks },
           tarea:   S.tarea,
           resumen: buildSummary()
         })
