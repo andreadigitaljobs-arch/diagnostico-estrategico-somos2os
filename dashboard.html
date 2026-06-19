@@ -175,6 +175,12 @@ window.tryLogin = function() {
 
 window.pwdKeydown = function(e) { if (e.key === 'Enter') tryLogin(); };
 
+window.togglePwd = function() {
+  const input = document.getElementById('pwd-input');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+};
+
 window.openRecord = function(id) {
   S.selected = S.records.find(r => r.id === id) || null;
   render();
@@ -213,19 +219,286 @@ function render() {
 
 // ── LOGIN ──
 function buildLogin() {
+  if (window.innerWidth < 768) return buildLoginMobile();
+  return buildLoginDesktop();
+}
+
+function buildLoginMobile() {
   return `
-  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    background:radial-gradient(900px 520px at 12% -8%,rgba(46,114,216,.16),transparent 60%),
-    radial-gradient(900px 560px at 92% 6%,rgba(122,44,158,.16),transparent 60%),#F4F3FB;padding:32px 20px;">
-    <div id="login-card" style="width:100%;max-width:420px;background:#fff;border-radius:26px;padding:44px 40px;
-      box-shadow:0 28px 70px -38px rgba(60,40,120,.45);border:1px solid #ECE9F7;text-align:center;">
-      <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:32px;width:auto;margin-bottom:28px;opacity:.9;">
-      <div class="pill-soft" style="margin-bottom:16px;">Dashboard Coach</div>
-      <h1 style="font-family:'Sora',sans-serif;font-size:26px;font-weight:700;margin:0 0 8px;letter-spacing:-.02em;color:#231D3A;">Acceso privado</h1>
-      <p style="font-size:15px;color:#6B6680;margin:0 0 28px;">Introduce la contraseña para ver las respuestas de tus clientes.</p>
-      <input id="pwd-input" type="password" placeholder="Contraseña" onkeydown="pwdKeydown(event)" style="margin-bottom:10px;">
-      <p id="pwd-hint" style="font-size:13px;color:#9A95AD;margin:0 0 18px;min-height:18px;"></p>
-      <button onclick="tryLogin()" class="btn-primary" style="width:100%;padding:15px;">Entrar →</button>
+  <div style="min-height:100vh;background:
+    radial-gradient(600px 400px at 80% -10%,rgba(122,44,158,.13),transparent 60%),
+    radial-gradient(500px 400px at -10% 80%,rgba(46,114,216,.1),transparent 60%),
+    #F0EEF8;padding:36px 20px 40px;font-family:'Plus Jakarta Sans',sans-serif;">
+
+    <!-- Círculos decorativos -->
+    <div style="position:fixed;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;border:2px dashed rgba(122,44,158,.12);pointer-events:none;"></div>
+    <div style="position:fixed;bottom:40px;left:-60px;width:200px;height:200px;border-radius:50%;border:1.5px dashed rgba(46,114,216,.1);pointer-events:none;"></div>
+
+    <!-- Logo + pill -->
+    <div style="text-align:center;margin-bottom:28px;">
+      <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:38px;width:auto;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;">
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:#fff;border:1px solid #E6E3F2;box-shadow:0 2px 10px -4px rgba(90,52,160,.12);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A2C9E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6B6680;">Panel Admin</span>
+      </div>
+    </div>
+
+    <!-- Tarjeta login -->
+    <div id="login-card" style="background:#fff;border-radius:24px;padding:36px 28px 28px;
+      box-shadow:0 20px 60px -20px rgba(60,40,120,.2),0 0 0 1px rgba(230,227,242,.8);
+      margin-bottom:20px;text-align:center;">
+
+      <!-- App icon S -->
+      <div style="width:72px;height:72px;border-radius:20px;margin:0 auto 20px;
+        background:linear-gradient(135deg,#4A7FE0,#7A2C9E);
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 10px 28px -8px rgba(90,52,160,.5);">
+        <span style="font-family:'Sora',sans-serif;font-size:34px;font-weight:800;color:#fff;line-height:1;">S</span>
+      </div>
+
+      <!-- Lock -->
+      <div style="margin-bottom:10px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B6B2C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </div>
+
+      <h2 style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin:0 0 10px;letter-spacing:-.02em;color:#1C1830;">Acceso privado</h2>
+      <p style="font-size:14px;color:#9A95AD;margin:0 0 28px;line-height:1.6;">Ingresa tu contraseña para revisar formularios, respuestas y diagnósticos de tus clientes.</p>
+
+      <!-- Campo -->
+      <div style="text-align:left;margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:700;color:#5A45C4;display:block;margin-bottom:8px;">Contraseña</label>
+        <div style="position:relative;">
+          <input id="pwd-input" type="password" placeholder="••••••••••••••" onkeydown="pwdKeydown(event)"
+            style="width:100%;padding:15px 44px 15px 16px;border:1.5px solid #E6E3F2;border-radius:14px;
+            font-size:16px;letter-spacing:.1em;color:#2C2742;background:#FBFAFE;outline:none;font-family:inherit;
+            transition:border-color .18s,box-shadow .18s;box-sizing:border-box;"
+            onfocus="this.style.borderColor='#5A45C4';this.style.boxShadow='0 0 0 4px rgba(90,69,196,.13)';this.style.background='#fff'"
+            onblur="this.style.borderColor='#E6E3F2';this.style.boxShadow='none';this.style.background='#FBFAFE'">
+          <button onclick="togglePwd()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#B6B2C9;padding:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p id="pwd-hint" style="font-size:13px;color:#E05555;margin:0 0 16px;min-height:16px;text-align:left;"></p>
+
+      <button onclick="tryLogin()" class="btn-primary" style="width:100%;padding:17px;font-size:16px;border-radius:14px;margin-bottom:18px;letter-spacing:.01em;">
+        Entrar al panel →
+      </button>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;color:#B6B2C9;font-size:12.5px;font-weight:600;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Conexión segura y encriptada
+      </div>
+    </div>
+
+    <!-- Lista de secciones -->
+    <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #E6E3F2;box-shadow:0 4px 16px -6px rgba(60,40,120,.1);margin-bottom:28px;">
+      ${[
+        { icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', label:'Vista general del panel', desc:'Resumen de tu actividad', val:'', tag:'Últimos 7 días', color:'#5A45C4' },
+        { icon:'M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z', label:'Respuestas', desc:'Revisa formularios enviados', val:'128', tag:'↑ 18%', color:'#2E72D8' },
+        { icon:'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z', label:'Diagnósticos', desc:'Visualiza resultados e insights', val:'86', tag:'↑ 24%', color:'#6A38B0' },
+        { icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', label:'Seguimiento', desc:'Monitorea el progreso de tus clientes', val:'43', tag:'↑ 12%', color:'#7A2C9E' }
+      ].map((item, i, arr) => `
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;${i < arr.length-1 ? 'border-bottom:1px solid #F4F3FB;' : ''}">
+          <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${item.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${item.icon}"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:#231D3A;">${item.label}</div>
+            <div style="font-size:12px;color:#9A95AD;">${item.desc}</div>
+          </div>
+          ${item.val
+            ? `<div style="text-align:right;"><div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#231D3A;">${item.val}</div><div style="font-size:11px;font-weight:700;color:#3DAB7A;">${item.tag}</div></div>`
+            : `<div style="font-size:11px;color:#9A95AD;background:#F7F6FC;padding:4px 10px;border-radius:8px;border:1px solid #ECE9F7;white-space:nowrap;">${item.tag}</div>`
+          }
+        </div>`).join('')}
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;">
+      <p style="font-size:12px;color:#B6B2C9;margin:0;line-height:1.7;">© 2026 <strong style="color:#7A2C9E;">Somos2os Studio.</strong><br>Todos los derechos reservados.</p>
+    </div>
+  </div>`;
+}
+
+function buildLoginDesktop() {
+  return `
+  <div style="height:100vh;display:flex;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;">
+
+    <!-- ── COLUMNA IZQUIERDA ── -->
+    <div style="flex:1;background:#F4F3FB;padding:28px 36px;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+
+      <!-- Círculo decorativo de fondo -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-40%,-50%);width:480px;height:480px;border-radius:50%;border:2px dashed rgba(122,44,158,.15);pointer-events:none;"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-40%,-50%);width:340px;height:340px;border-radius:50%;border:1.5px dashed rgba(46,114,216,.1);pointer-events:none;"></div>
+
+      <!-- Header izq -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;position:relative;">
+        <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:28px;width:auto;">
+        <div style="width:1px;height:20px;background:#D8D4EA;"></div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9A95AD;">Panel Admin</span>
+      </div>
+
+      <!-- Headline -->
+      <div style="position:relative;margin-bottom:20px;">
+        <h1 style="font-family:'Sora',sans-serif;font-size:36px;font-weight:800;line-height:1.1;letter-spacing:-.03em;margin:0 0 10px;color:#1C1830;">
+          Accede a las<br>
+          <span style="background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">respuestas y diagnósticos</span>
+        </h1>
+        <p style="font-size:13.5px;color:#6B6680;line-height:1.55;margin:0;max-width:320px;">Ingresa tus credenciales para revisar formularios, respuestas y seguimiento de clientes.</p>
+      </div>
+
+      <!-- 3 mini features -->
+      <div style="display:flex;gap:10px;margin-bottom:18px;position:relative;">
+        ${[
+          { icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', label:'Respuestas', desc:'Revisa cada formulario y su historial.' },
+          { icon:'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z', label:'Diagnósticos', desc:'Visualiza resultados e insights clave.' },
+          { icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', label:'Seguimiento', desc:'Monitorea el progreso de tus clientes.' }
+        ].map(f => `
+        <div style="flex:1;background:#fff;border-radius:14px;padding:12px 14px;border:1px solid #ECE9F7;box-shadow:0 2px 12px -4px rgba(60,40,120,.08);">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6A38B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${f.icon}"/></svg>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#231D3A;margin-bottom:2px;">${f.label}</div>
+          <div style="font-size:11px;color:#9A95AD;line-height:1.35;">${f.desc}</div>
+        </div>`).join('')}
+      </div>
+
+      <!-- Preview card del dashboard -->
+      <div style="flex:1;background:#fff;border-radius:16px;border:1px solid #ECE9F7;box-shadow:0 8px 32px -8px rgba(60,40,120,.14);overflow:hidden;display:flex;min-height:0;position:relative;">
+        <!-- Sidebar -->
+        <div style="width:44px;background:#FAFAFE;border-right:1px solid #F0EEF8;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:12px;">
+          ${['M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z','M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z','M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'].map((p,i) => `
+          <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${i===0?'linear-gradient(135deg,#2E72D8,#7A2C9E)':'transparent'};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${i===0?'#fff':'#B6B2C9'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>
+          </div>`).join('')}
+        </div>
+        <!-- Contenido -->
+        <div style="flex:1;padding:18px 20px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;">S</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#231D3A;">¡Bienvenida, Coach! 👋</div>
+                <div style="font-size:11px;color:#9A95AD;">Aquí tienes un resumen de la actividad reciente.</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:#9A95AD;background:#F7F6FC;padding:4px 10px;border-radius:8px;border:1px solid #ECE9F7;">Últimos 7 días</div>
+          </div>
+          <!-- Stats -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+            ${[['128','Formularios enviados','↑ 18%'],['86','Respuestas nuevas','↑ 24%'],['62','Diagnósticos generados','↑ 15%'],['43','Clientes activos','↑ 12%']].map(([n,l,t])=>`
+            <div style="background:#F7F6FC;border-radius:12px;padding:10px 12px;border:1px solid #ECE9F7;">
+              <div style="font-size:10px;color:#9A95AD;margin-bottom:4px;">${l}</div>
+              <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#231D3A;line-height:1;">${n}</div>
+              <div style="font-size:10px;color:#3DAB7A;font-weight:700;margin-top:2px;">${t}</div>
+            </div>`).join('')}
+          </div>
+          <!-- Recientes + gráfica -->
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:#5A5470;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Respuestas recientes</div>
+              ${[['MC','María Camila G.','Formulario de Coaching','Hoy, 10:24 AM'],['JR','Juan Ricardo P.','Evaluación Inicial','Ayer, 04:15 PM'],['LA','Laura A.','Diagnóstico de Marca','Ayer, 11:03 AM']].map(([initials,name,type,time])=>`
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F4F3FB;">
+                <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6A38B0;flex:none;">${initials}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:700;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+                  <div style="font-size:11px;color:#9A95AD;">${type}</div>
+                </div>
+                <div style="font-size:10px;color:#B6B2C9;white-space:nowrap;">${time}</div>
+              </div>`).join('')}
+              <div style="font-size:12px;color:#5A45C4;font-weight:600;margin-top:10px;cursor:pointer;">Ver todas las respuestas →</div>
+            </div>
+            <!-- Donut -->
+            <div style="width:130px;flex:none;">
+              <div style="font-size:11px;font-weight:700;color:#5A5470;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Distribución</div>
+              <div style="position:relative;width:80px;height:80px;margin:0 auto 10px;">
+                <svg viewBox="0 0 36 36" style="width:80px;height:80px;transform:rotate(-90deg);">
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E5E1F2" stroke-width="4"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#2E72D8" stroke-width="4" stroke-dasharray="32 88" stroke-dashoffset="0"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#7A2C9E" stroke-width="4" stroke-dasharray="28 88" stroke-dashoffset="-32"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#5A45C4" stroke-width="4" stroke-dasharray="20 88" stroke-dashoffset="-60"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E5E1F2" stroke-width="4" stroke-dasharray="20 88" stroke-dashoffset="-80"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:#231D3A;">62</span>
+                  <span style="font-size:9px;color:#9A95AD;">Total</span>
+                </div>
+              </div>
+              ${[['#2E72D8','Fortalezas','32%'],['#7A2C9E','Oportunidades','28%'],['#5A45C4','Riesgos','20%'],['#E5E1F2','Pendientes','20%']].map(([c,l,p])=>`
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                <div style="width:8px;height:8px;border-radius:2px;background:${c};flex:none;"></div>
+                <span style="font-size:10px;color:#6B6680;flex:1;">${l}</span>
+                <span style="font-size:10px;font-weight:700;color:#231D3A;">${p}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLUMNA DERECHA (LOGIN) ── -->
+    <div style="width:440px;flex:none;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 44px;border-left:1px solid #ECE9F7;">
+      <div id="login-card" style="width:100%;max-width:360px;text-align:center;">
+
+        <!-- App icon + logo -->
+        <div style="width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
+          background:linear-gradient(135deg,#2E72D8,#7A2C9E);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 14px 30px -8px rgba(90,52,160,.5);">
+          <span style="font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1;">S</span>
+        </div>
+        <img src="assets/logo-somos2os.png" alt="Somos2os" style="height:28px;width:auto;margin-bottom:36px;">
+
+        <!-- Lock icon -->
+        <div style="margin-bottom:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B6B2C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </div>
+
+        <h2 style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em;color:#1C1830;">Acceso privado</h2>
+        <p style="font-size:14px;color:#9A95AD;margin:0 0 28px;">Ingresa tu contraseña para continuar.</p>
+
+        <!-- Campo contraseña -->
+        <div style="text-align:left;margin-bottom:6px;">
+          <label style="font-size:13px;font-weight:700;color:#5A5470;display:block;margin-bottom:8px;">Contraseña</label>
+          <div style="position:relative;">
+            <input id="pwd-input" type="password" placeholder="••••••••••••••••" onkeydown="pwdKeydown(event)"
+              style="width:100%;padding:14px 44px 14px 16px;border:1.5px solid #E6E3F2;border-radius:14px;
+              font-size:16px;letter-spacing:.1em;color:#2C2742;background:#FBFAFE;outline:none;font-family:inherit;
+              transition:border-color .18s ease,box-shadow .18s ease;"
+              onfocus="this.style.borderColor='#5A45C4';this.style.boxShadow='0 0 0 4px rgba(90,69,196,.13)';this.style.background='#fff'"
+              onblur="this.style.borderColor='#E6E3F2';this.style.boxShadow='none';this.style.background='#FBFAFE'">
+            <button onclick="togglePwd()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#B6B2C9;padding:0;display:flex;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p id="pwd-hint" style="font-size:13px;color:#E05555;margin:0 0 20px;min-height:18px;text-align:left;"></p>
+
+        <!-- Botón -->
+        <button onclick="tryLogin()" class="btn-primary" style="width:100%;padding:16px;font-size:16px;border-radius:14px;margin-bottom:20px;">
+          Entrar al panel →
+        </button>
+
+        <!-- Seguridad -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;color:#B6B2C9;font-size:12.5px;font-weight:600;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Conexión segura y encriptada
+        </div>
+
+        <!-- Footer -->
+        <p style="font-size:12px;color:#C2BDD3;margin:36px 0 0;">© 2026 <strong style="color:#9A95AD;">Somos2os Studio.</strong> Todos los derechos reservados.</p>
+      </div>
     </div>
   </div>`;
 }
@@ -416,6 +689,7 @@ function wrap(content) {
 
 // ─── INICIO ───────────────────────────────────────────────────────────────────
 render();
+window.addEventListener('resize', () => { if (!S.auth) render(); });
 </script>
 </body>
 </html>
