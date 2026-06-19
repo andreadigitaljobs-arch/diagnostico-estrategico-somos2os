@@ -299,6 +299,16 @@
       will-change: transform, opacity;
     }
 
+    @keyframes headerFadeIn {
+      from { opacity: 0; transform: translateY(-8px); filter: blur(1.5px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    .animate-header {
+      animation: headerFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
     /* Estilos de la Cortina Animada de Bienvenida */
     .intro-overlay {
       position: fixed;
@@ -1163,14 +1173,14 @@ function render() {
     padding:40px 20px;">
 
     <!-- Header con logo y etiqueta de paso -->
-    <div class="form-header" style="width:100%;max-width:860px;display:flex;align-items:center;justify-content:${isIntro ? 'center' : 'space-between'};margin-bottom:24px;">
+    <div class="form-header animate-header" style="width:100%;max-width:860px;display:flex;align-items:center;justify-content:${isIntro ? 'center' : 'space-between'};margin-bottom:24px;">
       <img class="form-logo" src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:38px;width:auto;object-fit:contain;">
       ${showProg ? `<div class="form-sub" style="font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A2C9E;">${esc(stepLabel)}</div>` : ''}
     </div>
 
     <!-- Barra de progreso -->
     ${showProg ? `
-    <div style="width:100%;max-width:780px;margin-bottom:24px;">
+    <div class="animate-header" style="width:100%;max-width:780px;margin-bottom:24px;">
       <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1);"></div>
       </div>
