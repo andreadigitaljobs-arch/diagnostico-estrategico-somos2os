@@ -1162,8 +1162,14 @@ window.go = function(step) {
   }
 };
 
+function scrollTop() {
+  try { document.documentElement.scrollTop = 0; } catch(e) {}
+  try { document.body.scrollTop = 0; } catch(e) {}
+  try { window.scrollTo(0, 0); } catch(e) {}
+}
+
 function executeGo(step) {
-  window.scrollTo(0, 0);
+  scrollTop();
   S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
   if (S.step > S.maxStep) S.maxStep = S.step;
   trackStep(S.step);
@@ -1175,6 +1181,9 @@ function executeGo(step) {
   if (newCard) {
     newCard.classList.add('animate-enter');
   }
+
+  // Forzar scroll al top después del render (algunos navegadores lo resetean)
+  requestAnimationFrame(() => scrollTop());
 }
 
 window.updateAnswer = function(id, val) {
