@@ -561,63 +561,63 @@
         Entrar al diagnóstico →
       </button>
     </div>
-  </div>
 </div>
 
 <div id="app"></div>
 
 <script>
+// Banco de ejemplos de respuesta para cada pregunta
+window.EXAMPLES = {
+  "b0_q0": "Visas de residencia permanente, peticiones familiares y casos de asilo",
+  "b0_q1": "Los casos de asilo — son complejos pero muy significativos",
+  "b0_q2": "Las peticiones familiares y los casos de naturalización",
+  "b0_q3": "Familias que quieren reunirse y emprendedores que buscan visa de inversión",
+  "b0_q4": "Prefiero clientes comprometidos, que entienden el proceso y confían en mi criterio",
+  "b0_q5": "11 años ejerciendo derecho migratorio",
+  "b0_q6": "Tuve una experiencia personal con migración en mi familia que me marcó profundamente",
+  "b0_q7": "Hablo español e inglés con fluidez y tengo experiencia con casos latinoamericanos complejos",
+  "b0_q8": "El 94% de mis clientes obtiene aprobación en primera instancia",
+  "b0_q9": "Una familia colombiana reunificada después de 6 años separados. Fue muy emotivo.",
+  "b1_q0": "Principalmente por referidos de clientes anteriores y algo de redes sociales",
+  "b1_q1": "Las referencias de boca en boca son mi principal fuente, más del 70%",
+  "b1_q2": "Aproximadamente 8 de cada 10 clientes llegan por recomendación",
+  "b1_q3": "Muy pocos, quizás 1 o 2 al mes vienen por redes sociales",
+  "b1_q4": "Casi ninguno llega por búsqueda en internet, no tengo SEO trabajado",
+  "b1_q5": "Recibo entre 15 y 20 consultas al mes",
+  "b1_q6": "Convierto alrededor del 40%, podría mejorar con un mejor proceso de seguimiento",
+  "b1_q7": "No tengo un proceso formal, solo notas en mi agenda",
+  "b1_q8": "Guardo algunos datos pero de forma muy desorganizada en hojas de Excel",
+  "b1_q9": "Sí, dependo demasiado de referencias. Si alguien deja de recomendarme, mi flujo cae",
+  "b2_q0": "Instagram principalmente, algo de LinkedIn, casi nada de Facebook",
+  "b2_q1": "Instagram, publico 2 o 3 veces por semana cuando tengo tiempo",
+  "b2_q2": "Publico contenido pero sin constancia, a veces paso 2 semanas sin publicar",
+  "b2_q3": "Comparto tips de migración, casos de éxito genéricos y noticias del tema",
+  "b2_q4": "Las publicaciones con historias reales y tips prácticos funcionan mejor",
+  "b2_q5": "Las publicaciones muy legales o con mucho texto casi no tienen interacción",
+  "b2_q6": "Me cuesta un poco al principio pero cuando empiezo me suelto",
+  "b2_q7": "No saber qué decir, la constancia y que me da vergüenza parecer vendedora",
+  "b2_q8": "Me gustaría mostrar más el proceso humano detrás de cada caso",
+  "b2_q9": "Creo que se llevan la impresión de que soy profesional pero no saben bien qué ofrezco",
+  "b3_q0": "Sí he usado ChatGPT, tengo la versión gratuita",
+  "b3_q1": "Para redactar emails, traducir documentos y buscar info sobre leyes migratorias",
+  "b3_q2": "WhatsApp, Google Calendar, Word y Excel básicamente",
+  "b3_q3": "Redactar documentos legales, responder consultas repetitivas y organizar expedientes",
+  "b3_q4": "La parte administrativa — llenar formularios repetitivos y dar seguimiento a casos",
+  "b3_q5": "El seguimiento de clientes y los recordatorios de fechas importantes",
+  "b3_q6": 4,
+  "b4_q0": "Tener 25 clientes activos de manera constante sin depender de referencias",
+  "b4_q1": "Tener un sistema claro de captación y haber lanzado mi primer curso online",
+  "b4_q2": "Ser reconocida como la abogada migratoria de referencia para latinos en mi región",
+  "b4_q3": "Entre 20 y 25 clientes al mes sería ideal",
+  "b4_q4": "Mínimo 40 consultas mensuales para poder seleccionar mejor mis casos",
+  "b4_q5": "Que pueda tomar vacaciones sin que mi negocio se detenga y tener ingresos predecibles",
+  "b4_q6": "Construir una presencia digital sólida que trabaje por mí aunque yo no esté publicando",
+  "b4_q7": "El miedo a ponerme delante de la cámara y no saber cómo comunicar mi valor sin sonar arrogante"
+};
+
 // Cargar datos demo de prueba
 window.loadDemoData = function() {
-  const demoAnswers = {
-    "b0_q0": "Visas de residencia permanente, peticiones familiares y casos de asilo",
-    "b0_q1": "Los casos de asilo — son complejos pero muy significativos",
-    "b0_q2": "Las peticiones familiares y los casos de naturalización",
-    "b0_q3": "Familias que quieren reunirse y emprendedores que buscan visa de inversión",
-    "b0_q4": "Prefiero clientes comprometidos, que entienden el proceso y confían en mi criterio",
-    "b0_q5": "11 años ejerciendo derecho migratorio",
-    "b0_q6": "Tuve una experiencia personal con migración en mi familia que me marcó profundamente",
-    "b0_q7": "Hablo español e inglés con fluidez y tengo experiencia con casos latinoamericanos complejos",
-    "b0_q8": "El 94% de mis clientes obtiene aprobación en primera instancia",
-    "b0_q9": "Una familia colombiana reunificada después de 6 años separados. Fue muy emotivo.",
-    "b1_q0": "Principalmente por referidos de clientes anteriores y algo de redes sociales",
-    "b1_q1": "Las referencias de boca en boca son mi principal fuente, más del 70%",
-    "b1_q2": "Aproximadamente 8 de cada 10 clientes llegan por recomendación",
-    "b1_q3": "Muy pocos, quizás 1 o 2 al mes vienen por redes sociales",
-    "b1_q4": "Casi ninguno llega por búsqueda en internet, no tengo SEO trabajado",
-    "b1_q5": "Recibo entre 15 y 20 consultas al mes",
-    "b1_q6": "Convierto alrededor del 40%, podría mejorar con un mejor proceso de seguimiento",
-    "b1_q7": "No tengo un proceso formal, solo notas en mi agenda",
-    "b1_q8": "Guardo algunos datos pero de forma muy desorganizada en hojas de Excel",
-    "b1_q9": "Sí, dependo demasiado de referencias. Si alguien deja de recomendarme, mi flujo cae",
-    "b2_q0": "Instagram principalmente, algo de LinkedIn, casi nada de Facebook",
-    "b2_q1": "Instagram, publico 2 o 3 veces por semana cuando tengo tiempo",
-    "b2_q2": "Publico contenido pero sin constancia, a veces paso 2 semanas sin publicar",
-    "b2_q3": "Comparto tips de migración, casos de éxito genéricos y noticias del tema",
-    "b2_q4": "Las publicaciones con historias reales y tips prácticos funcionan mejor",
-    "b2_q5": "Las publicaciones muy legales o con mucho texto casi no tienen interacción",
-    "b2_q6": "Me cuesta un poco al principio pero cuando empiezo me suelto",
-    "b2_q7": "No saber qué decir, la constancia y que me da vergüenza parecer vendedora",
-    "b2_q8": "Me gustaría mostrar más el proceso humano detrás de cada caso",
-    "b2_q9": "Creo que se llevan la impresión de que soy profesional pero no saben bien qué ofrezco",
-    "b3_q0": "Sí he usado ChatGPT, tengo la versión gratuita",
-    "b3_q1": "Para redactar emails, traducir documentos y buscar info sobre leyes migratorias",
-    "b3_q2": "WhatsApp, Google Calendar, Word y Excel básicamente",
-    "b3_q3": "Redactar documentos legales, responder consultas repetitivas y organizar expedientes",
-    "b3_q4": "La parte administrativa — llenar formularios repetitivos y dar seguimiento a casos",
-    "b3_q5": "El seguimiento de clientes y los recordatorios de fechas importantes",
-    "b3_q6": 4,
-    "b4_q0": "Tener 25 clientes activos de manera constante sin depender de referencias",
-    "b4_q1": "Tener un sistema claro de captación y haber lanzado mi primer curso online",
-    "b4_q2": "Ser reconocida como la abogada migratoria de referencia para latinos en mi región",
-    "b4_q3": "Entre 20 y 25 clientes al mes sería ideal",
-    "b4_q4": "Mínimo 40 consultas mensuales para poder seleccionar mejor mis casos",
-    "b4_q5": "Que pueda tomar vacaciones sin que mi negocio se detenga y tener ingresos predecibles",
-    "b4_q6": "Construir una presencia digital sólida que trabaje por mí aunque yo no esté publicando",
-    "b4_q7": "El miedo a ponerme delante de la cámara y no saber cómo comunicar mi valor sin sonar arrogante"
-  };
-  
-  S.answers = demoAnswers;
+  S.answers = { ...window.EXAMPLES };
   S.tarea = { "0": true, "1": true, "2": false, "3": true, "4": false, "5": true, "6": true };
   saveState();
   
@@ -648,6 +648,45 @@ window.loadDemoData = function() {
   }, 2500);
 
   render();
+};
+
+// Alternar visibilidad de la sección de ejemplo
+window.toggleExample = function(id) {
+  const el = document.getElementById('example-container-' + id);
+  if (el) {
+    if (el.style.display === 'none') {
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+};
+
+// Aplicar el ejemplo seleccionado al campo correspondiente
+window.applyExample = function(id, isScale) {
+  const val = window.EXAMPLES[id];
+  if (isScale) {
+    window.updateScale(id, val);
+  } else {
+    window.updateAnswer(id, val);
+  }
+  
+  // Forzar actualización visual inmediata de los campos en el DOM
+  if (isScale) {
+    const input = document.querySelector(`input[type="range"][oninput*="${id}"]`);
+    if (input) input.value = val;
+  } else {
+    const ta = document.querySelector(`textarea[oninput*="${id}"]`);
+    if (ta) {
+      ta.value = val;
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    }
+  }
+
+  // Ocultar el cuadro
+  const el = document.getElementById('example-container-' + id);
+  if (el) el.style.display = 'none';
 };
 
 // Función para despedir la cortina de bienvenida animada
@@ -1208,7 +1247,26 @@ function buildBlockHTML(blk, bi) {
     <div style="display:flex;flex-direction:column;gap:11px;">
       <div style="display:flex;align-items:flex-start;gap:13px;">
         <div style="flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;display:inline-flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important;margin-top:1px;">${i + 1}</div>
-        <label class="form-label" style="font-size:17px;font-weight:600;line-height:1.4;color:#2C2742;padding-top:3px;">${esc(text)}</label>
+        <div style="display:flex;flex-direction:column;gap:4px;width:100%;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%;gap:10px;">
+            <label class="form-label" style="font-size:17px;font-weight:600;line-height:1.4;color:#2C2742;padding-top:3px;text-align:left;">${esc(text)}</label>
+            <button type="button" onclick="toggleExample('${id}')" title="Ver ejemplo de respuesta" style="flex:none;background:none;border:none;color:#7A2C9E;cursor:pointer;padding:6px;margin-top:-2px;display:inline-flex;align-items:center;justify-content:center;opacity:0.65;transition:all 0.2s;border-radius:50%;background:rgba(122,44,158,0.05);outline:none;" onmouseover="this.style.opacity='1';this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.65';this.style.transform='scale(1)'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+            </button>
+          </div>
+          
+          <!-- Contenedor del ejemplo de respuesta -->
+          <div id="example-container-${id}" style="display:none;margin-top:6px;margin-bottom:6px;background:#F6F4FC;border:1px solid #E3DCF2;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#46415C;box-shadow:0 4px 12px rgba(122,44,158,0.03);">
+            <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#7A2C9E;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+              <span>Ejemplo sugerido:</span>
+            </div>
+            <p style="margin:0 0 10px;line-height:1.45;font-style:italic;color:#5A5470;text-align:left;">"${esc(window.EXAMPLES[id])}"</p>
+            <div style="text-align:right;">
+              <button type="button" onclick="applyExample('${id}', ${isScale})" style="background:linear-gradient(90deg,#2E72D8,#7A2C9E);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 6px 14px -4px rgba(122,44,158,0.4);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">✍️ Usar este ejemplo</button>
+            </div>
+          </div>
+        </div>
       </div>
       ${inputHTML}
     </div>`;
