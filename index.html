@@ -509,6 +509,17 @@ window.dismissIntro = function() {
   if (intro) {
     intro.classList.add('fade-out');
     sessionStorage.setItem('somos2os_intro_shown', 'true');
+    
+    // Buscar la tarjeta de diagnóstico en el fondo y reiniciar su animación de entrada
+    const card = document.querySelector('.form-card');
+    if (card) {
+      card.classList.remove('animate-enter');
+      void card.offsetWidth; // Forzar reflujo del navegador
+      setTimeout(() => {
+        card.classList.add('animate-enter');
+      }, 250); // Coincidir con el inicio del fade-out del overlay
+    }
+
     setTimeout(() => {
       intro.style.display = 'none';
       // Detener el loop del canvas de partículas para liberar memoria
