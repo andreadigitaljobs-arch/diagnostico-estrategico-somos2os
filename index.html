@@ -34,6 +34,13 @@
     /* Desactivar scrollbars globalmente */
     ::-webkit-scrollbar { display: none; }
 
+    /* Asegurar que los títulos siempre entren en una sola línea */
+    .form-h2, .form-h2-close, .form-h1 {
+      white-space: nowrap !important;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
     .btn-primary {
       border: none;
       cursor: pointer;
@@ -173,11 +180,18 @@
       .questions-wrapper {
         padding-bottom: 120px !important;
       }
-      .form-h1 {
-        font-size: 30px !important;
+       .form-h1 {
+        font-size: clamp(20px, 6.2vw, 30px) !important;
         line-height: 1.15 !important;
         text-align: left !important;
         margin-bottom: 12px !important;
+      }
+      .form-h2 {
+        font-size: clamp(17px, 5.2vw, 24px) !important;
+        margin: 4px 0 20px !important;
+      }
+      .form-h2-close {
+        font-size: clamp(20px, 6vw, 26px) !important;
       }
       .form-card p {
         text-align: left !important;
