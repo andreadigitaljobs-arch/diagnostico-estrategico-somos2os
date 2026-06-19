@@ -1265,11 +1265,6 @@ window.sendEmail = async function() {
     }
   }
 
-  // 2. Abrir cliente de correo con el resumen completo
-  const mailto = 'mailto:' + encodeURIComponent(COACH_EMAIL)
-    + '?subject=' + encodeURIComponent('Diagnóstico Estratégico' + (CLIENT_NAME ? ' — ' + CLIENT_NAME : ''))
-    + '&body='    + encodeURIComponent(buildSummary());
-  window.location.href = mailto;
 };
 
 window.copyAnswers = function() {
