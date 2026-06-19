@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; max-width: 100vw; }
     body {
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       background: #F4F3FB;
@@ -74,10 +74,15 @@
     }
     .shake { animation: shake .4s ease; }
 
-    @media (max-width: 560px) {
+    @media (max-width: 600px) {
       .dash-pill { display: none !important; }
       .dash-btn-text { display: none !important; }
       .btn-secondary { padding: 10px 12px !important; }
+      .card-pad { padding: 18px 16px !important; }
+      .card-pad h1 { font-size: 22px !important; }
+      .card-pad h2 { font-size: 18px !important; }
+      .mob-wrap { padding: 16px 12px 48px !important; }
+      .mob-full { width: 100% !important; max-width: 100% !important; }
     }
   </style>
 </head>
@@ -522,7 +527,7 @@ function buildLoginDesktop() {
 // ── LISTA ──
 function buildList() {
   const header = `
-  <div style="width:100%;max-width:820px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+  <div class="mob-full" style="width:100%;max-width:820px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
     <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:32px;width:auto;object-fit:contain;">
     <div style="display:flex;align-items:center;gap:10px;">
       <div class="pill-soft dash-pill">Dashboard Coach</div>
@@ -565,7 +570,7 @@ function buildList() {
     const pct       = Math.round((answered / total) * 100);
     const tareaCount = r.tarea ? Object.values(r.tarea).filter(Boolean).length : 0;
     return `
-    <div onclick="openRecord('${r.id}')" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;
+    <div onclick="openRecord('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;
       cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
       onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
       onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
@@ -588,7 +593,7 @@ function buildList() {
 
   const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
 
-  return wrap(header + countLabel + `<div style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
+  return wrap(header + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
 }
 
 // ── DETALLE ──
@@ -638,7 +643,7 @@ function buildDetail() {
     }).join('');
 
     return `
-    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
         <div class="pill" style="font-size:12px;">${esc(blk.time)}</div>
       </div>
@@ -662,7 +667,7 @@ function buildDetail() {
   const pct = Math.round((answered / 45) * 100);
 
   return wrap(`
-  <div style="width:100%;max-width:820px;">
+  <div class="mob-full" style="width:100%;max-width:820px;">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
       <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:30px;width:auto;">
@@ -679,7 +684,7 @@ function buildDetail() {
     </div>
 
     <!-- Info del cliente -->
-    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
+    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
       <div class="pill-soft" style="margin-bottom:14px;">Diagnóstico Estratégico · Sesión 1</div>
       <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
       <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
@@ -695,7 +700,7 @@ function buildDetail() {
     </div>
 
     <!-- Checklist de materiales -->
-    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
       <div class="pill-soft" style="margin-bottom:14px;">Tarea final</div>
       <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 18px;color:#231D3A;">Materiales para la auditoría</h2>
       <div style="display:flex;flex-direction:column;gap:10px;">${tareaHTML}</div>
@@ -709,10 +714,10 @@ function buildDetail() {
 
 function wrap(content) {
   return `
-  <div style="min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;
+  <div class="mob-wrap" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
     background:radial-gradient(900px 520px at 12% -8%,rgba(46,114,216,.16),transparent 60%),
     radial-gradient(900px 560px at 92% 6%,rgba(122,44,158,.16),transparent 60%),#F4F3FB;
-    padding:32px 20px 64px;">
+    padding:24px 16px 64px;">
     ${content}
   </div>`;
 }
