@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Coach · Somos2os Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: #F4F3FB;
+      color: #1C1830;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #D8D4EA; border-radius: 8px; }
+
+    .btn-primary {
+      border: none; cursor: pointer;
+      padding: 14px 30px; border-radius: 12px;
+      background: linear-gradient(120deg, #2E72D8, #5A45C4 55%, #7A2C9E);
+      color: #fff; font-size: 15.5px; font-weight: 700;
+      box-shadow: 0 14px 26px -12px rgba(90,52,160,.6);
+      transition: transform .18s ease;
+      font-family: inherit;
+    }
+    .btn-primary:hover { transform: translateY(-2px); }
+
+    .btn-secondary {
+      border: 1.5px solid #E0DCEF; background: #fff; color: #5A5470;
+      cursor: pointer; padding: 10px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; transition: background .15s ease;
+      font-family: inherit;
+    }
+    .btn-secondary:hover { background: #F7F6FC; }
+
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 5px 12px; border-radius: 99px;
+      background: linear-gradient(135deg, #2E72D8, #7A2C9E);
+      color: #fff; font-family: 'Sora', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: .04em;
+      white-space: nowrap;
+    }
+
+    .pill-soft {
+      display: inline-flex; align-items: center;
+      padding: 5px 12px; border-radius: 99px;
+      background: linear-gradient(135deg, rgba(46,114,216,.12), rgba(122,44,158,.12));
+      color: #5A2E9E; font-size: 12px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase; white-space: nowrap;
+    }
+
+    input[type="password"], input[type="text"] {
+      width: 100%; padding: 13px 15px; border: 1.5px solid #E6E3F2;
+      border-radius: 14px; font-size: 15.5px; color: #2C2742;
+      background: #FBFAFE; outline: none; font-family: inherit;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input:focus {
+      border-color: #5A45C4;
+      box-shadow: 0 0 0 4px rgba(90,69,196,.13);
+      background: #fff;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60%  { transform: translateX(-8px); }
+      40%,80%  { transform: translateX(8px); }
+    }
+    .shake { animation: shake .4s ease; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
+const SUPABASE_URL      = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
+const SUPABASE_SERVICE  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTgzOTY0MSwiZXhwIjoyMDk3NDE1NjQxfQ.YlDNh1zomDGSGqCH6YyWfNsy1MbyHmgpY3J4DRerEDw';
+const DASHBOARD_PASSWORD = 'somos2os2025'; // ← cambia esto
+
+// ─── DATOS ────────────────────────────────────────────────────────────────────
+const BLOCKS = [
+  { title: 'Entender el negocio', time: 'Minuto 10 – 25', qs: [
+    '¿Qué servicios ofreces actualmente?','¿Cuáles son los servicios que más disfrutas?',
+    '¿Cuáles son los más rentables?','¿Cuáles son los casos que más te gustaría atraer?',
+    '¿Hay algún tipo de cliente con el que prefieres trabajar?','¿Cuánto tiempo llevas ejerciendo?',
+    '¿Qué te llevó a especializarte en migración?','¿Qué te diferencia de otros abogados migratorios?',
+    '¿Qué tipo de resultados consigues para tus clientes?','¿Tienes algún caso de éxito que recuerdes especialmente?'
+  ]},
+  { title: 'Captación actual', time: 'Minuto 25 – 40', qs: [
+    '¿Cómo consigues clientes actualmente?','¿Cuál es tu principal fuente de clientes?',
+    '¿Cuántos clientes llegan por recomendación?','¿Cuántos llegan por redes sociales?',
+    '¿Cuántos llegan por búsqueda en internet?','¿Cuántas consultas recibes aproximadamente al mes?',
+    '¿Cuántas de esas consultas terminan convirtiéndose en clientes?','¿Tienes algún proceso de seguimiento?',
+    '¿Guardas los datos de personas que preguntan pero no compran?',
+    '¿Sientes que actualmente dependes demasiado de las referencias? ¿Por qué?'
+  ]},
+  { title: 'Marca personal y presencia digital', time: 'Minuto 40 – 55', qs: [
+    '¿Qué redes sociales utilizas actualmente?','¿Cuál utilizas con mayor frecuencia?',
+    '¿Publicas contenido? ¿Con qué frecuencia?','¿Qué tipo de contenido compartes?',
+    '¿Qué publicaciones suelen funcionar mejor?','¿Qué publicaciones suelen funcionar peor?',
+    '¿Te sientes cómoda grabando videos?','¿Qué es lo que más te cuesta de crear contenido?',
+    '¿Qué te gustaría comunicar que actualmente no estás comunicando?',
+    'Si alguien entra hoy a tus redes, ¿qué impresión crees que se lleva de ti?'
+  ]},
+  { title: 'Inteligencia Artificial y herramientas', time: 'Minuto 55 – 65', qs: [
+    '¿Has utilizado ChatGPT alguna vez? ¿Pagas la suscripción o lo usas gratis?',
+    '¿Para qué lo has utilizado?','¿Qué herramientas digitales utilizas normalmente?',
+    '¿Qué tareas te consumen más tiempo?','¿Qué parte de tu trabajo te gustaría simplificar?',
+    '¿Qué procesos te gustaría automatizar o hacer más rápidos?',
+    { q: '¿Cuál sería tu nivel actual de conocimiento en IA del 1 al 10?', scale: true }
+  ]},
+  { title: 'Objetivos', time: 'Minuto 65 – 80', qs: [
+    '¿Dónde te gustaría estar dentro de 3 meses?','¿Dónde te gustaría estar dentro de 6 meses?',
+    '¿Dónde te gustaría estar dentro de 12 meses?','¿Cuántos clientes te gustaría tener al mes?',
+    '¿Cuántas consultas te gustaría generar?',
+    '¿Qué tendría que pasar para que dijeras: "Este acompañamiento valió completamente la pena"?',
+    '¿Cuál es tu principal prioridad profesional en este momento?',
+    '¿Cuál es el principal obstáculo que sientes que te está frenando?'
+  ]}
+];
+const TAREA_LABELS = [
+  'Perfil de Instagram','Perfil de LinkedIn (si tiene)','Página web (si existe)',
+  'WhatsApp Business','Materiales de presentación','Servicios actuales y precios',
+  'Ejemplos de contenido previo'
+];
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────────
+let S = {
+  auth: false,
+  loading: false,
+  records: [],
+  selected: null,
+  error: null
+};
+
+// ─── API ──────────────────────────────────────────────────────────────────────
+async function fetchRecords() {
+  S.loading = true; render();
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/diagnosticos?select=*&order=created_at.desc',
+      { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } }
+    );
+    if (!res.ok) throw new Error('Error ' + res.status);
+    S.records = await res.json();
+    S.error = null;
+  } catch(e) {
+    S.error = 'No se pudieron cargar las respuestas. Verifica la conexión.';
+  } finally {
+    S.loading = false; render();
+  }
+}
+
+// ─── ACCIONES ─────────────────────────────────────────────────────────────────
+window.tryLogin = function() {
+  const val = document.getElementById('pwd-input').value;
+  if (val === DASHBOARD_PASSWORD) {
+    S.auth = true;
+    render();
+    fetchRecords();
+  } else {
+    const card = document.getElementById('login-card');
+    if (card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
+    const hint = document.getElementById('pwd-hint');
+    if (hint) { hint.textContent = 'Contraseña incorrecta'; hint.style.color = '#E05555'; }
+  }
+};
+
+window.pwdKeydown = function(e) { if (e.key === 'Enter') tryLogin(); };
+
+window.openRecord = function(id) {
+  S.selected = S.records.find(r => r.id === id) || null;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.closeRecord = function() {
+  S.selected = null; render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ─── UTILIDADES ───────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-ES', {
+    day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function countAnswered(answers) {
+  if (!answers) return 0;
+  return Object.values(answers).filter(v => v !== '' && v !== undefined && v !== null).length;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (!S.auth)          { app.innerHTML = buildLogin();  return; }
+  if (S.selected)       { app.innerHTML = buildDetail(); return; }
+  app.innerHTML = buildList();
+}
+
+// ── LOGIN ──
+function buildLogin() {
+  return `
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(900px 520px at 12% -8%,rgba(46,114,216,.16),transparent 60%),
+    radial-gradient(900px 560px at 92% 6%,rgba(122,44,158,.16),transparent 60%),#F4F3FB;padding:32px 20px;">
+    <div id="login-card" style="width:100%;max-width:420px;background:#fff;border-radius:26px;padding:44px 40px;
+      box-shadow:0 28px 70px -38px rgba(60,40,120,.45);border:1px solid #ECE9F7;text-align:center;">
+      <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:32px;width:auto;margin-bottom:28px;opacity:.9;">
+      <div class="pill-soft" style="margin-bottom:16px;">Dashboard Coach</div>
+      <h1 style="font-family:'Sora',sans-serif;font-size:26px;font-weight:700;margin:0 0 8px;letter-spacing:-.02em;color:#231D3A;">Acceso privado</h1>
+      <p style="font-size:15px;color:#6B6680;margin:0 0 28px;">Introduce la contraseña para ver las respuestas de tus clientes.</p>
+      <input id="pwd-input" type="password" placeholder="Contraseña" onkeydown="pwdKeydown(event)" style="margin-bottom:10px;">
+      <p id="pwd-hint" style="font-size:13px;color:#9A95AD;margin:0 0 18px;min-height:18px;"></p>
+      <button onclick="tryLogin()" class="btn-primary" style="width:100%;padding:15px;">Entrar →</button>
+    </div>
+  </div>`;
+}
+
+// ── LISTA ──
+function buildList() {
+  const header = `
+  <div style="width:100%;max-width:820px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+    <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:32px;width:auto;object-fit:contain;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="pill-soft">Dashboard Coach</div>
+      <button onclick="fetchRecords()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
+        ↻ Actualizar
+      </button>
+    </div>
+  </div>`;
+
+  if (S.loading) {
+    return wrap(header + `
+    <div style="width:100%;max-width:820px;text-align:center;padding:60px 0;color:#9A95AD;font-size:15px;font-weight:600;">
+      Cargando respuestas…
+    </div>`);
+  }
+
+  if (S.error) {
+    return wrap(header + `
+    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:32px;border:1px solid #ECE9F7;text-align:center;color:#E05555;">
+      ${esc(S.error)}
+    </div>`);
+  }
+
+  if (S.records.length === 0) {
+    return wrap(header + `
+    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">📋</div>
+      <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay respuestas enviadas.</p>
+    </div>`);
+  }
+
+  const cards = S.records.map(r => {
+    const answered  = countAnswered(r.answers);
+    const total     = 45;
+    const pct       = Math.round((answered / total) * 100);
+    const tareaCount = r.tarea ? Object.values(r.tarea).filter(Boolean).length : 0;
+    return `
+    <div onclick="openRecord('${r.id}')" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;
+      cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
+      onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+        <div>
+          <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Sin nombre')}</h3>
+          <p style="font-size:13px;color:#9A95AD;margin:0;">${formatDate(r.created_at)}</p>
+        </div>
+        <div class="pill" style="font-size:12px;">${pct}% completo</div>
+      </div>
+      <div style="height:6px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:16px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:13px;font-weight:600;color:#6B6680;">✏️ ${answered} de ${total} preguntas respondidas</span>
+        <span style="font-size:13px;font-weight:600;color:#6B6680;">✓ ${tareaCount} de 7 materiales</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
+
+  return wrap(header + countLabel + `<div style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
+}
+
+// ── DETALLE ──
+function buildDetail() {
+  const r = S.selected;
+  if (!r) return buildList();
+
+  const answers = r.answers || {};
+  const tarea   = r.tarea   || {};
+
+  const blocksHTML = BLOCKS.map((blk, bi) => {
+    const qsHTML = blk.qs.map((raw, i) => {
+      const isScale = typeof raw === 'object' && raw.scale;
+      const text    = typeof raw === 'string' ? raw : raw.q;
+      const id      = 'b' + bi + '_q' + i;
+      const val     = answers[id];
+      const empty   = val === undefined || val === '' || val === null;
+
+      let answerHTML;
+      if (isScale) {
+        const num = empty ? '—' : Number(val);
+        const pct = empty ? 0 : ((Number(val) - 1) / 9) * 100;
+        answerHTML = `
+        <div style="background:#F7F6FC;border:1px solid #ECE9F7;border-radius:12px;padding:14px 18px;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${num}</span>
+            <div style="flex:1;height:6px;background:#E5E1F2;border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+            </div>
+            <span style="font-size:13px;color:#9A95AD;font-weight:600;">/ 10</span>
+          </div>
+        </div>`;
+      } else {
+        answerHTML = empty
+          ? `<p style="margin:0;font-size:15px;color:#C2BDD3;font-style:italic;">(sin respuesta)</p>`
+          : `<p style="margin:0;font-size:15.5px;line-height:1.6;color:#2C2742;white-space:pre-wrap;">${esc(String(val))}</p>`;
+      }
+
+      return `
+      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i + 1}</div>
+          <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(text)}</p>
+        </div>
+        <div style="margin-left:36px;">${answerHTML}</div>
+      </div>`;
+    }).join('');
+
+    return `
+    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+        <div class="pill" style="font-size:12px;">${esc(blk.time)}</div>
+      </div>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#231D3A;">${esc(blk.title)}</h2>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        ${qsHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  const tareaHTML = TAREA_LABELS.map((label, i) => {
+    const on = !!tarea[i];
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1.5px solid ${on ? '#7A2C9E' : '#E6E3F2'};background:${on ? 'linear-gradient(135deg,rgba(46,114,216,.07),rgba(122,44,158,.07))' : '#FBFAFE'};">
+      <div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:${on ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#fff'};border:2px solid ${on ? '#7A2C9E' : '#CFC9E3'};color:#fff;font-size:13px;font-weight:800;">${on ? '✓' : ''}</div>
+      <span style="font-size:15px;font-weight:600;color:${on ? '#2C2742' : '#9A95AD'};">${esc(label)}</span>
+    </div>`;
+  }).join('');
+
+  const answered = countAnswered(answers);
+  const pct = Math.round((answered / 45) * 100);
+
+  return wrap(`
+  <div style="width:100%;max-width:820px;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <img src="assets/logo-somos2os.png" alt="Somos2os Studio" style="height:30px;width:auto;">
+      <button onclick="closeRecord()" class="btn-secondary">← Volver a la lista</button>
+    </div>
+
+    <!-- Info del cliente -->
+    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
+      <div class="pill-soft" style="margin-bottom:14px;">Diagnóstico Estratégico · Sesión 1</div>
+      <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+      <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
+      <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s ease;"></div>
+      </div>
+      <p style="font-size:13px;color:#9A95AD;margin:0;">${answered} de 45 preguntas respondidas · ${pct}% completado</p>
+    </div>
+
+    <!-- Bloques de preguntas -->
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
+      ${blocksHTML}
+    </div>
+
+    <!-- Checklist de materiales -->
+    <div style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+      <div class="pill-soft" style="margin-bottom:14px;">Tarea final</div>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 18px;color:#231D3A;">Materiales para la auditoría</h2>
+      <div style="display:flex;flex-direction:column;gap:10px;">${tareaHTML}</div>
+    </div>
+
+    <div style="margin-top:24px;text-align:center;">
+      <button onclick="closeRecord()" class="btn-secondary">← Volver a la lista</button>
+    </div>
+  </div>`);
+}
+
+function wrap(content) {
+  return `
+  <div style="min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;
+    background:radial-gradient(900px 520px at 12% -8%,rgba(46,114,216,.16),transparent 60%),
+    radial-gradient(900px 560px at 92% 6%,rgba(122,44,158,.16),transparent 60%),#F4F3FB;
+    padding:32px 20px 64px;">
+    ${content}
+  </div>`;
+}
+
+// ─── INICIO ───────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
