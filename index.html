@@ -177,8 +177,11 @@
         max-width: 100% !important;
         margin: 0 !important;
       }
-      .questions-wrapper {
+      .form-card:has(.form-nav), .form-card:has(#send-btn) {
         padding-bottom: 120px !important;
+      }
+      .questions-wrapper {
+        padding-bottom: 20px !important;
       }
        .form-h1 {
         font-size: clamp(20px, 6.2vw, 30px) !important;
@@ -218,7 +221,6 @@
         padding: 14px 12px !important;
       }
       /* Barra de navegación inferior fija */
-      /* Barra de navegación inferior flotante tipo dock */
       .form-nav {
         position: fixed !important;
         bottom: 16px !important;
@@ -244,6 +246,9 @@
         font-size: 14px !important;
         padding: 11px 16px !important;
         border-radius: 10px !important;
+      }
+      .mobile-spacer {
+        display: block !important;
       }
     }
 
@@ -616,6 +621,9 @@ window.EXAMPLES = {
   "b4_q7": "El miedo a ponerme delante de la cámara y no saber cómo comunicar mi valor sin sonar arrogante"
 };
 
+// Variable para controlar la visibilidad del spacer en móvil
+const mobileSpacerHTML = '<div class="mobile-spacer" style="height: 90px; display: none;"></div>';
+
 // Cargar datos demo de prueba
 window.loadDemoData = function() {
   S.answers = { ...window.EXAMPLES };
@@ -886,7 +894,7 @@ const BLOCKS = [
     '¿Qué te gustaría comunicar que actualmente no estás comunicando?',
     'Si alguien entra hoy a tus redes, ¿qué impresión crees que se lleva de ti?'
   ]},
-  { title: 'Inteligencia Artificial y herramientas', time: 'Minuto 55 – 65', qs: [
+  { title: 'Inteligencia IA y herramientas', time: 'Minuto 55 – 65', qs: [
     '¿Has utilizado ChatGPT alguna vez? ¿Pagas la suscripción o lo usas gratis?',
     '¿Para qué lo has utilizado?',
     '¿Qué herramientas digitales utilizas normalmente?',
@@ -1061,7 +1069,6 @@ window.sendEmail = async function() {
           fecha:   new Date().toISOString(),
           answers: S.answers,
           tarea:   S.tarea,
-          tareaLinks: S.tareaLinks,
           resumen: buildSummary()
         })
       });
@@ -1273,7 +1280,7 @@ function buildBlockHTML(blk, bi) {
     return `
     <div style="display:flex;flex-direction:column;gap:11px;">
       <div style="display:flex;align-items:flex-start;gap:13px;">
-        <div style="flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;display:inline-flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important;margin-top:1px;">${i + 1}</div>
+        <div style="flex:none;width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;display:inline-flex !important;align-items:center !important;justify-content:center !important;line-height:1 !important;margin-top:1px;">${i + 1}</div>
         <div style="display:flex;flex-direction:column;gap:4px;width:100%;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%;gap:10px;">
             <label class="form-label" style="font-size:17px;font-weight:600;line-height:1.4;color:#2C2742;padding-top:3px;text-align:left;">${esc(text)}</label>
@@ -1311,6 +1318,7 @@ function buildBlockHTML(blk, bi) {
     <div class="questions-wrapper" style="display:flex;flex-direction:column;gap:24px;">
       ${questionsHTML}
     </div>
+    ${mobileSpacerHTML}
     <div class="form-nav" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:34px;padding-top:26px;border-top:1px solid #F0EEF8;">
       <button onclick="go(${S.step - 1})" class="btn-secondary">← Atrás</button>
       <button onclick="go(${S.step + 1})" class="btn-primary">Continuar →</button>
@@ -1341,7 +1349,7 @@ function buildTareaHTML() {
         </a>
       </div>
     </div>
-
+    ${mobileSpacerHTML}
     <div class="form-nav" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:32px;padding-top:24px;border-top:1px solid #F0EEF8;">
       <button onclick="go(${S.step - 1})" class="btn-secondary">← Atrás</button>
       <button onclick="go(${S.step + 1})" class="btn-primary">Finalizar →</button>
