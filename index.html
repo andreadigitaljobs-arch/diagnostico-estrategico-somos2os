@@ -1350,7 +1350,7 @@ function buildTareaHTML() {
 }
 
 function buildCloseHTML() {
-  const sendLabel = S.sent ? '✓ Respuestas guardadas en Somos2os' : '✉ Enviar mis respuestas a Somos2os';
+  const sendLabel = S.sent ? '✓ Respuestas enviadas correctamente' : '✉ Enviar mis respuestas a Somos2os';
   return `
   <div class="form-card" style="width:100%;max-width:660px;background:#fff;border-radius:26px;padding:52px 44px;box-shadow:0 28px 70px -38px rgba(60,40,120,.45);border:1px solid #ECE9F7;text-align:center;">
     <div style="width:76px;height:76px;border-radius:50%;margin:0 auto 26px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 34px -14px rgba(90,52,160,.6);">
@@ -1361,7 +1361,8 @@ function buildCloseHTML() {
     <p class="form-body" style="font-size:16.5px;line-height:1.65;color:#46415C;margin:0 auto 34px;max-width:520px;">En nuestra próxima sesión te presentaremos el plan completo con las prioridades, el posicionamiento recomendado, la estrategia de contenido, las oportunidades comerciales y los pasos concretos que vamos a implementar juntos.</p>
 
     <button id="send-btn" onclick="sendEmail()" class="btn-primary" style="width:100%;padding:17px 24px;border-radius:14px;font-size:16.5px;margin-bottom:12px;">${sendLabel}</button>
-    <p style="font-size:13px;color:#9A95AD;margin:20px 0 0;">Al enviar, se abrirá tu gestor de correo con el resumen de la sesión listo para enviar. Tus respuestas quedarán registradas en Somos2os.</p>
+    <button onclick="go(${S.step - 1})" class="btn-secondary" style="width:100%;padding:14px 20px;border-radius:12px;font-size:15px;font-weight:600;margin-bottom:20px;">← Revisar respuestas</button>
+    <p style="font-size:13px;color:#9A95AD;margin:0;">Tus respuestas se enviarán directamente al equipo de Somos2os y quedarán registradas de forma segura.</p>
   </div>`;
 }
 
