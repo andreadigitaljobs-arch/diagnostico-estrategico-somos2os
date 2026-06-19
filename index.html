@@ -1605,7 +1605,7 @@ function buildCloseHTML() {
     <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px -8px rgba(90,52,160,.55);">
       <span style="color:#fff;font-size:32px;font-weight:800;line-height:1;">✓</span>
     </div>
-    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#231D3A;">${CLIENT_NAME ? '¡Gracias, ' + CLIENT_NAME + '!' : '¡Gracias!'}</h2>
+    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:clamp(18px,5vw,32px);font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${CLIENT_NAME ? '¡Gracias, ' + CLIENT_NAME + '!' : '¡Gracias!'}</h2>
     <p class="form-body" style="font-size:15px;line-height:1.55;color:#5A5470;margin:0 auto 28px;max-width:520px;text-align:center;">Hemos registrado tus respuestas. Con esta información comenzaremos a diseñar tu estrategia personalizada.</p>
     
     <!-- Timeline / Próximos pasos -->
