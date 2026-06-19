@@ -1036,8 +1036,8 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    // Si el enlace tiene un nombre distinto al guardado, empezar desde 0
-    if (CLIENT_NAME && raw.clienteName && raw.clienteName !== CLIENT_NAME) {
+    // Si hay nombre en la URL y no coincide con el guardado, empezar desde 0
+    if (CLIENT_NAME && raw.clienteName !== CLIENT_NAME) {
       return; // estado vacío, step 0
     }
     S.step       = raw.step       || 0;
