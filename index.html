@@ -938,13 +938,13 @@ const BLOCKS = [
 ];
 
 const TAREA_LABELS = [
-  'Perfil de Instagram',
-  'Perfil de LinkedIn (si tiene)',
-  'Página web (si existe)',
-  'WhatsApp Business',
-  'Materiales de presentación',
-  'Servicios actuales y precios',
-  'Ejemplos de contenido previo'
+  { label: 'Perfil de Instagram', key: true },
+  { label: 'Perfil de LinkedIn (si tiene)' },
+  { label: 'Página web (si existe)' },
+  { label: 'WhatsApp Business', key: true },
+  { label: 'Materiales de presentación' },
+  { label: 'Servicios actuales y precios', key: true },
+  { label: 'Ejemplos de contenido previo' }
 ];
 
 const TOTAL_SCREENS = 1 + BLOCKS.length + 2; // 8
@@ -1010,8 +1010,9 @@ function buildSummary() {
   lines.push('— MATERIALES PARA AUDITORÍA —');
   TAREA_LABELS.forEach((l, i) => {
     const checked = S.tarea[i] ? '[x]' : '[ ]';
+    const labelText = typeof l === 'string' ? l : l.label;
     const link = S.tareaLinks[i] ? ` (Info: ${S.tareaLinks[i]})` : '';
-    lines.push(`${checked} ${l}${link}`);
+    lines.push(`${checked} ${labelText}${link}`);
   });
   return lines.join('\n');
 }
@@ -1168,7 +1169,9 @@ window.openWhatsApp = function() {
 // ─── CONSTRUCTORES HTML ───────────────────────────────────────────────────────
 
 function buildTareaItemsHTML() {
-  return TAREA_LABELS.map((label, i) => {
+  return TAREA_LABELS.map((item, i) => {
+    const label       = typeof item === 'string' ? item : item.label;
+    const isKey       = (typeof item === 'object') && item.key;
     const on          = !!S.tarea[i];
     const borderColor = on ? '#7A2C9E'   : '#E6E3F2';
     const bg          = on ? 'linear-gradient(135deg,rgba(46,114,216,.07),rgba(122,44,158,.07))' : '#FBFAFE';
@@ -1185,11 +1188,14 @@ function buildTareaItemsHTML() {
         </div>`;
     }
 
+    const badgeHTML = isKey ? `<span style="font-size:11px;font-weight:700;color:#7A2C9E;background:rgba(122,44,158,0.08);padding:3px 10px;border-radius:99px;margin-left:auto;letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;font-family:'Sora',sans-serif;">Recomendado</span>` : '';
+
     return `
       <div class="tarea-item" onclick="toggleTarea(${i})" style="display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;padding:15px 18px;border-radius:14px;border:1.5px solid ${borderColor};background:${bg};width:100%;transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-        <div style="display:flex;align-items:center;gap:14px;width:100%;">
+        <div style="display:flex;align-items:center;gap:14px;width:100%;flex-wrap:wrap;">
           <div style="flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid ${boxBorder};background:${boxBg};color:#fff;font-size:15px;font-weight:800;">${check}</div>
           <span style="font-size:16px;font-weight:600;color:#2C2742;text-align:left;line-height:1.2;">${esc(label)}</span>
+          ${badgeHTML}
         </div>
         ${inputHTML}
       </div>`;
