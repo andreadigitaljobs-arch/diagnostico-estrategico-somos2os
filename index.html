@@ -897,6 +897,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
 const CLIENT_NAME  = new URLSearchParams(window.location.search).get('cliente') || '';
+const GENERO       = new URLSearchParams(window.location.search).get('genero') || ''; // 'f' | 'm' | ''
 // Reemplaza estos valores con los de tu proyecto de Supabase
 const SUPABASE_URL = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4Mzk2NDEsImV4cCI6MjA5NzQxNTY0MX0.3Ej1Cs7yY6Uoo7YPTX6X7MbOMZBHGQDdWmk9q3fEA2w';
@@ -1420,7 +1421,7 @@ function buildIntroHTML() {
         </div>
 
 
-        <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:500;color:#9A95AD;margin:0 0 2px;letter-spacing:0em;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.2s;">Bienvenido/a a tu</h2>
+        <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:500;color:#9A95AD;margin:0 0 2px;letter-spacing:0em;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.2s;">${GENERO === 'f' ? 'Bienvenida a tu' : GENERO === 'm' ? 'Bienvenido a tu' : 'Bienvenido/a a tu'}</h2>
         <h1 class="form-h1" style="font-family:'Sora',sans-serif;font-size:28px;line-height:1.1;font-weight:800;margin:0 0 10px;letter-spacing:-.03em;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:left;opacity:0;animation:screenFadeIn .6s ease-out forwards;animation-delay:.3s;">Diagnóstico Estratégico</h1>
 
         <div style="display:flex;align-items:center;gap:5px;color:#9A95AD;font-size:12px;font-weight:500;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.4s;">
