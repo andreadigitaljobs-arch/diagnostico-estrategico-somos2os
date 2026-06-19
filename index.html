@@ -600,7 +600,10 @@ try {
 // Ocultar intro inmediatamente si el usuario ya avanzó (evita flash en recarga)
 try {
   var _st = JSON.parse(localStorage.getItem('somos2os_diagnostico_v1'));
-  if (_st && _st.step > 0) {
+  var _urlCliente = new URLSearchParams(window.location.search).get('cliente') || '';
+  var _clienteCoincide = !_urlCliente || (_st && _st.clienteName === _urlCliente);
+  // Solo ocultar si: avanzó, no llegó al final (step 8), y el cliente coincide
+  if (_st && _st.step > 0 && _st.step < 8 && _clienteCoincide) {
     document.getElementById('intro-screen').style.display = 'none';
   }
 } catch(e) {}
@@ -1045,6 +1048,10 @@ function loadState() {
     S.answers    = raw.answers    || {};
     S.tarea      = raw.tarea      || {};
     S.tareaLinks = raw.tareaLinks || S.answers._tareaLinks || {};
+    // Si ya llegó al final (pantalla de cierre), volver al inicio
+    if (S.step >= TOTAL_SCREENS - 1) {
+      S.step = 0; S.maxStep = 0;
+    }
   } catch(e) {}
 }
 
