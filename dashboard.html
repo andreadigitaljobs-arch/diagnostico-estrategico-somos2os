@@ -731,14 +731,16 @@ function buildList() {
         if (diff < 1440) return `hace ${Math.round(diff/60)}h`;
         return `hace ${Math.round(diff/1440)}d`;
       })() : '—';
+      const link = FORM_BASE_URL + '?cliente=' + encodeURIComponent(ses.cliente);
       return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEF8;">
         <div style="flex:1;min-width:0;">
           <div style="font-size:14px;font-weight:600;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
-          <div style="font-size:11.5px;color:#B6B2C9;margin-top:2px;">${cuando}</div>
+          <a href="${link}" target="_blank" style="font-size:11px;color:#9A95AD;margin-top:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;max-width:260px;" title="${link}">${link}</a>
         </div>
-        <div style="height:4px;width:80px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
+        <div style="height:4px;width:60px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
           <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
         </div>
+        <div style="font-size:11px;color:#C2BDCF;flex-shrink:0;white-space:nowrap;">${cuando}</div>
         <div style="font-size:11.5px;font-weight:700;color:${color};background:${bg};padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0;">${badge}</div>
       </div>`;
     }).join('');
