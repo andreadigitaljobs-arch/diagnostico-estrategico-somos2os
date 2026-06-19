@@ -845,6 +845,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const SUPABASE_URL = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4Mzk2NDEsImV4cCI6MjA5NzQxNTY0MX0.3Ej1Cs7yY6Uoo7YPTX6X7MbOMZBHGQDdWmk9q3fEA2w';
 const COACH_EMAIL  = 'hola@somos2os.studio';
+const COACH_WHATSAPP = '5491130141662'; // Número de WhatsApp del equipo
 const STORAGE_KEY  = 'somos2os_diagnostico_v1';
 
 // ─── DATOS ────────────────────────────────────────────────────────────────────
@@ -1137,11 +1138,11 @@ function buildTareaItemsHTML() {
     const check       = on ? '✓' : '';
     const linkVal     = esc(S.tareaLinks[i] || '');
 
-    let inputHTML = '';
+     let inputHTML = '';
     if (on) {
       inputHTML = `
         <div onclick="event.stopPropagation()" style="margin-top:12px;width:100%;">
-          <input type="text" placeholder="Pega el enlace o escribe detalles aquí..." value="${linkVal}" oninput="updateTareaLink(${i}, this.value)" style="width:100%;border:1.5px solid #ECE9F7;border-radius:10px;padding:9px 12px;font-size:13.5px;color:#2C2742;outline:none;background:#fff;transition:border-color 0.25s, box-shadow 0.25s;font-family:'Inter',sans-serif;" onfocus="this.style.borderColor='#7A2C9E';this.style.boxShadow='0 0 0 3px rgba(122,44,158,0.1)';" onblur="this.style.borderColor='#ECE9F7';this.style.boxShadow='none';">
+          <textarea class="tarea-textarea" placeholder="Pega el enlace o escribe detalles aquí..." oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; updateTareaLink(${i}, this.value)" style="width:100%;border:1.5px solid #ECE9F7;border-radius:10px;padding:9px 12px;font-size:13.5px;color:#2C2742;outline:none;background:#fff;transition:border-color 0.25s, box-shadow 0.25s;font-family:'Inter',sans-serif;resize:none;min-height:48px;" onfocus="this.style.borderColor='#7A2C9E';this.style.boxShadow='0 0 0 3px rgba(122,44,158,0.1)';" onblur="this.style.borderColor='#ECE9F7';this.style.boxShadow='none';">${linkVal}</textarea>
         </div>`;
     }
 
@@ -1326,6 +1327,21 @@ function buildTareaHTML() {
     <div id="tarea-list" class="questions-wrapper" style="display:flex;flex-direction:column;gap:12px;">
       ${buildTareaItemsHTML()}
     </div>
+
+    <!-- Mensaje de WhatsApp para envío de archivos -->
+    <div style="margin-top:24px;background:rgba(37,211,102,0.05);border:1.5px dashed #25D366;border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;text-align:left;">
+      <div style="flex:none;width:42px;height:42px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(37,211,102,0.25);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div style="flex:1;">
+        <h4 style="margin:0 0 4px;font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;color:#128C7E;">📎 ¿Quieres compartir archivos o documentos?</h4>
+        <p style="margin:0 0 8px;font-size:13px;line-height:1.45;color:#46415C;">Si necesitas enviarnos capturas, PDFs o presentaciones, puedes enviárnoslos directamente por nuestro chat de WhatsApp.</p>
+        <a href="https://wa.me/${COACH_WHATSAPP}?text=${encodeURIComponent('Hola equipo de Somos2os! Aquí les comparto los archivos para mi Diagnóstico Estratégico.')}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#128C7E;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          Enviar archivos por WhatsApp →
+        </a>
+      </div>
+    </div>
+
     <div class="form-nav" style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:32px;padding-top:24px;border-top:1px solid #F0EEF8;">
       <button onclick="go(${S.step - 1})" class="btn-secondary">← Atrás</button>
       <button onclick="go(${S.step + 1})" class="btn-primary">Finalizar →</button>
@@ -1400,7 +1416,7 @@ function render() {
   }
 
   // Ajustar la altura de todos los textareas cargados según su contenido
-  document.querySelectorAll('.q-textarea').forEach(ta => {
+  document.querySelectorAll('.q-textarea, .tarea-textarea').forEach(ta => {
     ta.style.height = 'auto';
     ta.style.height = (ta.scrollHeight) + 'px';
   });
