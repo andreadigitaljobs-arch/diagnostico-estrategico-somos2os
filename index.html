@@ -908,19 +908,26 @@ const SESSION_KEY  = 'somos2os_sesion_id';
 
 // ─── SEGUIMIENTO DE SESIÓN ────────────────────────────────────────────────────
 let _sesionId = null;
-try { _sesionId = localStorage.getItem(SESSION_KEY); } catch(e) {}
+try {
+  const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+  // Solo usar el ID guardado si es del mismo cliente
+  if (saved && saved.cliente === CLIENT_NAME) _sesionId = saved.id;
+} catch(e) {}
+
+function _saveSesionId(id) {
+  _sesionId = id;
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify({ id, cliente: CLIENT_NAME })); } catch(e) {}
+}
 
 async function trackOpen() {
   if (!CLIENT_NAME) return;
   try {
-    const params = new URLSearchParams(window.location.search);
-    const sidFromUrl = params.get('sid');
+    const sidFromUrl = new URLSearchParams(window.location.search).get('sid');
 
-    // 1. Si el enlace tiene sid, ese es el registro a actualizar
+    // 1. URL tiene sid → usar ese registro directamente
     if (sidFromUrl) {
-      _sesionId = sidFromUrl;
-      localStorage.setItem(SESSION_KEY, _sesionId);
-      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
+      _saveSesionId(sidFromUrl);
+      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + sidFromUrl, {
         method: 'PATCH',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
@@ -928,36 +935,33 @@ async function trackOpen() {
       return;
     }
 
-    // 2. Sin sid: buscar el registro más reciente de este cliente en Supabase
-    if (!_sesionId) {
-      const lookup = await fetch(
-        SUPABASE_URL + '/rest/v1/link_sesiones?cliente=eq.' + encodeURIComponent(CLIENT_NAME) + '&enviado=eq.false&order=created_at.desc&limit=1',
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-      );
-      if (lookup.ok) {
-        const data = await lookup.json();
-        if (data[0]) { _sesionId = data[0].id; localStorage.setItem(SESSION_KEY, _sesionId); }
+    // 2. Buscar siempre el registro más reciente de este cliente en Supabase
+    const lookup = await fetch(
+      SUPABASE_URL + '/rest/v1/link_sesiones?cliente=eq.' + encodeURIComponent(CLIENT_NAME) + '&order=created_at.desc&limit=1',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (lookup.ok) {
+      const data = await lookup.json();
+      if (data[0] && !data[0].enviado) {
+        _saveSesionId(data[0].id);
+        fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + data[0].id, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
+        });
+        return;
       }
     }
 
-    // 3. Actualizar o crear
-    if (_sesionId) {
-      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionId, {
-        method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
-      });
-    } else {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-        body: JSON.stringify({ cliente: CLIENT_NAME, ultimo_paso: 0 })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        _sesionId = data[0]?.id || null;
-        if (_sesionId) localStorage.setItem(SESSION_KEY, _sesionId);
-      }
+    // 3. No existe registro → crear uno nuevo
+    const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ cliente: CLIENT_NAME, ultimo_paso: 0 })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data[0]?.id) _saveSesionId(data[0].id);
     }
   } catch(e) {}
 }
