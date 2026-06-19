@@ -1163,19 +1163,18 @@ window.go = function(step) {
 };
 
 function executeGo(step) {
+  window.scrollTo(0, 0);
   S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
   if (S.step > S.maxStep) S.maxStep = S.step;
   trackStep(S.step);
   saveState();
   render();
-  
+
   // Agregar la animación de entrada a la nueva tarjeta renderizada
   const newCard = document.querySelector('.form-card');
   if (newCard) {
     newCard.classList.add('animate-enter');
   }
-
-  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) { window.scrollTo(0, 0); }
 }
 
 window.updateAnswer = function(id, val) {
