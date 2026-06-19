@@ -1345,15 +1345,7 @@ function buildCloseHTML() {
     <p class="form-body" style="font-size:16.5px;line-height:1.65;color:#46415C;margin:0 auto 34px;max-width:520px;">En nuestra próxima sesión te presentaremos el plan completo con las prioridades, el posicionamiento recomendado, la estrategia de contenido, las oportunidades comerciales y los pasos concretos que vamos a implementar juntos.</p>
 
     <button id="send-btn" onclick="sendEmail()" class="btn-primary" style="width:100%;padding:17px 24px;border-radius:14px;font-size:16.5px;margin-bottom:12px;">${sendLabel}</button>
-    <div class="close-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button id="copy-btn" onclick="copyAnswers()" class="btn-secondary" style="color:#5A2E9E;">${S.copied ? '✓ ¡Copiado!' : 'Copiar respuestas'}</button>
-      <button onclick="printAnswers()" class="btn-secondary">Guardar PDF</button>
-      <button onclick="go(${S.step - 1})" class="btn-secondary">← Revisar</button>
-    </div>
-    <p style="font-size:13px;color:#9A95AD;margin:24px 0 0;">Al enviar, se abrirá tu correo con todas las respuestas ya escritas. Tus respuestas también quedan guardadas en este dispositivo.</p>
-    <div style="margin-top:30px;padding-top:24px;border-top:1px solid #F0EEF8;">
-      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;opacity:.85;">
-    </div>
+    <p style="font-size:13px;color:#9A95AD;margin:20px 0 0;">Al enviar, se abrirá tu gestor de correo con el resumen de la sesión listo para enviar. Tus respuestas quedarán registradas en Somos2os.</p>
   </div>`;
 }
 
