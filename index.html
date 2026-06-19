@@ -151,10 +151,12 @@
        .form-wrap {
         background: url('assets/background-mobile.png') no-repeat center center fixed !important;
         background-size: cover !important;
-        padding: 24px 16px 100px !important; /* Espacio para barra de navegación inferior fija */
+        min-height: 100vh !important;
+        min-height: 100dvh !important; /* excluye barra del navegador */
+        padding: 36px 16px 48px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;
+        justify-content: flex-start !important; /* alinea desde arriba, no centra */
         align-items: center !important;
       }
       .form-wrap.has-header {
@@ -168,19 +170,19 @@
       .form-logo {
         height: 32px !important;
       }
-      /* Estilo para que la brújula se ubique de fondo de forma colorida y nítida en móviles */
+      /* Brújula en móvil: dentro de los límites del card para no ser cortada por overflow-x:hidden */
       .floating-compass {
         position: absolute !important;
-        right: -25px !important;
-        top: 25px !important;
-        width: 105px !important;
-        height: 105px !important;
-        z-index: 0 !important;
+        right: 6px !important;
+        top: -8px !important;
+        width: 92px !important;
+        height: 92px !important;
+        z-index: 2 !important;
         pointer-events: none !important;
-        opacity: 0.8 !important;
+        opacity: 0.88 !important;
       }
       .floating-compass img {
-        filter: drop-shadow(0 10px 20px rgba(122,44,158,0.22)) !important;
+        filter: drop-shadow(0 8px 16px rgba(122,44,158,0.28)) !important;
       }
       .form-card {
         background: rgba(255, 255, 255, 0.85) !important;
@@ -360,6 +362,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh; /* viewport dinámico: excluye barra del navegador en móvil */
       background: #090514;
       display: flex;
       flex-direction: column;
