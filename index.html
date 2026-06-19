@@ -41,6 +41,18 @@
       overflow: hidden;
     }
 
+    .form-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.72) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 30px 70px -20px rgba(60, 40, 120, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+    }
+
     .btn-primary {
       border: none;
       cursor: pointer;
@@ -145,6 +157,10 @@
         justify-content: center !important;
         align-items: center !important;
       }
+      .form-wrap.has-header {
+        padding-top: 96px !important;
+        padding-bottom: 100px !important;
+      }
       /* Eliminar .form-header justify-content override para permitir space-between en bloques */
       .form-header {
         margin-bottom: 24px !important;
@@ -177,9 +193,7 @@
         max-width: 100% !important;
         margin: 0 !important;
       }
-      .form-card:has(.form-nav), .form-card:has(#send-btn) {
-        padding-bottom: 120px !important;
-      }
+
       .questions-wrapper {
         padding-bottom: 20px !important;
       }
@@ -568,6 +582,14 @@
     </div>
   </div>
 </div>
+
+
+<header id="main-header" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 72px; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(230, 226, 242, 0.6); z-index: 1000; transition: all 0.3s ease;">
+  <div style="width: 100%; max-width: 860px; height: 100%; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
+    <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height: 32px; width: auto; object-fit: contain;">
+    <div id="header-progress-label" style="font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #7A2C9E; font-family: 'Sora', sans-serif;"></div>
+  </div>
+</header>
 
 <div id="app"></div>
 
@@ -1368,17 +1390,48 @@ function buildTareaHTML() {
 function buildCloseHTML() {
   const sendLabel = S.sent ? '✓ Respuestas enviadas correctamente' : '✉ Enviar mis respuestas a Somos2os';
   return `
-  <div class="form-card" style="width:100%;max-width:660px;background:#fff;border-radius:26px;padding:52px 44px;box-shadow:0 28px 70px -38px rgba(60,40,120,.45);border:1px solid #ECE9F7;text-align:center;">
-    <div style="width:76px;height:76px;border-radius:50%;margin:0 auto 26px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 34px -14px rgba(90,52,160,.6);">
-      <span style="color:#fff;font-size:38px;font-weight:800;line-height:1;">✓</span>
+  <div class="form-card" style="width:100%;max-width:660px;background:#fff;border-radius:26px;padding:44px 40px 34px;box-shadow:0 28px 70px -38px rgba(60,40,120,.45);border:1px solid #ECE9F7;text-align:center;">
+    <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px -8px rgba(90,52,160,.55);">
+      <span style="color:#fff;font-size:32px;font-weight:800;line-height:1;">✓</span>
     </div>
-    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:#231D3A;">¡Gracias, Daniela!</h2>
-    <p class="form-body" style="font-size:16.5px;line-height:1.65;color:#46415C;margin:0 auto 14px;max-width:520px;">Perfecto. Con toda esta información vamos a trabajar en tu <strong>Plan Estratégico Personalizado de 90 Días</strong>: analizaremos todo lo que compartiste, identificaremos las mayores oportunidades de crecimiento y diseñaremos una estrategia adaptada específicamente a tu situación.</p>
-    <p class="form-body" style="font-size:16.5px;line-height:1.65;color:#46415C;margin:0 auto 34px;max-width:520px;">En nuestra próxima sesión te presentaremos el plan completo con las prioridades, el posicionamiento recomendado, la estrategia de contenido, las oportunidades comerciales y los pasos concretos que vamos a implementar juntos.</p>
+    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#231D3A;white-space:nowrap !important;">¡Gracias, Daniela!</h2>
+    <p class="form-body" style="font-size:15px;line-height:1.55;color:#5A5470;margin:0 auto 28px;max-width:520px;text-align:center;">Hemos registrado tus respuestas. Con esta información comenzaremos a diseñar tu estrategia personalizada.</p>
+    
+    <!-- Timeline / Próximos pasos -->
+    <div style="text-align:left;margin:32px 0;display:flex;flex-direction:column;gap:20px;background:#F8F7FC;padding:24px 20px;border-radius:18px;border:1px solid #ECE9F7;">
+      <div style="font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#7A2C9E;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>¿Qué pasa ahora? (Próximos pasos)</span>
+      </div>
+      
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div style="flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2E72D8,#5A45C4);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'Sora',sans-serif;">1</div>
+        <div>
+          <h4 style="margin:0 0 3px;font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;color:#231D3A;">Auditoría Estratégica</h4>
+          <p style="margin:0;font-size:13.5px;line-height:1.45;color:#5A5470;">Analizaremos a fondo tus respuestas y materiales de marca para detectar las mayores oportunidades de diferenciación.</p>
+        </div>
+      </div>
 
-    <button id="send-btn" onclick="sendEmail()" class="btn-primary" style="width:100%;padding:17px 24px;border-radius:14px;font-size:16.5px;margin-bottom:12px;">${sendLabel}</button>
-    <button onclick="go(${S.step - 1})" class="btn-secondary" style="width:100%;padding:14px 20px;border-radius:12px;font-size:15px;font-weight:600;margin-bottom:20px;">← Revisar respuestas</button>
-    <p style="font-size:13px;color:#9A95AD;margin:0;">Tus respuestas se enviarán directamente al equipo de Somos2os y quedarán registradas de forma segura.</p>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div style="flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#5A45C4,#7A2C9E);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'Sora',sans-serif;">2</div>
+        <div>
+          <h4 style="margin:0 0 3px;font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;color:#231D3A;">Diseño del Plan de 90 Días</h4>
+          <p style="margin:0;font-size:13.5px;line-height:1.45;color:#5A5470;">Construiremos un plan detallado con las prioridades tácticas, la automatización con IA sugerida y la estrategia de contenido.</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div style="flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7A2C9E,#A78BFA);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'Sora',sans-serif;">3</div>
+        <div>
+          <h4 style="margin:0 0 3px;font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;color:#231D3A;">Sesión de Presentación</h4>
+          <p style="margin:0;font-size:13.5px;line-height:1.45;color:#5A5470;">En nuestro próximo encuentro te presentaremos el Plan de Acción completo listo para implementar.</p>
+        </div>
+      </div>
+    </div>
+
+    <button id="send-btn" onclick="sendEmail()" class="btn-primary" style="width:100%;padding:16px 24px;border-radius:12px;font-size:16px;margin-bottom:12px;">${sendLabel}</button>
+    <button onclick="go(${S.step - 1})" class="btn-secondary" style="width:100%;padding:13px 20px;border-radius:12px;font-size:14.5px;font-weight:600;margin-bottom:18px;">← Revisar respuestas</button>
+    <p style="font-size:12.5px;color:#9A95AD;margin:0;">Tus respuestas se enviarán directamente al equipo de Somos2os y quedarán registradas de forma segura.</p>
   </div>`;
 }
 
@@ -1397,17 +1450,29 @@ function render() {
     ? `Bloque ${blockIdx + 1} de ${BLOCKS.length}`
     : isTarea ? 'Tarea final' : '';
 
+  // Controlar la visibilidad y contenido del header superior fijo
+  const mainHeader = document.getElementById('main-header');
+  const progressLabel = document.getElementById('header-progress-label');
+  if (mainHeader) {
+    if (step > 0) {
+      mainHeader.style.display = 'flex';
+      if (progressLabel) {
+        progressLabel.textContent = stepLabel;
+      }
+    } else {
+      mainHeader.style.display = 'none';
+    }
+  }
+
+  // Padding dinámico para compensar el header superior fijo
+  const wrapPadding = step > 0 ? '112px 20px 40px' : '40px 20px';
+  const hasHeaderClass = step > 0 ? 'has-header' : '';
+
   let html = `
-  <div class="form-wrap" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  <div class="form-wrap ${hasHeaderClass}" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
     background: url('assets/background.png') no-repeat center center fixed;
     background-size: cover;
-    padding:40px 20px;">
-
-    <!-- Header con logo y etiqueta de paso -->
-    <div class="form-header animate-header" style="width:100%;max-width:860px;display:flex;align-items:center;justify-content:${isIntro ? 'center' : 'space-between'};margin-bottom:24px;">
-      <img class="form-logo" src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:38px;width:auto;object-fit:contain;">
-      ${showProg ? `<div class="form-sub" style="font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A2C9E;">${esc(stepLabel)}</div>` : ''}
-    </div>
+    padding:${wrapPadding};">
 
     <!-- Barra de progreso -->
     ${showProg ? `
