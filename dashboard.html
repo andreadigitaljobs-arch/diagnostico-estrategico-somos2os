@@ -674,8 +674,54 @@ function buildList() {
     <div id="link-preview" style="margin-top:10px;font-size:12px;color:#B6B2C9;font-family:monospace;word-break:break-all;display:none;"></div>
   </div>`;
 
+  // ── Sección de seguimiento de sesiones (se construye ANTES del early return) ──
+  const BLOCK_NAMES = ['Negocio', 'Captación', 'Comunicación', 'Tecnología', 'Visión'];
+  const sesionesHTML = S.sesiones.length === 0 ? '' : (() => {
+    const rows = S.sesiones.map(ses => {
+      const paso = ses.ultimo_paso != null ? ses.ultimo_paso : 0;
+      const enviado = ses.enviado;
+      let badge, color, bg;
+      if (enviado) {
+        badge = '✓ Enviado'; color = '#3DAB7A'; bg = 'rgba(61,171,122,.1)';
+      } else if (paso === -1) {
+        badge = '📤 Generado'; color = '#9A95AD'; bg = 'rgba(154,149,173,.1)';
+      } else if (paso === 0) {
+        badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)';
+      } else if (paso >= 1 && paso <= 5) {
+        badge = `⏳ Bloque ${paso}/5 · ${BLOCK_NAMES[paso-1]||''}`; color = '#2E72D8'; bg = 'rgba(46,114,216,.1)';
+      } else {
+        badge = '📋 Casi listo'; color = '#6A38B0'; bg = 'rgba(106,56,176,.1)';
+      }
+      const pct = paso <= 0 ? 0 : Math.min(100, Math.round((paso / 8) * 100));
+      const cuando = ses.ultimo_acceso ? (() => {
+        const diff = Math.round((Date.now() - new Date(ses.ultimo_acceso)) / 60000);
+        if (diff < 1) return 'ahora';
+        if (diff < 60) return `hace ${diff} min`;
+        if (diff < 1440) return `hace ${Math.round(diff/60)}h`;
+        return `hace ${Math.round(diff/1440)}d`;
+      })() : '—';
+      const link = FORM_BASE_URL + '?cliente=' + encodeURIComponent(ses.cliente);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEF8;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
+          <a href="${link}" target="_blank" style="font-size:11px;color:#9A95AD;margin-top:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;max-width:260px;" title="${link}">${link}</a>
+        </div>
+        <div style="height:4px;width:60px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+        </div>
+        <div style="font-size:11px;color:#C2BDCF;flex-shrink:0;white-space:nowrap;">${cuando}</div>
+        <div style="font-size:11.5px;font-weight:700;color:${color};background:${bg};padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0;">${badge}</div>
+      </div>`;
+    }).join('');
+    return `<div class="mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:20px 24px;border:1px solid #ECE9F7;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Seguimiento de sesiones</div>
+      <div style="font-size:12px;color:#C2BDCF;margin-bottom:14px;">Clientes que abrieron su enlace personalizado</div>
+      ${rows}
+    </div>`;
+  })();
+
   if (S.records.length === 0) {
-    return wrap(header + linkCard + `
+    return wrap(header + linkCard + sesionesHTML + `
     <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
       <div style="font-size:32px;margin-bottom:12px;">📋</div>
       <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay respuestas enviadas.</p>
@@ -710,52 +756,6 @@ function buildList() {
   }).join('');
 
   const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
-
-  // ── Sección de seguimiento de sesiones ──
-  const BLOCK_NAMES = ['Negocio', 'Captación', 'Comunicación', 'Tecnología', 'Visión'];
-  const sesionesHTML = S.sesiones.length === 0 ? '' : (() => {
-    const rows = S.sesiones.map(ses => {
-      const paso = ses.ultimo_paso || 0;
-      const enviado = ses.enviado;
-      let badge, color, bg;
-      if (enviado) {
-        badge = '✓ Enviado'; color = '#3DAB7A'; bg = 'rgba(61,171,122,.1)';
-      } else if (paso === -1) {
-        badge = '📤 Generado'; color = '#9A95AD'; bg = 'rgba(154,149,173,.1)';
-      } else if (paso === 0) {
-        badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)';
-      } else if (paso >= 1 && paso <= 5) {
-        badge = `⏳ Bloque ${paso}/5 · ${BLOCK_NAMES[paso-1]||''}`; color = '#2E72D8'; bg = 'rgba(46,114,216,.1)';
-      } else {
-        badge = '📋 Casi listo'; color = '#6A38B0'; bg = 'rgba(106,56,176,.1)';
-      }
-      const pct = Math.min(100, Math.round((paso / 8) * 100));
-      const cuando = ses.ultimo_acceso ? (() => {
-        const diff = Math.round((Date.now() - new Date(ses.ultimo_acceso)) / 60000);
-        if (diff < 1) return 'ahora';
-        if (diff < 60) return `hace ${diff} min`;
-        if (diff < 1440) return `hace ${Math.round(diff/60)}h`;
-        return `hace ${Math.round(diff/1440)}d`;
-      })() : '—';
-      const link = FORM_BASE_URL + '?cliente=' + encodeURIComponent(ses.cliente);
-      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEF8;">
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;font-weight:600;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
-          <a href="${link}" target="_blank" style="font-size:11px;color:#9A95AD;margin-top:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;max-width:260px;" title="${link}">${link}</a>
-        </div>
-        <div style="height:4px;width:60px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
-        </div>
-        <div style="font-size:11px;color:#C2BDCF;flex-shrink:0;white-space:nowrap;">${cuando}</div>
-        <div style="font-size:11.5px;font-weight:700;color:${color};background:${bg};padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0;">${badge}</div>
-      </div>`;
-    }).join('');
-    return `<div class="mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:20px 24px;border:1px solid #ECE9F7;margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Seguimiento de sesiones</div>
-      <div style="font-size:12px;color:#C2BDCF;margin-bottom:14px;">Clientes que abrieron su enlace personalizado</div>
-      ${rows}
-    </div>`;
-  })();
 
   return wrap(header + linkCard + sesionesHTML + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
 }
