@@ -453,7 +453,7 @@ function buildLoginDesktop() {
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;">S</div>
               <div>
-                <div style="font-size:13px;font-weight:700;color:#231D3A;">¡Bienvenida, Coach! 👋</div>
+                <div style="font-size:13px;font-weight:700;color:#231D3A;">¡Hola, Coach! 👋</div>
                 <div style="font-size:11px;color:#9A95AD;">Aquí tienes un resumen de la actividad reciente.</div>
               </div>
             </div>
@@ -609,7 +609,7 @@ function buildList() {
   <div class="card-pad mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:22px 28px;border:1px solid #ECE9F7;margin-bottom:20px;">
     <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Generar enlace personalizado</div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <input type="text" id="link-nombre" placeholder="Nombre de tu clienta…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;outline:none;font-family:inherit;" oninput="actualizarLink()" onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'">
+      <input type="text" id="link-nombre" placeholder="Nombre del cliente…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;outline:none;font-family:inherit;" oninput="actualizarLink()" onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'">
       <button onclick="copiarLink()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         Copiar enlace
@@ -829,7 +829,7 @@ window.actualizarLink = function() {
 
 window.copiarLink = function() {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
-  if (!nombre) { alert('Escribe el nombre de tu clienta primero.'); return; }
+  if (!nombre) { alert('Escribe el nombre del cliente primero.'); return; }
   const url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
   navigator.clipboard.writeText(url).then(() => {
     const btn = document.querySelector('[onclick="copiarLink()"]');
