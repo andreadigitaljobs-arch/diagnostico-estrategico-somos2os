@@ -923,6 +923,7 @@ let S = {
   step: 0,
   answers: {},
   tarea: {},
+  tareaLinks: {},
   copied: false,
   sending: false,
   sent: false
@@ -931,16 +932,17 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    S.step    = raw.step    || 0; // Reanudar en el paso donde se quedó el usuario
-    S.answers = raw.answers || {};
-    S.tarea   = raw.tarea   || {};
+    S.step       = raw.step       || 0; // Reanudar en el paso donde se quedó el usuario
+    S.answers    = raw.answers    || {};
+    S.tarea      = raw.tarea      || {};
+    S.tareaLinks = raw.tareaLinks || {};
   } catch(e) {}
 }
 
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      step: S.step, answers: S.answers, tarea: S.tarea
+      step: S.step, answers: S.answers, tarea: S.tarea, tareaLinks: S.tareaLinks
     }));
   } catch(e) {}
 }
@@ -975,7 +977,11 @@ function buildSummary() {
     });
   });
   lines.push('— MATERIALES PARA AUDITORÍA —');
-  TAREA_LABELS.forEach((l, i) => lines.push((S.tarea[i] ? '[x] ' : '[ ] ') + l));
+  TAREA_LABELS.forEach((l, i) => {
+    const checked = S.tarea[i] ? '[x]' : '[ ]';
+    const link = S.tareaLinks[i] ? ` (Info: ${S.tareaLinks[i]})` : '';
+    lines.push(`${checked} ${l}${link}`);
+  });
   return lines.join('\n');
 }
 
@@ -1029,6 +1035,11 @@ window.toggleTarea = function(i) {
   if (container) container.innerHTML = buildTareaItemsHTML();
 };
 
+window.updateTareaLink = function(i, val) {
+  S.tareaLinks[i] = val;
+  saveState();
+};
+
 window.sendEmail = async function() {
   const btn = document.getElementById('send-btn');
 
@@ -1049,6 +1060,7 @@ window.sendEmail = async function() {
           fecha:   new Date().toISOString(),
           answers: S.answers,
           tarea:   S.tarea,
+          tareaLinks: S.tareaLinks,
           resumen: buildSummary()
         })
       });
@@ -1123,10 +1135,23 @@ function buildTareaItemsHTML() {
     const boxBorder   = on ? '#7A2C9E'   : '#CFC9E3';
     const boxBg       = on ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#fff';
     const check       = on ? '✓' : '';
+    const linkVal     = esc(S.tareaLinks[i] || '');
+
+    let inputHTML = '';
+    if (on) {
+      inputHTML = `
+        <div onclick="event.stopPropagation()" style="margin-top:12px;width:100%;">
+          <input type="text" placeholder="Pega el enlace o escribe detalles aquí..." value="${linkVal}" oninput="updateTareaLink(${i}, this.value)" style="width:100%;border:1.5px solid #ECE9F7;border-radius:10px;padding:9px 12px;font-size:13.5px;color:#2C2742;outline:none;background:#fff;transition:border-color 0.25s, box-shadow 0.25s;font-family:'Inter',sans-serif;" onfocus="this.style.borderColor='#7A2C9E';this.style.boxShadow='0 0 0 3px rgba(122,44,158,0.1)';" onblur="this.style.borderColor='#ECE9F7';this.style.boxShadow='none';">
+        </div>`;
+    }
+
     return `
-      <div class="tarea-item" onclick="toggleTarea(${i})" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:15px 18px;border-radius:14px;border:1.5px solid ${borderColor};background:${bg};">
-        <div style="flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid ${boxBorder};background:${boxBg};color:#fff;font-size:15px;font-weight:800;">${check}</div>
-        <span style="font-size:16px;font-weight:600;color:#2C2742;">${esc(label)}</span>
+      <div class="tarea-item" onclick="toggleTarea(${i})" style="display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;padding:15px 18px;border-radius:14px;border:1.5px solid ${borderColor};background:${bg};width:100%;transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div style="display:flex;align-items:center;gap:14px;width:100%;">
+          <div style="flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid ${boxBorder};background:${boxBg};color:#fff;font-size:15px;font-weight:800;">${check}</div>
+          <span style="font-size:16px;font-weight:600;color:#2C2742;text-align:left;line-height:1.2;">${esc(label)}</span>
+        </div>
+        ${inputHTML}
       </div>`;
   }).join('');
 }
