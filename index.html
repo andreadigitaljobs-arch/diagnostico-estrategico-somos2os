@@ -956,11 +956,13 @@ const TAREA_LABELS = [
   { label: 'Ejemplos de contenido previo' }
 ];
 
-const TOTAL_SCREENS = 1 + BLOCKS.length + 2; // 8
+const TOTAL_SCREENS = 1 + BLOCKS.length + 3; // 9: intro + 5 bloques + tarea + resumen + cierre
+const BLOCK_MINS = [15, 15, 15, 10, 15]; // minutos por bloque
 
 // ─── ESTADO ───────────────────────────────────────────────────────────────────
 let S = {
   step: 0,
+  maxStep: 0,
   answers: {},
   tarea: {},
   tareaLinks: {},
@@ -972,7 +974,8 @@ let S = {
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    S.step       = raw.step       || 0; 
+    S.step       = raw.step       || 0;
+    S.maxStep    = raw.maxStep    || raw.step || 0;
     S.answers    = raw.answers    || {};
     S.tarea      = raw.tarea      || {};
     S.tareaLinks = raw.tareaLinks || S.answers._tareaLinks || {};
@@ -982,7 +985,7 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      step: S.step, answers: S.answers, tarea: S.tarea, tareaLinks: S.tareaLinks
+      step: S.step, maxStep: S.maxStep, answers: S.answers, tarea: S.tarea, tareaLinks: S.tareaLinks
     }));
   } catch(e) {}
 }
@@ -1028,6 +1031,16 @@ function buildSummary() {
 
 // ─── ACCIONES GLOBALES (accesibles desde onclick inline) ──────────────────────
 window.go = function(step) {
+  // Validación suave al avanzar desde un bloque
+  if (step > S.step && S.step >= 1 && S.step <= BLOCKS.length) {
+    const bi = S.step - 1;
+    const empty = BLOCKS[bi].qs.filter((raw, i) => {
+      if (typeof raw === 'object' && raw.scale) return false;
+      const v = S.answers[qid(bi, i)];
+      return !v || String(v).trim() === '';
+    }).length;
+    if (empty > 0) { showValidationModal(empty, step); return; }
+  }
   const card = document.querySelector('.form-card');
   if (card && step !== 0) {
     // Si hay una tarjeta activa y no vamos a la cortina de bienvenida, aplicar salida
@@ -1045,6 +1058,7 @@ window.go = function(step) {
 
 function executeGo(step) {
   S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
+  if (S.step > S.maxStep) S.maxStep = S.step;
   saveState();
   render();
   
@@ -1060,6 +1074,22 @@ function executeGo(step) {
 window.updateAnswer = function(id, val) {
   S.answers[id] = val;
   saveState();
+  showSaveToast();
+  // Actualizar contador del bloque en vivo
+  const counter = document.getElementById('block-counter');
+  if (counter) {
+    const bi = S.step - 1;
+    if (bi >= 0 && bi < BLOCKS.length) {
+      const blk = BLOCKS[bi];
+      const done = blk.qs.filter((raw, i) => {
+        if (typeof raw === 'object' && raw.scale) return true;
+        const v = S.answers[qid(bi, i)];
+        return v && String(v).trim() !== '';
+      }).length;
+      counter.textContent = `${done} / ${blk.qs.length}`;
+      counter.style.color = done === blk.qs.length ? '#3DAB7A' : '#9A95AD';
+    }
+  }
 };
 
 window.updateScale = function(id, val) {
@@ -1172,6 +1202,62 @@ window.printAnswers = function() {
   );
   win.document.close();
   setTimeout(() => { try { win.print(); } catch(e) {} }, 350);
+};
+
+// ── AUTOGUARDADO TOAST ────────────────────────────────────────────────────────
+window._saveTimer = null;
+window.showSaveToast = function() {
+  const t = document.getElementById('save-toast');
+  if (!t) return;
+  t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+  clearTimeout(window._saveTimer);
+  window._saveTimer = setTimeout(() => {
+    t.style.opacity = '0'; t.style.transform = 'translateY(8px)';
+  }, 1800);
+};
+
+// ── VALIDACIÓN SUAVE ──────────────────────────────────────────────────────────
+window.showValidationModal = function(empty, targetStep) {
+  const prev = document.getElementById('val-modal');
+  if (prev) prev.remove();
+  const m = document.createElement('div');
+  m.id = 'val-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(28,24,48,.52);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;';
+  m.innerHTML = `
+    <div style="background:#fff;border-radius:22px;padding:30px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.2);">
+      <div style="width:50px;height:50px;border-radius:50%;background:#FFF8E1;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h3 style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#231D3A;margin:0 0 8px;">${empty} pregunta${empty>1?'s':''} sin responder</h3>
+      <p style="font-size:13.5px;color:#6B6680;line-height:1.5;margin:0 0 20px;">Cuantas más respondas, mejor será tu diagnóstico. Pero puedes continuar si prefieres.</p>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('val-modal').remove()" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #E0DCEF;background:#fff;color:#5A5470;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Completar</button>
+        <button onclick="document.getElementById('val-modal').remove();continueAnyway(${targetStep})" style="flex:1;padding:12px;border-radius:10px;border:none;background:linear-gradient(120deg,#2E72D8,#7A2C9E);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar →</button>
+      </div>
+    </div>`;
+  m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+  document.body.appendChild(m);
+};
+window.continueAnyway = function(step) {
+  const card = document.querySelector('.form-card');
+  if (card) { card.classList.remove('animate-enter'); card.classList.add('animate-leave'); setTimeout(() => executeGo(step), 400); }
+  else executeGo(step);
+};
+
+// ── VOZ ───────────────────────────────────────────────────────────────────────
+window.startVoiceInput = function(id) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Tu navegador no soporta entrada de voz. Usa Chrome en Android.'); return; }
+  const r = new SR(); r.lang = 'es-ES'; r.continuous = false; r.interimResults = false;
+  const btn = document.getElementById('vbtn-' + id);
+  if (btn) { btn.style.color = '#E05555'; btn.style.background = 'rgba(224,85,85,.12)'; }
+  r.onresult = e => {
+    const txt = e.results[0][0].transcript;
+    const ta = document.querySelector(`textarea[data-qid="${id}"]`);
+    if (ta) { ta.value = (ta.value ? ta.value + ' ' : '') + txt; ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; updateAnswer(id, ta.value); }
+  };
+  r.onend = r.onerror = () => { if (btn) { btn.style.color=''; btn.style.background=''; } };
+  r.start();
 };
 
 window.openWhatsApp = function() {
@@ -1287,12 +1373,74 @@ function buildIntroHTML() {
 
     <!-- Botón CTA y nota -->
     <div style="width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.7s;">
-      <button onclick="go(1)" class="btn-primary" style="width:100%;padding:14px 20px;border-radius:12px;font-size:16px;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">Comenzar ahora →</button>
+      ${S.maxStep > 0 ? `
+      <div onclick="go(${S.maxStep})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1.5px solid #7A2C9E;background:linear-gradient(135deg,rgba(46,114,216,.06),rgba(122,44,158,.06));cursor:pointer;margin-bottom:12px;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div style="flex:1;text-align:left;">
+          <div style="font-size:13.5px;font-weight:700;color:#231D3A;">Continuar donde lo dejaste</div>
+          <div style="font-size:12px;color:#7A2C9E;font-weight:600;">${S.maxStep <= BLOCKS.length ? `Bloque ${S.maxStep} de ${BLOCKS.length}` : S.maxStep === BLOCKS.length + 1 ? 'Tarea final' : 'Resumen'}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A2C9E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>` : ''}
+
+      <button onclick="go(1)" class="btn-primary" style="width:100%;padding:14px 20px;border-radius:12px;font-size:16px;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">${S.maxStep > 0 ? 'Empezar de nuevo' : 'Comenzar ahora →'}</button>
 
       <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:12px;color:#9A95AD;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         <span>Tus respuestas se guardan automáticamente en este dispositivo.</span>
       </div>
+    </div>
+  </div>`;
+}
+
+function buildResumenHTML() {
+  const totalQ = BLOCKS.reduce((s, b) => s + b.qs.length, 0);
+  const totalA = BLOCKS.reduce((s, blk, bi) => s + blk.qs.filter((raw, i) => {
+    if (typeof raw === 'object' && raw.scale) return true;
+    const v = S.answers[qid(bi, i)]; return v && String(v).trim() !== '';
+  }).length, 0);
+  const pct = Math.round((totalA / totalQ) * 100);
+  const tareaChecked = Object.values(S.tarea).filter(Boolean).length;
+
+  const blocksHTML = BLOCKS.map((blk, bi) => {
+    const done = blk.qs.filter((raw, i) => {
+      if (typeof raw === 'object' && raw.scale) return true;
+      const v = S.answers[qid(bi, i)]; return v && String(v).trim() !== '';
+    }).length;
+    const complete = done === blk.qs.length;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1.5px solid ${complete ? 'rgba(61,171,122,.3)' : '#E6E3F2'};background:${complete ? 'rgba(61,171,122,.05)' : '#FBFAFE'};">
+      <div style="flex:none;width:30px;height:30px;border-radius:99px;background:${complete ? 'linear-gradient(135deg,#3DAB7A,#2E72D8)' : '#F0EEF8'};display:flex;align-items:center;justify-content:center;">
+        ${complete
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+          : `<span style="font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:#9A95AD;">${bi+1}</span>`}
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:#2C2742;">${esc(blk.title)}</div>
+        <div style="font-size:12px;font-weight:600;color:${complete ? '#3DAB7A' : '#E05555'};margin-top:2px;">${done} de ${blk.qs.length} respondidas</div>
+      </div>
+      ${!complete ? `<button onclick="continueAnyway(${bi+1})" style="font-size:12px;font-weight:700;color:#7A2C9E;background:rgba(122,44,158,.08);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-family:inherit;">Completar</button>` : ''}
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="form-card" style="width:100%;max-width:660px;padding:36px 32px 28px;text-align:center;">
+    <div style="width:68px;height:68px;border-radius:50%;margin:0 auto 16px;background:${pct===100 ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : 'linear-gradient(135deg,#F0EEF8,#E5E1F2)'};display:flex;align-items:center;justify-content:center;box-shadow:${pct===100 ? '0 12px 28px -8px rgba(90,52,160,.5)' : 'none'};">
+      <span style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;${pct===100 ? 'color:#fff' : 'background:linear-gradient(135deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;'};">${pct}%</span>
+    </div>
+    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;color:#231D3A;">${pct===100 ? '¡Todo completo!' : 'Casi lista'}</h2>
+    <p style="font-size:13.5px;color:#9A95AD;margin:0 0 24px;">${totalA} de ${totalQ} preguntas · ${tareaChecked} de 7 materiales</p>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;">
+      ${blocksHTML}
+    </div>
+
+    ${mobileSpacerHTML}
+    <div class="form-nav" style="display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:20px;border-top:1px solid #F0EEF8;">
+      <button onclick="go(${TOTAL_SCREENS - 1})" class="btn-primary" style="width:100%;padding:15px;font-size:15.5px;border-radius:12px;">${pct===100 ? 'Enviar diagnóstico →' : 'Enviar de todas formas →'}</button>
+      <button onclick="go(${TOTAL_SCREENS - 3})" class="btn-secondary" style="width:100%;text-align:center;">← Volver</button>
     </div>
   </div>`;
 }
@@ -1321,7 +1469,14 @@ function buildBlockHTML(blk, bi) {
       </div>`;
     } else {
       const val = esc(stored || '');
-      inputHTML = `<textarea class="q-textarea" rows="2" placeholder="Escribe tu respuesta…" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; updateAnswer('${id}', this.value)">${val}</textarea>`;
+      inputHTML = `
+      <div style="position:relative;">
+        <textarea class="q-textarea" data-qid="${id}" rows="2" placeholder="Escribe tu respuesta…" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)">${val}</textarea>
+        <button id="vbtn-${id}" type="button" onclick="startVoiceInput('${id}')" title="Dictar respuesta por voz" style="position:absolute;right:10px;bottom:10px;background:rgba(122,44,158,.07);border:none;border-radius:8px;padding:5px 7px;cursor:pointer;color:#7A2C9E;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:inherit;transition:all .2s;" onmouseover="this.style.background='rgba(122,44,158,.14)'" onmouseout="this.style.background='rgba(122,44,158,.07)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Voz
+        </button>
+      </div>`;
     }
 
     return `
@@ -1356,10 +1511,26 @@ function buildBlockHTML(blk, bi) {
     </div>`;
   }).join('');
 
+  // Contador de respondidas en este bloque
+  const answeredInBlock = blk.qs.filter((raw, i) => {
+    if (typeof raw === 'object' && raw.scale) return true;
+    const v = S.answers[qid(bi, i)];
+    return v && String(v).trim() !== '';
+  }).length;
+  const totalInBlock = blk.qs.length;
+  const allDone = answeredInBlock === totalInBlock;
+  // Tiempo restante estimado
+  const minsLeft = BLOCK_MINS.slice(bi).reduce((a,b) => a+b, 0) + 5; // +5 tarea
+
   return `
   <div class="form-card" style="width:100%;max-width:780px;background:#fff;border-radius:26px;padding:42px 40px 34px;box-shadow:0 28px 70px -38px rgba(60,40,120,.4);border:1px solid #ECE9F7;">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
       <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#2E72D8,#7A2C9E);padding:5px 12px;border-radius:99px;letter-spacing:.03em;white-space:nowrap;">${esc(blk.time)}</div>
+      <div id="block-counter" style="font-size:12px;font-weight:700;color:${allDone ? '#3DAB7A' : '#9A95AD'};background:${allDone ? 'rgba(61,171,122,.1)' : '#F7F6FC'};padding:4px 10px;border-radius:99px;white-space:nowrap;">${answeredInBlock} / ${totalInBlock}</div>
+      <div style="margin-left:auto;font-size:12px;color:#B6B2C9;font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ~${minsLeft} min restantes
+      </div>
     </div>
     <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.02em;margin:8px 0 28px;color:#231D3A;">${esc(blk.title)}</h2>
     <div class="questions-wrapper" style="display:flex;flex-direction:column;gap:24px;">
@@ -1469,15 +1640,17 @@ function render() {
   const step      = S.step;
   const isIntro   = step === 0;
   const isClose   = step === TOTAL_SCREENS - 1;
-  const isTarea   = step === TOTAL_SCREENS - 2;
-  const isBlock   = !isIntro && !isClose && !isTarea;
+  const isResumen = step === TOTAL_SCREENS - 2;
+  const isTarea   = step === TOTAL_SCREENS - 3;
+  const isBlock   = !isIntro && !isClose && !isTarea && !isResumen;
   const showProg  = !isIntro && !isClose;
   const blockIdx  = step - 1;
   const blk       = isBlock ? BLOCKS[blockIdx] : null;
   const pct       = Math.round((step / (TOTAL_SCREENS - 1)) * 100);
   const stepLabel = isBlock
     ? `Bloque ${blockIdx + 1} de ${BLOCKS.length}`
-    : isTarea ? 'Tarea final' : '';
+    : isTarea ? 'Tarea final'
+    : isResumen ? 'Resumen' : '';
 
   // Controlar la visibilidad y contenido del header superior fijo
   const mainHeader = document.getElementById('main-header');
@@ -1512,10 +1685,11 @@ function render() {
     </div>` : ''}
   `;
 
-  if      (isIntro) html += buildIntroHTML();
-  else if (isBlock) html += buildBlockHTML(blk, blockIdx);
-  else if (isTarea) html += buildTareaHTML();
-  else if (isClose) html += buildCloseHTML();
+  if      (isIntro)   html += buildIntroHTML();
+  else if (isBlock)   html += buildBlockHTML(blk, blockIdx);
+  else if (isTarea)   html += buildTareaHTML();
+  else if (isResumen) html += buildResumenHTML();
+  else if (isClose)   html += buildCloseHTML();
 
   html += '</div>';
   document.getElementById('app').innerHTML = html;
@@ -1537,5 +1711,10 @@ function render() {
 loadState();
 render();
 </script>
+<!-- Toast de autoguardado -->
+<div id="save-toast" style="position:fixed;bottom:88px;right:16px;background:rgba(46,114,216,.92);color:#fff;padding:8px 14px;border-radius:99px;font-size:12.5px;font-weight:600;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;pointer-events:none;z-index:9998;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(46,114,216,.25);">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  Guardado
+</div>
 </body>
 </html>
