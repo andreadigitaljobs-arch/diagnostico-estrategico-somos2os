@@ -1308,78 +1308,75 @@ function buildIntroHTML() {
       </svg>
     </div>
 
-    <!-- Layout principal de la tarjeta: Títulos -->
-    <div class="intro-header-row" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;width:100%;">
-      <div class="welcome-text-container" style="width:100%;padding-right:75px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;position:relative;z-index:1;">
-        
-        <div style="display:inline-flex;align-items:center;justify-content:flex-start;margin-bottom:10px;width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.1s;">
-          <div style="display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.08),rgba(122,44,158,.08));color:#7A2C9E;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;margin:0;">Guía de Sesión · Sesión 1</div>
+    <!-- Header: texto + brújula -->
+    <div class="intro-header-row" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative;width:100%;">
+      <div class="welcome-text-container" style="width:100%;padding-right:80px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;position:relative;z-index:1;">
+
+        <div style="display:inline-flex;margin-bottom:8px;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.1s;">
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1));color:#7A2C9E;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;">Guía de Sesión · Sesión 1</div>
         </div>
-        
-        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:600;color:#7A2C9E;margin:0 0 4px;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.2s;">Bienvenida a tu <span style="display:inline-block;width:24px;height:1px;background:linear-gradient(90deg,#7A2C9E,transparent);margin-left:2px;"></span></h2>
-        
-        <h1 class="form-h1" style="font-family:'Sora',sans-serif;font-size:36px;line-height:1.08;font-weight:700;margin:0 0 8px;letter-spacing:-.02em;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:left; opacity:0; animation: screenFadeIn 0.6s ease-out forwards; animation-delay: 0.3s;">Diagnóstico Estratégico</h1>
-        
-        <div style="display:flex;align-items:center;gap:6px;color:#6B6680;font-size:13px;font-weight:500;text-align:left;justify-content:flex-start;width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.4s;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#7A2C9E;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          <span>90 minutos · Sesión de claridad y diferenciación para tu marca</span>
+
+        <h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:500;color:#9A95AD;margin:0 0 2px;letter-spacing:0em;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.2s;">Bienvenida a tu</h2>
+
+        <h1 class="form-h1" style="font-family:'Sora',sans-serif;font-size:28px;line-height:1.1;font-weight:800;margin:0 0 10px;letter-spacing:-.03em;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:left;opacity:0;animation:screenFadeIn .6s ease-out forwards;animation-delay:.3s;">Diagnóstico Estratégico</h1>
+
+        <div style="display:flex;align-items:center;gap:5px;color:#9A95AD;font-size:12px;font-weight:500;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.4s;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#7A2C9E;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>90 minutos · Claridad y diferenciación para tu marca</span>
         </div>
       </div>
-      
-      <!-- Brújula flotante a la derecha con tamaño original en computadora -->
-      <div class="floating-compass" style="position:absolute;right:-25px;top:-10px;width:170px;height:170px;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none; opacity:0; animation: screenFadeIn 0.8s ease-out forwards; animation-delay: 0.3s;">
-        <img src="assets/compass.png" alt="Compass" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 15px 25px rgba(122,44,158,0.22)) drop-shadow(0 0 15px rgba(46,114,216,0.15));">
+
+      <!-- Brújula: más pequeña, detrás del texto -->
+      <div class="floating-compass" style="position:absolute;right:-20px;top:-6px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;z-index:0;pointer-events:none;opacity:0;animation:screenFadeIn .8s ease-out forwards;animation-delay:.3s;">
+        <img src="assets/compass.png" alt="Compass" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 20px rgba(122,44,158,0.18)) drop-shadow(0 0 12px rgba(46,114,216,0.12));opacity:.85;">
       </div>
     </div>
 
-    <!-- Sección de Objetivo -->
-    <div style="background:#F7F6FC;border:1.5px dashed #E0DCEF;border-left:4px solid #7A2C9E;border-radius:12px;padding:16px 20px;margin-bottom:24px;width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.5s;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A2C9E;margin-bottom:6px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+    <!-- Objetivo de hoy: limpio, sin borde dashed -->
+    <div style="background:linear-gradient(135deg,rgba(46,114,216,.06),rgba(122,44,158,.06));border:1px solid rgba(122,44,158,.14);border-radius:12px;padding:13px 16px;margin-bottom:16px;width:100%;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.5s;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A2C9E;margin-bottom:5px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         <span>Objetivo de hoy</span>
       </div>
-      <p class="form-body" style="margin:0;font-size:14.5px;line-height:1.55;color:#322C45;font-weight:500;">Entender a fondo tu negocio y su contexto actual para detectar tus mayores oportunidades de diferenciación y construir tu <strong>Plan Estratégico de 90 Días</strong>.</p>
+      <p class="form-body" style="margin:0;font-size:13.5px;line-height:1.5;color:#322C45;font-weight:500;">Detectar tus mayores oportunidades de diferenciación y construir tu <strong>Plan Estratégico de 90 Días</strong>.</p>
     </div>
 
-    <!-- Sección de Enfoques Clave -->
-    <div style="margin-bottom:28px;width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.6s;">
-      <div style="font-size:11px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;text-align:left;">Trabajaremos sobre 3 pilares:</div>
-      <div style="display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap;width:100%;">
-        <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;font-size:12.5px;font-weight:600;color:#2E72D8;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-          Posicionamiento
+    <!-- 3 Pilares: grid uniforme, sin wrap roto -->
+    <div style="margin-bottom:18px;width:100%;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.6s;">
+      <div style="font-size:10px;font-weight:700;color:#B6B2C9;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Trabajaremos sobre</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E72D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span style="font-size:11px;font-weight:600;color:#2E72D8;text-align:center;line-height:1.2;">Posicio&shy;namiento</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;font-size:12.5px;font-weight:600;color:#7A2C9E;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 2 18 2 22 6 12 22 2 6 6 2"></polygon></svg>
-          Diferenciación
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A2C9E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 2 18 2 22 6 12 22 2 6 6 2"/></svg>
+          <span style="font-size:11px;font-weight:600;color:#7A2C9E;text-align:center;line-height:1.2;">Diferencia&shy;ción</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;font-size:12.5px;font-weight:600;color:#2E72D8;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          Claridad de marca
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;border:1px solid #ECE9F7;background:#FBFAFE;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E72D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span style="font-size:11px;font-weight:600;color:#2E72D8;text-align:center;line-height:1.2;">Claridad de marca</span>
         </div>
       </div>
     </div>
 
-    <!-- Botón CTA y nota -->
-    <div style="width:100%; opacity:0; animation: screenFadeIn 0.5s ease-out forwards; animation-delay: 0.7s;">
+    <!-- CTA -->
+    <div style="width:100%;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:.7s;">
       ${S.maxStep > 0 ? `
-      <div onclick="go(${S.maxStep})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1.5px solid #7A2C9E;background:linear-gradient(135deg,rgba(46,114,216,.06),rgba(122,44,158,.06));cursor:pointer;margin-bottom:12px;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;flex:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <div onclick="go(${S.maxStep})" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(122,44,158,.3);background:linear-gradient(135deg,rgba(46,114,216,.05),rgba(122,44,158,.05));cursor:pointer;margin-bottom:10px;transition:all .2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(46,114,216,.05),rgba(122,44,158,.05))'">
+        <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div style="flex:1;text-align:left;">
-          <div style="font-size:13.5px;font-weight:700;color:#231D3A;">Continuar donde lo dejaste</div>
-          <div style="font-size:12px;color:#7A2C9E;font-weight:600;">${S.maxStep <= BLOCKS.length ? `Bloque ${S.maxStep} de ${BLOCKS.length}` : S.maxStep === BLOCKS.length + 1 ? 'Tarea final' : 'Resumen'}</div>
+          <div style="font-size:13px;font-weight:700;color:#231D3A;">Continuar donde lo dejaste</div>
+          <div style="font-size:11.5px;color:#7A2C9E;font-weight:600;">${S.maxStep <= BLOCKS.length ? `Bloque ${S.maxStep} de ${BLOCKS.length}` : S.maxStep === BLOCKS.length + 1 ? 'Tarea final' : 'Resumen'}</div>
         </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A2C9E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B6B2C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>` : ''}
 
-      <button onclick="go(1)" class="btn-primary" style="width:100%;padding:14px 20px;border-radius:12px;font-size:16px;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">${S.maxStep > 0 ? 'Empezar de nuevo' : 'Comenzar ahora →'}</button>
+      <button onclick="go(1)" class="btn-primary" style="width:100%;padding:13px 20px;border-radius:12px;font-size:15.5px;font-weight:700;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">${S.maxStep > 0 ? 'Empezar de nuevo' : 'Comenzar ahora →'}</button>
 
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:12px;color:#9A95AD;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-        <span>Tus respuestas se guardan automáticamente en este dispositivo.</span>
-      </div>
+      <p style="text-align:center;font-size:11px;color:#C2BDCF;margin:10px 0 0;letter-spacing:.01em;">Tus respuestas se guardan en este dispositivo</p>
     </div>
   </div>`;
 }
