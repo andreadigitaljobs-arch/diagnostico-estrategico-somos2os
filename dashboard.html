@@ -674,10 +674,6 @@ function buildList() {
     <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Generar enlace personalizado</div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
       <input type="text" id="link-nombre" placeholder="Nombre del cliente…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;outline:none;font-family:inherit;" oninput="actualizarLink()" onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'">
-      <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button id="btn-genero-f" onclick="selGenero('f')" style="padding:9px 14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;font-size:13px;font-weight:600;color:#9A95AD;cursor:pointer;font-family:inherit;transition:all .15s;">♀ Mujer</button>
-        <button id="btn-genero-m" onclick="selGenero('m')" style="padding:9px 14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;font-size:13px;font-weight:600;color:#9A95AD;cursor:pointer;font-family:inherit;transition:all .15s;">♂ Hombre</button>
-      </div>
       <button onclick="copiarLink()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         Copiar enlace
@@ -939,28 +935,11 @@ function buildDetail() {
 // ── LINK PERSONALIZADO ────────────────────────────────────────────────────────
 const FORM_BASE_URL = 'https://formularios.somosdostudio.com';
 
-let _generoSeleccionado = '';
-
-window.selGenero = function(g) {
-  _generoSeleccionado = g;
-  const btnF = document.getElementById('btn-genero-f');
-  const btnM = document.getElementById('btn-genero-m');
-  if (btnF && btnM) {
-    btnF.style.background = g === 'f' ? '#F3EBF9' : '#FBFAFE';
-    btnF.style.borderColor = g === 'f' ? '#7A2C9E' : '#E6E3F2';
-    btnF.style.color = g === 'f' ? '#7A2C9E' : '#9A95AD';
-    btnM.style.background = g === 'm' ? '#EBF1F9' : '#FBFAFE';
-    btnM.style.borderColor = g === 'm' ? '#2E72D8' : '#E6E3F2';
-    btnM.style.color = g === 'm' ? '#2E72D8' : '#9A95AD';
-  }
-  actualizarLink();
-};
 
 function buildLink(sid) {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
   if (!nombre) return '';
   let url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
-  if (_generoSeleccionado) url += '&genero=' + _generoSeleccionado;
   if (sid) url += '&sid=' + sid;
   return url;
 }
