@@ -1208,6 +1208,37 @@ window.printAnswers = function() {
   setTimeout(() => { try { win.print(); } catch(e) {} }, 350);
 };
 
+// ── BORRAR RESPUESTAS ─────────────────────────────────────────────────────────
+window.confirmReset = function() {
+  const prev = document.getElementById('reset-modal');
+  if (prev) prev.remove();
+  const m = document.createElement('div');
+  m.id = 'reset-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(28,24,48,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;';
+  m.innerHTML = `
+    <div style="background:#fff;border-radius:22px;padding:28px 22px;max-width:320px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.2);">
+      <div style="width:48px;height:48px;border-radius:50%;background:#FEF2F2;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E05555" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <h3 style="font-family:'Sora',sans-serif;font-size:17px;font-weight:700;color:#231D3A;margin:0 0 8px;">¿Borrar todas las respuestas?</h3>
+      <p style="font-size:13.5px;color:#6B6680;line-height:1.5;margin:0 0 20px;">Perderás todo el progreso guardado. Esta acción no se puede deshacer.</p>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('reset-modal').remove()" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #E0DCEF;background:#fff;color:#5A5470;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar</button>
+        <button onclick="doReset()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#E05555;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Sí, borrar</button>
+      </div>
+    </div>`;
+  m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+  document.body.appendChild(m);
+};
+
+window.doReset = function() {
+  localStorage.removeItem(STORAGE_KEY);
+  S.step = 0; S.maxStep = 0; S.answers = {}; S.tarea = {}; S.tareaLinks = {};
+  const modal = document.getElementById('reset-modal');
+  if (modal) modal.remove();
+  render();
+};
+
 // ── AUTOGUARDADO TOAST ────────────────────────────────────────────────────────
 window._saveTimer = null;
 window.showSaveToast = function() {
@@ -1308,6 +1339,11 @@ function buildIntroHTML() {
       </svg>
     </div>
 
+    <!-- Logo en el intro card -->
+    <div style="margin-bottom:14px;opacity:0;animation:screenFadeIn .5s ease-out forwards;animation-delay:0s;">
+      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:28px;width:auto;object-fit:contain;">
+    </div>
+
     <!-- Header: texto + brújula -->
     <div class="intro-header-row" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative;width:100%;">
       <div class="welcome-text-container" style="width:100%;padding-right:80px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;position:relative;z-index:1;">
@@ -1374,7 +1410,7 @@ function buildIntroHTML() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B6B2C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>` : ''}
 
-      <button onclick="go(1)" class="btn-primary" style="width:100%;padding:13px 20px;border-radius:12px;font-size:15.5px;font-weight:700;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">${S.maxStep > 0 ? 'Empezar de nuevo' : 'Comenzar ahora →'}</button>
+      <button onclick="${S.maxStep > 0 ? 'confirmReset()' : 'go(1)'}" class="btn-primary" style="width:100%;padding:13px 20px;border-radius:12px;font-size:15.5px;font-weight:700;letter-spacing:.01em;box-shadow:0 12px 25px -10px rgba(90,52,160,.4);background:linear-gradient(90deg,#2E72D8,#7A2C9E);font-family:'Sora',sans-serif;">${S.maxStep > 0 ? 'Empezar de nuevo' : 'Comenzar ahora →'}</button>
 
       <p style="text-align:center;font-size:11px;color:#C2BDCF;margin:10px 0 0;letter-spacing:.01em;">Tus respuestas se guardan en este dispositivo</p>
     </div>
