@@ -539,12 +539,14 @@ window.dismissIntro = function() {
     intro.classList.add('fade-out');
     sessionStorage.setItem('somos2os_intro_shown', 'true');
     
-    // Buscar la tarjeta de diagnóstico en el fondo y reiniciar su animación de entrada
+    // Buscar la tarjeta de diagnóstico en el fondo y ocultarla de inmediato
     const card = document.querySelector('.form-card');
     if (card) {
       card.classList.remove('animate-enter');
+      card.style.opacity = '0'; // Ocultar para evitar el parpadeo
       void card.offsetWidth; // Forzar reflujo del navegador
       setTimeout(() => {
+        card.style.opacity = ''; // Restaurar la opacidad original para permitir la animación
         card.classList.add('animate-enter');
       }, 250); // Coincidir con el inicio del fade-out del overlay
     }
