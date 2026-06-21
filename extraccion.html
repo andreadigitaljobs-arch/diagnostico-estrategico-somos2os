@@ -153,74 +153,135 @@
     .animate-leave { animation: screenFadeOut 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
 
     /* Intro overlay */
+    /* ── INTRO OVERLAY (desktop: imagen de fondo, mobile: gradiente) ── */
     .intro-overlay {
       position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh; height: 100dvh;
-      background: #040E1C;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 9999; color: #fff; overflow: hidden;
-      font-family: 'Sora', sans-serif;
+      background: url('assets/extraccion-bg-compu.png') center center / cover no-repeat, #040E1C;
+      z-index: 9999; overflow: hidden;
+      font-family: 'Sora', sans-serif; color: #fff;
     }
-    #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    .intro-content-wrap { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 800px; padding: 0 24px; }
-    .intro-bg-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(46,114,216,0.38) 0%, transparent 70%); filter: blur(50px); animation: pulseGlow 10s ease-in-out infinite alternate; z-index: 0; }
-    .intro-bg-glow-2 { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(90,69,196,0.28) 0%, transparent 70%); filter: blur(60px); animation: pulseGlow2 15s ease-in-out infinite alternate; z-index: 0; bottom: -100px; right: -100px; }
-    @keyframes pulseGlow { 0% { transform: scale(0.8) translate(-30px,-30px); opacity: 0.6; } 100% { transform: scale(1.1) translate(30px,30px); opacity: 0.9; } }
-    @keyframes pulseGlow2 { 0% { transform: scale(0.9) translate(40px,40px); opacity: 0.5; } 100% { transform: scale(1.2) translate(-40px,-40px); opacity: 0.8; } }
-    @keyframes shine { 0% { left: -150%; } 50% { left: -150%; } 100% { left: 150%; } }
+    .intro-overlay.fade-out { opacity: 0; pointer-events: none; transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1); }
+
+    /* Posicionadores absolutos — cada uno ubica su elemento sobre el chrome del fondo */
+    .intro-pos-logo    { position: absolute; top: 7.5vh; left: 50%; transform: translateX(-50%); }
+    .intro-pos-heading { position: absolute; top: 24vh;  left: 0; width: 100%; text-align: center; }
+    .intro-pos-phrase  { position: absolute; top: 38vh;  left: 0; width: 100%; text-align: center; }
+    .intro-pos-btn     { position: absolute; top: 60vh;  left: 0; width: 100%; text-align: center; }
+
+    .intro-logo-circle {
+      width: 82px; height: 82px; border-radius: 50%; overflow: hidden; position: relative;
+      opacity: 0; animation: fadeInUp .8s ease forwards; animation-delay: .3s;
+    }
+    .logo-shine { position: absolute; top: 0; left: -150%; width: 50%; height: 100%; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent); transform: skewX(-25deg); animation: logoShine 4s ease-in-out infinite; animation-delay: 2.5s; }
+    @keyframes logoShine { 0%,50%{left:-150%} 100%{left:150%} }
+
     .intro-heading {
-      font-size: 64px; font-weight: 800; text-align: center; line-height: 1.1; letter-spacing: -0.03em;
+      display: inline-block;
+      font-size: clamp(40px, 5vw, 70px); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
       background: linear-gradient(135deg, #fff 20%, #93c5fd 60%, #818cf8 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
-      opacity: 0; filter: blur(10px); transform: translateY(40px);
-      animation: revealText 1.6s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.6s; margin-bottom: 24px;
+      opacity: 0; filter: blur(10px); transform: translateY(30px);
+      animation: revealText 1.4s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: .6s;
     }
-    @keyframes revealText { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
-    .intro-phrase {
-      font-size: 18px; font-weight: 400; color: #b8cde8; text-align: center;
-      max-width: 580px; line-height: 1.6;
-      opacity: 0; transform: translateY(20px);
-      animation: fadeInUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 1.4s; margin-bottom: 48px;
-    }
-    .intro-btn { opacity: 0; transform: translateY(15px); animation: fadeInUp 1s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 2s; }
-    .intro-btn-action {
-      padding: 18px 44px; border-radius: 99px; font-size: 17px; font-weight: 700;
-      border: none; color: #fff; cursor: pointer;
-      background: linear-gradient(135deg,#7A2C9E,#2E72D8);
-      box-shadow: 0 15px 35px -10px rgba(46,114,216,0.55);
-      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-    }
-    .intro-btn-action:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 20px 40px -8px rgba(46,114,216,0.7); }
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-    .intro-overlay.fade-out { opacity: 0; pointer-events: none; transform: scale(1.05); transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1); }
-    .logo-wrapper { position: relative; display: inline-block; overflow: hidden; border-radius: 50%; margin-bottom: 24px; opacity: 0; transform: translateY(20px); animation: fadeInUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.3s; height: 96px; width: 96px; }
-    .logo-shine { position: absolute; top: 0; left: -150%; width: 50%; height: 100%; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent); transform: skewX(-25deg); animation: shine 4s ease-in-out infinite; animation-delay: 2.5s; }
+    @keyframes revealText { to { opacity:1; filter:blur(0); transform:translateY(0); } }
 
-    @media (max-width: 600px) {
-      .intro-heading { font-size: 44px; margin-bottom: 18px; }
-      .intro-phrase { font-size: 15px; line-height: 1.55; margin-bottom: 40px; color: #a8c4e0; }
-      .intro-btn-action { padding: 16px 36px !important; font-size: 16px !important; width: 85vw; max-width: 320px; }
+    .intro-phrase {
+      display: inline-block; max-width: 520px;
+      font-size: clamp(13px, 0.95vw, 16px); font-weight: 400; color: #b8cde8; line-height: 1.65;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeInUp 1s ease forwards; animation-delay: 1.4s;
+    }
+
+    .intro-btn {
+      display: inline-block;
+      opacity: 0; transform: translateY(15px);
+      animation: fadeInUp .8s ease forwards; animation-delay: 2s;
+    }
+    .intro-btn-action {
+      padding: 16px 54px; border-radius: 99px; font-size: 17px; font-weight: 700;
+      border: none; color: #fff; cursor: pointer; font-family: 'Sora', sans-serif;
+      background: linear-gradient(90deg, #3B82F6, #9B4DCA);
+      box-shadow: 0 0 40px rgba(59,130,246,0.55);
+      transition: all 0.3s ease;
+    }
+    .intro-btn-action:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(59,130,246,0.8); }
+
+    .intro-features {
+      position: absolute; bottom: 7vh; left: 50%; transform: translateX(-50%);
+      width: 78%; display: flex; justify-content: space-around; align-items: flex-start;
+      opacity: 0; animation: fadeInUp .8s ease forwards; animation-delay: 2.3s;
+    }
+    .intro-feature-item {
+      text-align: center; width: 20%;
+      font-size: clamp(10px, 0.75vw, 12px); color: rgba(255,255,255,0.72);
+      line-height: 1.45; font-weight: 500;
+    }
+
+    @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
+
+    /* Mobile: sin imagen de fondo, layout vertical centrado */
+    @media (max-width: 768px) {
+      .intro-overlay {
+        background: radial-gradient(ellipse at 30% 40%, rgba(122,44,158,0.55) 0%, transparent 60%),
+                    radial-gradient(ellipse at 72% 62%, rgba(46,114,216,0.45) 0%, transparent 60%),
+                    #040E1C;
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; padding: 0 28px;
+      }
+      .intro-pos-logo, .intro-pos-heading, .intro-pos-phrase, .intro-pos-btn {
+        position: static; transform: none; width: 100%; text-align: center;
+      }
+      .intro-pos-logo    { margin-bottom: 22px; }
+      .intro-logo-circle { margin: 0 auto; }
+      .intro-pos-heading { margin-bottom: 14px; }
+      .intro-pos-phrase  { margin-bottom: 36px; }
+      .intro-pos-btn     { margin-bottom: 44px; }
+      .intro-heading     { font-size: 42px; }
+      .intro-phrase      { font-size: 15px; max-width: 340px; }
+      .intro-btn-action  { width: 82vw; max-width: 320px; }
+      .intro-features    { position: static; transform: none; width: 100%; bottom: auto; }
+      .intro-feature-item { font-size: 10px; width: 22%; }
     }
   </style>
 </head>
 <body>
 
 <div id="intro-screen" class="intro-overlay">
-  <canvas id="particles-canvas"></canvas>
-  <div class="intro-bg-glow"></div>
-  <div class="intro-bg-glow-2"></div>
-  <div class="intro-content-wrap">
-    <div class="logo-wrapper">
-      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="height:100%;width:100%;object-fit:contain;filter:brightness(0) invert(1);">
+
+  <!-- Logo: se posa dentro del círculo dibujado en el fondo -->
+  <div class="intro-pos-logo">
+    <div class="intro-logo-circle">
+      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);">
       <div class="logo-shine"></div>
     </div>
+  </div>
+
+  <!-- Título: dentro del marco del fondo -->
+  <div class="intro-pos-heading">
     <div class="intro-heading" id="intro-saludo">¡Hola!</div>
-    <div class="intro-phrase">Lo que sabes vale más de lo que crees. En los próximos 20-30 minutos vamos a extraer el conocimiento que has acumulado durante años para convertirlo en tu mayor activo.</div>
+  </div>
+
+  <!-- Subtítulo: debajo del título, dentro del marco -->
+  <div class="intro-pos-phrase">
+    <div class="intro-phrase">Lo que sabes vale más de lo que crees.<br>En los próximos 20–30 min vamos a extraer el conocimiento<br>que has acumulado durante años para convertirlo en tu mayor activo.</div>
+  </div>
+
+  <!-- Botón: se posa sobre la pastilla dibujada en el fondo -->
+  <div class="intro-pos-btn">
     <div class="intro-btn">
       <button onclick="dismissIntro()" class="intro-btn-action">Comenzar →</button>
     </div>
   </div>
+
+  <!-- Textos bajo los 4 iconos ya dibujados en el fondo -->
+  <div class="intro-features">
+    <div class="intro-feature-item">Tu conocimiento<br>tiene valor</div>
+    <div class="intro-feature-item">Extractamos lo esencial,<br>sin perder tu esencia</div>
+    <div class="intro-feature-item">Lo transformamos<br>en ventaja estratégica</div>
+    <div class="intro-feature-item">Lo convertimos en<br>tu mayor activo</div>
+  </div>
+
 </div>
 
 <script>
@@ -927,13 +988,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.dismissIntro = function() {
   trackOpenExt();
+  go(1); // va directo a la primera sección, sin mostrar la tarjeta blanca
   const intro = document.getElementById('intro-screen');
   if (intro) {
     intro.classList.add('fade-out');
     sessionStorage.setItem('somos2os_extraccion_intro','true');
-    const card = document.querySelector('.form-card');
-    if (card) { card.classList.remove('animate-enter'); card.style.opacity='0'; void card.offsetWidth; setTimeout(() => { card.style.opacity=''; card.classList.add('animate-enter'); }, 250); }
-    setTimeout(() => { intro.style.display='none'; window.introParticlesActive=false; }, 1200);
+    setTimeout(() => { intro.style.display='none'; }, 1200);
   }
 };
 
