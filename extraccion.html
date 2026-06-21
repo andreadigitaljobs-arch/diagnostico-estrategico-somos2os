@@ -167,7 +167,7 @@
     .intro-pos-logo    { position: absolute; top: 7.5vh; left: 50%; transform: translateX(-50%); }
     .intro-pos-heading { position: absolute; top: 24vh;  left: 0; width: 100%; text-align: center; }
     .intro-pos-phrase  { position: absolute; top: 38vh;  left: 0; width: 100%; text-align: center; }
-    .intro-pos-btn     { position: absolute; top: 60vh;  left: 0; width: 100%; text-align: center; }
+    .intro-pos-btn     { position: absolute; top: 62vh;  left: 0; width: 100%; text-align: center; }
 
     .intro-logo-circle {
       width: 82px; height: 82px; border-radius: 50%; overflow: hidden; position: relative;
@@ -199,23 +199,32 @@
       animation: fadeInUp .8s ease forwards; animation-delay: 2s;
     }
     .intro-btn-action {
-      padding: 16px 54px; border-radius: 99px; font-size: 17px; font-weight: 700;
+      padding: 17px 64px; border-radius: 99px; font-size: 18px; font-weight: 700;
       border: none; color: #fff; cursor: pointer; font-family: 'Sora', sans-serif;
       background: linear-gradient(90deg, #3B82F6, #9B4DCA);
-      box-shadow: 0 0 40px rgba(59,130,246,0.55);
+      box-shadow: 0 0 50px rgba(59,130,246,0.55), 0 10px 40px rgba(0,0,0,0.35);
       transition: all 0.3s ease;
     }
-    .intro-btn-action:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(59,130,246,0.8); }
+    .intro-btn-action:hover { transform: scale(1.05); box-shadow: 0 0 70px rgba(59,130,246,0.85), 0 10px 40px rgba(0,0,0,0.4); }
 
     .intro-features {
-      position: absolute; bottom: 7vh; left: 50%; transform: translateX(-50%);
-      width: 78%; display: flex; justify-content: space-around; align-items: flex-start;
+      position: absolute; bottom: 6vh; left: 50%; transform: translateX(-50%);
+      width: 76%; display: flex; justify-content: space-around; align-items: flex-start;
       opacity: 0; animation: fadeInUp .8s ease forwards; animation-delay: 2.3s;
     }
     .intro-feature-item {
-      text-align: center; width: 20%;
-      font-size: clamp(10px, 0.75vw, 12px); color: rgba(255,255,255,0.72);
-      line-height: 1.45; font-weight: 500;
+      text-align: center; width: 20%; display: flex; flex-direction: column; align-items: center; gap: 7px;
+    }
+    .intro-feature-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 18px rgba(59,130,246,0.25);
+    }
+    .intro-feature-label {
+      font-size: clamp(10px, 0.75vw, 12px); color: rgba(255,255,255,0.75);
+      line-height: 1.4; font-weight: 500;
     }
 
     @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
@@ -352,12 +361,24 @@
     </div>
   </div>
 
-  <!-- Textos bajo los 4 iconos ya dibujados en el fondo (solo desktop) -->
+  <!-- Features con iconos (desktop) -->
   <div class="intro-features">
-    <div class="intro-feature-item">Tu conocimiento<br>tiene valor</div>
-    <div class="intro-feature-item">Extractamos lo esencial,<br>sin perder tu esencia</div>
-    <div class="intro-feature-item">Lo transformamos<br>en ventaja estratégica</div>
-    <div class="intro-feature-item">Lo convertimos en<br>tu mayor activo</div>
+    <div class="intro-feature-item">
+      <div class="intro-feature-icon">🧠</div>
+      <div class="intro-feature-label">Tu conocimiento<br>tiene valor</div>
+    </div>
+    <div class="intro-feature-item">
+      <div class="intro-feature-icon">🎯</div>
+      <div class="intro-feature-label">Extractamos lo esencial,<br>sin perder tu esencia</div>
+    </div>
+    <div class="intro-feature-item">
+      <div class="intro-feature-icon">📈</div>
+      <div class="intro-feature-label">Lo transformamos<br>en ventaja estratégica</div>
+    </div>
+    <div class="intro-feature-item">
+      <div class="intro-feature-icon">💎</div>
+      <div class="intro-feature-label">Lo convertimos en<br>tu mayor activo</div>
+    </div>
   </div>
 
   <!-- ── LAYOUT MÓVIL ── -->
@@ -715,8 +736,9 @@ window.secretAdmin = function() {
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
-  const step     = S.step;
-  const isIntro  = step === 0;
+  const step = S.step;
+  if (step === 0) { go(1); return; } // el overlay ES la bienvenida, nunca mostrar tarjeta blanca
+  const isIntro  = false;
   const isClose  = step === TOTAL_SCREENS - 1;
   const isResumen = step === TOTAL_SCREENS - 2;
   const isBlock  = step >= 1 && step <= BLOCKS.length;
