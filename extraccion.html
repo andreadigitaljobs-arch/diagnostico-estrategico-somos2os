@@ -923,7 +923,7 @@ function buildListaHTML(blk, bi) {
   return `
   <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.2),rgba(122,44,158,.2));color:#a78bfa;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
       <div style="font-size:12px;color:rgba(165,185,225,0.7);font-weight:600;">${answered}/${blk.count} respondidas</div>
     </div>
     <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:#e8edf8;">${esc(blk.title)}</h2>
@@ -979,11 +979,11 @@ function buildCasosHTML(blk, bi) {
     }).join('');
 
     return `
-    <div data-caso-div="${caso.num}" style="border-radius:16px;overflow:hidden;border:1.5px solid ${filled===4 ? '#3DAB7A' : color+'33'};">
-      <div style="background:linear-gradient(135deg,${color}18,${color}0a);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ${color}22;">
+    <div data-caso-div="${caso.num}" style="border-radius:16px;overflow:hidden;border:1.5px solid ${filled===4 ? 'rgba(61,171,122,0.5)' : 'rgba(255,255,255,0.1)'};">
+      <div style="background:rgba(255,255,255,0.04);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.08);">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${color},${color}CC);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${caso.num}</div>
-        <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:${color};">${caso.label}</span>
-        <span data-caso-badge="${caso.num}" style="margin-left:auto;font-size:12px;font-weight:600;color:${filled===4?'#3DAB7A':'#B6B2C9'};">${filled}/4 ${filled===4?'✓ completo':'respondidas'}</span>
+        <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:${color};filter:brightness(1.3);">${caso.label}</span>
+        <span data-caso-badge="${caso.num}" style="margin-left:auto;font-size:12px;font-weight:600;color:${filled===4?'#3DAB7A':'rgba(165,185,225,0.7)'};">${filled}/4 ${filled===4?'✓ completo':'respondidas'}</span>
       </div>
       <div style="padding:20px 18px;display:flex;flex-direction:column;gap:16px;" class="questions-wrapper">
         ${qsHTML}
@@ -994,7 +994,7 @@ function buildCasosHTML(blk, bi) {
   return `
   <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.2),rgba(122,44,158,.2));color:#a78bfa;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
     </div>
     <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#e8edf8;">${esc(blk.title)}</h2>
     <p style="font-size:14px;line-height:1.6;color:rgba(195,212,240,0.9);margin:0 0 20px;">${esc(blk.intro)}</p>
@@ -1031,7 +1031,7 @@ function buildNormalHTML(blk, bi) {
   return `
   <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.2),rgba(122,44,158,.2));color:#a78bfa;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
     </div>
     <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#e8edf8;">${esc(blk.title)}</h2>
     <p style="font-size:14px;line-height:1.6;color:rgba(195,212,240,0.9);margin:0 0 24px;border-left:3px solid ${blk.color};padding-left:14px;">${esc(blk.intro)}</p>
@@ -1068,16 +1068,16 @@ function buildResumenHTML() {
     }
     const ok = count === total;
     return `
-    <div onclick="go(${bi+1})" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:1.5px solid ${ok ? '#3DAB7A' : '#ECE9F7'};background:${ok ? 'rgba(61,171,122,.06)' : '#FBFAFE'};cursor:pointer;transition:all .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
-      <div style="width:36px;height:36px;border-radius:10px;background:${ok ? 'linear-gradient(135deg,#3DAB7A,#2E9E68)' : 'linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15))'};display:flex;align-items:center;justify-content:center;flex:none;">
+    <div onclick="go(${bi+1})" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:1.5px solid ${ok ? 'rgba(61,171,122,0.5)' : 'rgba(255,255,255,0.1)'};background:${ok ? 'rgba(61,171,122,.1)' : 'rgba(255,255,255,0.05)'};cursor:pointer;transition:all .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+      <div style="width:36px;height:36px;border-radius:10px;background:${ok ? 'linear-gradient(135deg,#3DAB7A,#2E9E68)' : 'linear-gradient(135deg,rgba(46,114,216,.2),rgba(122,44,158,.2))'};display:flex;align-items:center;justify-content:center;flex:none;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${ok ? '#fff' : blk.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${ok ? '<polyline points="20 6 9 17 4 12"/>' : '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>'}
         </svg>
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:700;color:#231D3A;">${esc(blk.title)}</div>
-        <div style="font-size:12px;color:#9A95AD;">${count} de ${total} respondidas</div>
+        <div style="font-size:14px;font-weight:700;color:#e8edf8;">${esc(blk.title)}</div>
+        <div style="font-size:12px;color:rgba(165,185,225,0.7);">${count} de ${total} respondidas</div>
       </div>
-      <div style="font-size:12px;font-weight:700;color:${ok ? '#3DAB7A' : '#9A95AD'};">${count}/${total}</div>
+      <div style="font-size:12px;font-weight:700;color:${ok ? '#3DAB7A' : 'rgba(165,185,225,0.7)'};">${count}/${total}</div>
     </div>`;
   }).join('');
 
@@ -1085,9 +1085,9 @@ function buildResumenHTML() {
   <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
     <div style="text-align:center;margin-bottom:24px;">
       <div style="font-family:'Sora',sans-serif;font-size:48px;font-weight:800;background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1;">${pct}%</div>
-      <p style="font-size:14px;color:#9A95AD;margin:4px 0 0;">${answered} de ${total} preguntas respondidas</p>
+      <p style="font-size:14px;color:rgba(165,185,225,0.7);margin:4px 0 0;">${answered} de ${total} preguntas respondidas</p>
     </div>
-    <div style="height:8px;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:28px;">
+    <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-bottom:28px;">
       <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;transition:width .5s ease;"></div>
     </div>
 
@@ -1096,7 +1096,7 @@ function buildResumenHTML() {
     </div>
 
     ${mobileSpacerHTML}
-    <div class="form-nav" style="display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:20px;border-top:1px solid #F0EEF8;">
+    <div class="form-nav" style="display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <button onclick="go(${TOTAL_SCREENS - 1})" class="btn-primary" style="width:100%;padding:15px;font-size:15.5px;border-radius:12px;">${pct===100 ? 'Enviar extracción →' : 'Enviar de todas formas →'}</button>
       <button onclick="go(${TOTAL_SCREENS - 3})" class="btn-secondary" style="width:100%;text-align:center;">← Volver</button>
     </div>
@@ -1110,11 +1110,11 @@ function buildCloseHTML() {
     <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px -8px rgba(90,52,160,.55);">
       <span style="color:#fff;font-size:32px;font-weight:800;line-height:1;">✓</span>
     </div>
-    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:clamp(18px,5vw,28px);font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#231D3A;">${CLIENT_NAME ? '¡Gracias, ' + esc(CLIENT_NAME) + '!' : '¡Gracias!'}</h2>
-    <p style="font-size:15px;line-height:1.55;color:#5A5470;margin:0 auto 28px;max-width:480px;">Tu conocimiento ha sido registrado. Con esta información construiremos tu estrategia de contenido, tu GPT personalizado y tus sistemas de autoridad.</p>
+    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:clamp(18px,5vw,28px);font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#e8edf8;">${CLIENT_NAME ? '¡Gracias, ' + esc(CLIENT_NAME) + '!' : '¡Gracias!'}</h2>
+    <p style="font-size:15px;line-height:1.55;color:rgba(195,212,240,0.85);margin:0 auto 28px;max-width:480px;">Tu conocimiento ha sido registrado. Con esta información construiremos tu estrategia de contenido, tu GPT personalizado y tus sistemas de autoridad.</p>
 
-    <div style="text-align:left;background:#F8F7FC;padding:24px 20px;border-radius:18px;border:1px solid #ECE9F7;margin-bottom:28px;">
-      <p style="font-size:12px;font-weight:700;color:#7A2C9E;text-transform:uppercase;letter-spacing:.06em;margin:0 0 16px;">¿Qué construiremos con esto?</p>
+    <div style="text-align:left;background:rgba(255,255,255,0.06);padding:24px 20px;border-radius:18px;border:1px solid rgba(255,255,255,0.1);margin-bottom:28px;">
+      <p style="font-size:12px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;margin:0 0 16px;">¿Qué construiremos con esto?</p>
       <div style="display:flex;flex-direction:column;gap:12px;">
         ${[
           ['GPT Personalizado','Un asistente entrenado con tu conocimiento y tu voz para responder como tú.'],
@@ -1123,12 +1123,12 @@ function buildCloseHTML() {
           ['Sistema de Autoridad','Recursos y automatizaciones que posicionan tu expertise en piloto automático.']
         ].map(([t,d]) => `
         <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15));display:flex;align-items:center;justify-content:center;flex:none;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6A38B0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.2),rgba(122,44,158,.2));display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style="font-size:13.5px;font-weight:700;color:#231D3A;">${t}</div>
-            <div style="font-size:12.5px;color:#9A95AD;line-height:1.4;">${d}</div>
+            <div style="font-size:13.5px;font-weight:700;color:#e8edf8;">${t}</div>
+            <div style="font-size:12.5px;color:rgba(175,195,230,0.75);line-height:1.4;">${d}</div>
           </div>
         </div>`).join('')}
       </div>
