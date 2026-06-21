@@ -97,6 +97,49 @@
     }
     .shake { animation: shake .4s ease; }
 
+    /* ── Animaciones de transición ── */
+    @keyframes dashFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes dashSlideUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);     }
+    }
+    @keyframes dashSlideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Wrapper de pantalla completa anima como fade */
+    .dash-enter { animation: dashFadeIn 0.28s ease both; }
+
+    /* Hijos directos de mob-wrap se escalonan */
+    .dash-stagger > * {
+      opacity: 0;
+      animation: dashSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .dash-stagger > *:nth-child(1) { animation-delay:  20ms; }
+    .dash-stagger > *:nth-child(2) { animation-delay:  80ms; }
+    .dash-stagger > *:nth-child(3) { animation-delay: 140ms; }
+    .dash-stagger > *:nth-child(4) { animation-delay: 200ms; }
+    .dash-stagger > *:nth-child(5) { animation-delay: 260ms; }
+    .dash-stagger > *:nth-child(6) { animation-delay: 320ms; }
+    .dash-stagger > *:nth-child(7) { animation-delay: 380ms; }
+    .dash-stagger > *:nth-child(8) { animation-delay: 440ms; }
+
+    /* Cards en vistas de detalle también animan */
+    .dash-cards > * {
+      opacity: 0;
+      animation: dashSlideUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .dash-cards > *:nth-child(1) { animation-delay:  60ms; }
+    .dash-cards > *:nth-child(2) { animation-delay: 130ms; }
+    .dash-cards > *:nth-child(3) { animation-delay: 200ms; }
+    .dash-cards > *:nth-child(4) { animation-delay: 270ms; }
+    .dash-cards > *:nth-child(5) { animation-delay: 340ms; }
+    .dash-cards > *:nth-child(6) { animation-delay: 410ms; }
+
     /* ── Clases de texto para dark theme ── */
     .dk-label   { color: rgba(150,175,230,0.55) !important; }
     .dk-body    { color: rgba(190,210,250,0.85) !important; }
@@ -373,10 +416,25 @@ function countAnswered(answers) {
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
-  if (!S.auth)                   { app.innerHTML = buildLogin();             return; }
-  if (S.selected)                { app.innerHTML = buildDetail();            return; }
-  if (S.selectedExtraccion)      { app.innerHTML = buildDetailExtraccion();  return; }
-  app.innerHTML = buildList();
+
+  const doRender = () => {
+    app.style.cssText = '';
+    if (!S.auth)                  app.innerHTML = buildLogin();
+    else if (S.selected)          app.innerHTML = buildDetail();
+    else if (S.selectedExtraccion) app.innerHTML = buildDetailExtraccion();
+    else                          app.innerHTML = buildList();
+    app.classList.add('dash-enter');
+    setTimeout(() => app.classList.remove('dash-enter'), 400);
+  };
+
+  if (app.children.length > 0) {
+    app.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+    app.style.opacity = '0';
+    app.style.transform = 'translateY(-10px)';
+    setTimeout(doRender, 160);
+  } else {
+    doRender();
+  }
 }
 
 window.openExtraccion = function(id) {
@@ -965,7 +1023,7 @@ function buildDetailExtraccion() {
       <p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0;">${totalAnswered} de ${totalQ} preguntas respondidas · ${pct}% completado</p>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">${blocksHTML}</div>
+    <div class="dash-cards" style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">${blocksHTML}</div>
 
     <div style="margin-top:24px;text-align:center;">
       <button onclick="closeExtraccion()" class="btn-secondary">← Volver a la lista</button>
@@ -1117,7 +1175,7 @@ function buildDetail() {
     </div>
 
     <!-- Bloques de preguntas -->
-    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
+    <div class="dash-cards" style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
       ${blocksHTML}
     </div>
 
@@ -1248,7 +1306,7 @@ window.exportarPDF = function() {
 
 function wrap(content) {
   return `
-  <div class="mob-wrap" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
+  <div class="mob-wrap dash-stagger" style="min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
     padding:24px 16px 64px;">
     ${content}
   </div>`;
