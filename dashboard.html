@@ -1162,7 +1162,7 @@ function buildLink(sid) {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
   if (!nombre) return '';
   if (S.linkTipo === 'extraccion') {
-    return FORM_BASE_URL + '/extraccion.html?cliente=' + encodeURIComponent(nombre);
+    return FORM_BASE_URL + '/extraccion?cliente=' + encodeURIComponent(nombre);
   }
   let url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
   if (sid) url += '&sid=' + sid;

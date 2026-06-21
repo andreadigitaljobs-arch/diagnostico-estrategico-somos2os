@@ -511,7 +511,7 @@ let _secretTaps = 0, _secretTimer = null;
 window.secretAdmin = function() {
   _secretTaps++;
   clearTimeout(_secretTimer);
-  if (_secretTaps >= 5) { _secretTaps = 0; window.location.href = '/dashboard.html'; return; }
+  if (_secretTaps >= 5) { _secretTaps = 0; window.location.href = '/dashboard'; return; }
   _secretTimer = setTimeout(() => { _secretTaps = 0; }, 3000);
 };
 

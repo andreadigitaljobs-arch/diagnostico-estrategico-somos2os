@@ -1200,7 +1200,7 @@ window.secretAdmin = function() {
   clearTimeout(_secretTimer);
   if (_secretTaps >= 5) {
     _secretTaps = 0;
-    window.location.href = '/dashboard.html';
+    window.location.href = '/dashboard';
     return;
   }
   _secretTimer = setTimeout(() => { _secretTaps = 0; }, 3000);
