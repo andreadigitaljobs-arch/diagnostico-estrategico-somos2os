@@ -541,7 +541,7 @@ function render() {
 
   let html = '';
   const wrapClass = showProg ? 'form-wrap has-header' : 'form-wrap';
-  const wrapBg = isIntro ? '' : `background:url('assets/background.png') no-repeat center center fixed;background-size:cover;`;
+  const wrapBg = `background:url('assets/background.png') no-repeat center center fixed;background-size:cover;`;
 
   html += `<div class="${wrapClass}" style="min-height:100vh;min-height:100dvh;padding:${isIntro ? '40px 20px' : '110px 20px 48px'};display:flex;flex-direction:column;align-items:center;${isIntro ? 'justify-content:center;' : ''}${wrapBg}">`;
   html += progBar;
