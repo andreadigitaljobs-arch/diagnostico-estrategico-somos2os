@@ -464,12 +464,6 @@
 
     <button onclick="dismissIntro()" class="mobile-cta">Comenzar →</button>
 
-    <div class="mobile-dots">
-      <div class="mobile-dot active"></div>
-      <div class="mobile-dot"></div>
-      <div class="mobile-dot"></div>
-    </div>
-
   </div>
 
 </div>
@@ -480,14 +474,6 @@ try {
   if (_n) {
     const _el = document.getElementById('intro-saludo'); if (_el) _el.textContent = '¡Hola, ' + _n + '!';
     const _nm = document.getElementById('intro-nombre'); if (_nm) _nm.textContent = _n + '!';
-  }
-} catch(e) {}
-try {
-  var _st = JSON.parse(localStorage.getItem('somos2os_extraccion_v1'));
-  var _urlCliente = new URLSearchParams(window.location.search).get('cliente') || '';
-  var _clienteCoincide = !_urlCliente || (_st && _st.clienteName === _urlCliente);
-  if (_st && _st.step > 0 && _st.step < 8 && _clienteCoincide) {
-    document.getElementById('intro-screen').style.display = 'none';
   }
 } catch(e) {}
 </script>
