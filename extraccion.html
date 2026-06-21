@@ -510,7 +510,7 @@ function render() {
   const isIntro  = step === 0;
   const isClose  = step === TOTAL_SCREENS - 1;
   const isResumen = step === TOTAL_SCREENS - 2;
-  const isBlock  = step >= 1 && step <= 6;
+  const isBlock  = step >= 1 && step <= BLOCKS.length;
   const blockIdx = isBlock ? step - 1 : -1;
   const blk      = isBlock ? BLOCKS[blockIdx] : null;
   const showProg = !isIntro && !isClose;
