@@ -1152,12 +1152,6 @@ function buildCloseHTML() {
 // ─── PARTÍCULAS ───────────────────────────────────────────────────────────────
 window.introParticlesActive = true;
 document.addEventListener('DOMContentLoaded', () => {
-  if (S.step > 0) {
-    const intro = document.getElementById('intro-screen');
-    if (intro) intro.style.display = 'none';
-    window.introParticlesActive = false;
-    return;
-  }
   const canvas = document.getElementById('particles-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
