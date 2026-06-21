@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extracción de Conocimiento · Somos2os Studio</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icon-pwa.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Asesorías S2">
+  <meta name="theme-color" content="#7A2C9E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; overflow-x: hidden;
+      -ms-overflow-style: none; scrollbar-width: none;
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar, ::-webkit-scrollbar { display: none; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F4F3FB;
+      color: #1C1830;
+      -webkit-font-smoothing: antialiased;
+    }
+    textarea, input, button { font-family: inherit; }
+    textarea::placeholder { color: #B6B2C9; }
+
+    .form-h2, .form-h2-close, .form-h1 {
+      white-space: nowrap !important;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .form-card {
+      width: 100%;
+      background: rgba(255,255,255,0.72) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 30px 70px -20px rgba(60,40,120,0.08), inset 0 1px 0 rgba(255,255,255,0.6) !important;
+      border: 1px solid rgba(255,255,255,0.4) !important;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      border: none; cursor: pointer;
+      padding: 14px 30px; border-radius: 12px;
+      background: linear-gradient(120deg, #2E72D8, #5A45C4 55%, #7A2C9E);
+      color: #fff; font-size: 15.5px; font-weight: 700;
+      box-shadow: 0 14px 26px -12px rgba(90,52,160,.6);
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 38px -10px rgba(90,52,160,.75); }
+    .btn-primary:active { transform: translateY(-1px) scale(0.98); }
+    .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-secondary {
+      border: 1.5px solid #E0DCEF; background: #fff; color: #5A5470;
+      cursor: pointer; padding: 13px 24px; border-radius: 12px;
+      font-size: 15px; font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-secondary:hover { background: #FAF9FD; border-color: #7A2C9E; color: #7A2C9E; transform: translateY(-2px); }
+    .btn-secondary:active { transform: translateY(0); }
+
+    .q-textarea {
+      margin-left: 43px; width: calc(100% - 43px);
+      resize: vertical; min-height: 54px;
+      border: 1.5px solid #E6E3F2; border-radius: 14px;
+      padding: 13px 15px; font-size: 15.5px; line-height: 1.5;
+      color: #2C2742; background: #FBFAFE; outline: none;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .q-textarea:hover { border-color: #CFC9E3; background: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(90,52,160,0.04); }
+    .q-textarea:focus { border-color: #5A45C4; box-shadow: 0 0 0 4px rgba(90,69,196,.15); background: #fff; transform: translateY(-2px); }
+
+    /* Textarea especial para listas de 15 (sin margen izquierdo, más compacta) */
+    .lista-textarea {
+      width: 100%; resize: vertical; min-height: 46px;
+      border: 1.5px solid #E6E3F2; border-radius: 12px;
+      padding: 11px 14px; font-size: 15px; line-height: 1.5;
+      color: #2C2742; background: #FBFAFE; outline: none;
+      transition: all 0.2s ease;
+    }
+    .lista-textarea:focus { border-color: #5A45C4; box-shadow: 0 0 0 3px rgba(90,69,196,.12); background: #fff; }
+
+    .questions-wrapper { padding-bottom: 20px; }
+
+    @media (max-width: 600px) {
+      .form-wrap {
+        background: url('assets/background-mobile.png') no-repeat center center fixed !important;
+        background-size: cover !important;
+        min-height: 100vh !important; min-height: 100dvh !important;
+        padding: 28px 16px 48px !important;
+        display: flex !important; flex-direction: column !important;
+        justify-content: center !important; align-items: center !important;
+      }
+      .form-wrap.has-header {
+        padding-top: 96px !important; padding-bottom: 100px !important;
+        justify-content: flex-start !important;
+      }
+      .form-header { margin-bottom: 24px !important; }
+      .form-card {
+        background: rgba(255,255,255,0.85) !important;
+        backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important;
+        border-radius: 20px !important; padding: 20px 18px 18px !important;
+        box-shadow: 0 8px 32px rgba(60,40,120,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        max-width: 100% !important; margin: 0 !important;
+      }
+      .form-h1 { font-size: clamp(20px,6.2vw,30px) !important; line-height: 1.15 !important; }
+      .form-h2 { font-size: clamp(17px,5.2vw,24px) !important; margin: 4px 0 20px !important; }
+      .form-h2-close { font-size: clamp(20px,6vw,26px) !important; }
+      .form-card .form-body { text-align: left !important; font-size: 13.5px !important; }
+      .q-textarea { margin-left: 0 !important; width: 100% !important; font-size: 16px !important; }
+      .lista-textarea { font-size: 16px !important; }
+      .form-nav {
+        position: fixed !important; bottom: 16px !important;
+        left: 50% !important; transform: translateX(-50%) !important;
+        width: calc(100% - 32px) !important; max-width: 500px !important;
+        background: rgba(255,255,255,0.88) !important;
+        backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+        padding: 12px 18px !important; border-radius: 16px !important;
+        border: 1px solid rgba(255,255,255,0.6) !important;
+        z-index: 1000 !important; box-shadow: 0 10px 30px rgba(60,40,120,0.12) !important;
+      }
+      .btn-primary { font-size: 14.5px !important; padding: 12px 20px !important; border-radius: 10px !important; }
+      .btn-secondary { font-size: 14px !important; padding: 11px 16px !important; border-radius: 10px !important; }
+      .mobile-spacer { display: block !important; }
+    }
+
+    @keyframes floatCompass {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes screenFadeOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-18px) scale(0.98); }
+    }
+    .animate-enter { animation: screenFadeIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards; will-change: transform, opacity; }
+    .animate-leave { animation: screenFadeOut 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    /* Intro overlay */
+    .intro-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh; height: 100dvh;
+      background: #090514;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; color: #fff; overflow: hidden;
+      font-family: 'Sora', sans-serif;
+    }
+    #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+    .intro-content-wrap { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 800px; padding: 0 24px; }
+    .intro-bg-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90,69,196,0.35) 0%, transparent 70%); filter: blur(50px); animation: pulseGlow 10s ease-in-out infinite alternate; z-index: 0; }
+    .intro-bg-glow-2 { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(122,44,158,0.25) 0%, transparent 70%); filter: blur(60px); animation: pulseGlow2 15s ease-in-out infinite alternate; z-index: 0; bottom: -100px; right: -100px; }
+    @keyframes pulseGlow { 0% { transform: scale(0.8) translate(-30px,-30px); opacity: 0.6; } 100% { transform: scale(1.1) translate(30px,30px); opacity: 0.9; } }
+    @keyframes pulseGlow2 { 0% { transform: scale(0.9) translate(40px,40px); opacity: 0.5; } 100% { transform: scale(1.2) translate(-40px,-40px); opacity: 0.8; } }
+    @keyframes shine { 0% { left: -150%; } 50% { left: -150%; } 100% { left: 150%; } }
+    .intro-heading {
+      font-size: 64px; font-weight: 800; text-align: center; line-height: 1.1; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 20%, #a78bfa 60%, #c084fc 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      opacity: 0; filter: blur(10px); transform: translateY(40px);
+      animation: revealText 1.6s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.6s; margin-bottom: 24px;
+    }
+    @keyframes revealText { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+    .intro-phrase {
+      font-size: 18px; font-weight: 400; color: #c2bdd3; text-align: center;
+      max-width: 580px; line-height: 1.6;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeInUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 1.4s; margin-bottom: 48px;
+    }
+    .intro-btn { opacity: 0; transform: translateY(15px); animation: fadeInUp 1s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 2s; }
+    .intro-btn-action {
+      padding: 18px 44px; border-radius: 99px; font-size: 17px; font-weight: 700;
+      border: none; color: #fff; cursor: pointer;
+      background: linear-gradient(135deg,#2E72D8,#7A2C9E);
+      box-shadow: 0 15px 35px -10px rgba(90,52,160,0.6);
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .intro-btn-action:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 20px 40px -8px rgba(122,44,158,0.7); }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    .intro-overlay.fade-out { opacity: 0; pointer-events: none; transform: scale(1.05); transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1); }
+    .logo-wrapper { position: relative; display: inline-block; overflow: hidden; border-radius: 50%; margin-bottom: 24px; opacity: 0; transform: translateY(20px); animation: fadeInUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.3s; height: 96px; width: 96px; }
+    .logo-shine { position: absolute; top: 0; left: -150%; width: 50%; height: 100%; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent); transform: skewX(-25deg); animation: shine 4s ease-in-out infinite; animation-delay: 2.5s; }
+
+    @media (max-width: 600px) {
+      .intro-heading { font-size: 44px; margin-bottom: 18px; }
+      .intro-phrase { font-size: 15px; line-height: 1.55; margin-bottom: 40px; color: #b6b2c9; }
+      .intro-btn-action { padding: 16px 36px !important; font-size: 16px !important; width: 85vw; max-width: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="intro-screen" class="intro-overlay">
+  <canvas id="particles-canvas"></canvas>
+  <div class="intro-bg-glow"></div>
+  <div class="intro-bg-glow-2"></div>
+  <div class="intro-content-wrap">
+    <div class="logo-wrapper">
+      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="height:100%;width:100%;object-fit:contain;filter:brightness(0) invert(1);">
+      <div class="logo-shine"></div>
+    </div>
+    <div class="intro-heading" id="intro-saludo">¡Hola!</div>
+    <div class="intro-phrase">Lo que sabes vale más de lo que crees. En los próximos 20-30 minutos vamos a extraer el conocimiento que has acumulado durante años para convertirlo en tu mayor activo.</div>
+    <div class="intro-btn">
+      <button onclick="dismissIntro()" class="intro-btn-action">Comenzar extracción →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+try {
+  const _n = new URLSearchParams(window.location.search).get('cliente');
+  if (_n) { const _el = document.getElementById('intro-saludo'); if (_el) _el.textContent = '¡Hola, ' + _n + '!'; }
+} catch(e) {}
+try {
+  var _st = JSON.parse(localStorage.getItem('somos2os_extraccion_v1'));
+  var _urlCliente = new URLSearchParams(window.location.search).get('cliente') || '';
+  var _clienteCoincide = !_urlCliente || (_st && _st.clienteName === _urlCliente);
+  if (_st && _st.step > 0 && _st.step < 8 && _clienteCoincide) {
+    document.getElementById('intro-screen').style.display = 'none';
+  }
+} catch(e) {}
+</script>
+
+<header id="main-header" style="display:none;position:fixed;top:0;left:0;width:100%;height:72px;background:rgba(255,255,255,0.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(230,226,242,0.6);z-index:1000;transition:all 0.3s ease;">
+  <div style="width:100%;max-width:860px;height:100%;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;">
+    <img src="assets/logo-s2-asesorias.png" alt="S2 Asesorías" style="height:36px;width:auto;object-fit:contain;cursor:default;" onclick="secretAdmin()">
+    <div id="header-progress-label" style="font-size:13px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A2C9E;font-family:'Sora',sans-serif;"></div>
+  </div>
+</header>
+
+<div id="app"></div>
+
+<div id="save-toast" style="position:fixed;bottom:88px;right:16px;background:rgba(46,114,216,.92);color:#fff;padding:8px 14px;border-radius:99px;font-size:12.5px;font-weight:600;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;pointer-events:none;z-index:9998;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(46,114,216,.25);">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  Guardado
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const CLIENT_NAME  = new URLSearchParams(window.location.search).get('cliente') || '';
+const SUPABASE_URL = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4Mzk2NDEsImV4cCI6MjA5NzQxNTY0MX0.3Ej1Cs7yY6Uoo7YPTX6X7MbOMZBHGQDdWmk9q3fEA2w';
+const STORAGE_KEY  = 'somos2os_extraccion_v1';
+const TOTAL_SCREENS = 9; // intro + 6 bloques + resumen + cierre
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+const BLOCKS = [
+  {
+    title: 'Preguntas Frecuentes',
+    tag: 'Sección 1 · 6',
+    tipo: 'lista',
+    color: '#2E72D8',
+    que: 'Las <strong>preguntas frecuentes</strong> son las que tus clientes hacen <em>antes</em> de contratarte. Se repiten una y otra vez en tus consultas, DMs y conversaciones de venta. Son el primer filtro que cualquier prospecto aplica antes de tomar una decisión.',
+    nota: 'Piensa en las últimas 10 consultas que recibiste. ¿Qué te preguntaron primero?',
+    ejemplos: [
+      '¿Cuánto tiempo toma el proceso completo?',
+      '¿Qué documentos necesito reunir antes de empezar?',
+      '¿Puedo hacerlo desde otro país?',
+      '¿Tienes experiencia con mi situación específica?',
+      '¿Qué pasa si me rechazan?'
+    ],
+    count: 15,
+    placeholder: 'Escribe la pregunta tal como te la hacen...'
+  },
+  {
+    title: 'Dudas Comunes',
+    tag: 'Sección 2 · 6',
+    tipo: 'lista',
+    color: '#5A45C4',
+    que: 'Las <strong>dudas</strong> son diferentes a las preguntas. Una pregunta busca información. Una duda es un <em>miedo, una inseguridad o una preocupación</em> que el cliente no siempre expresa en voz alta. Son las razones por las que alguien duda en contratar aunque ya sabe que te necesita.',
+    nota: 'Piensa en los clientes que se tardaron más en decidirse. ¿Qué los frenaba internamente?',
+    ejemplos: [
+      '"No sé si realmente calificaré para esto..."',
+      '"¿Y si el proceso falla y pierdo mi dinero?"',
+      '"¿Seré capaz de seguir todos los pasos?"',
+      '"¿Qué pasa con mi familia durante el proceso?"',
+      '"¿Vale realmente la pena el esfuerzo y el costo?"'
+    ],
+    count: 15,
+    placeholder: 'Escribe la duda (puede ser en primera persona del cliente)...'
+  },
+  {
+    title: 'Errores Comunes',
+    tag: 'Sección 3 · 6',
+    tipo: 'lista',
+    color: '#7A2C9E',
+    que: 'Los <strong>errores comunes</strong> son las equivocaciones que cometen las personas cuando intentan resolver este problema <em>sin orientación profesional</em>. Son las razones por las que después llegan a ti a buscar ayuda. Este conocimiento es oro puro para tu estrategia de contenido.',
+    nota: '¿Qué historias de "lo intenté solo y salió mal" escuchas más seguido?',
+    ejemplos: [
+      'Entregar documentos incompletos o en el formato incorrecto',
+      'No cumplir los plazos establecidos por desconocimiento',
+      'Confiar en información desactualizada de internet o grupos de Facebook',
+      'No prepararse bien para las entrevistas o evaluaciones',
+      'Asumir que todos los casos son iguales y aplicar soluciones genéricas'
+    ],
+    count: 15,
+    placeholder: 'Escribe el error tal como lo observas en tus clientes...'
+  },
+  {
+    title: 'Casos Reales',
+    tag: 'Sección 4 · 6',
+    tipo: 'casos',
+    color: '#2E72D8',
+    intro: 'Los casos reales son tu activo más poderoso. No solo demuestran resultados — cuentan historias con las que otras personas se identifican. Comparte 3 casos que recuerdes con claridad. No necesitan ser perfectos, solo reales.',
+    casos: [
+      { num: 1, label: 'Caso 1', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
+      { num: 2, label: 'Caso 2', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
+      { num: 3, label: 'Caso 3', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] }
+    ]
+  },
+  {
+    title: 'Objeciones Frecuentes',
+    tag: 'Sección 5 · 6',
+    tipo: 'normal',
+    color: '#5A45C4',
+    intro: 'Las objeciones son las últimas barreras antes de que alguien tome la decisión de contratarte. Conocerlas te permite anticiparlas, responderlas de forma natural en tu contenido y diseñar mensajes que las disuelvan antes de que aparezcan.',
+    qs: [
+      { q: '¿Cuáles son las objeciones más comunes antes de contratar? ¿Qué te dicen para no avanzar en este momento?', ph: 'Ej: "Ahora no tengo presupuesto", "Quiero pensarlo", "Voy a esperar un poco más"...' },
+      { q: '¿Cuáles son los miedos más frecuentes antes de dar el paso? ¿Qué los frena aunque ya saben que te necesitan?', ph: 'Ej: Miedo a que no funcione, a perder dinero, a que el proceso sea muy complicado...' },
+      { q: '¿Por qué razones algunas personas no avanzan o abandonan el proceso a mitad del camino?', ph: 'Ej: Falta de seguimiento, complicaciones inesperadas, factores externos...' }
+    ]
+  },
+  {
+    title: 'Conocimiento Experto',
+    tag: 'Sección 6 · 6',
+    tipo: 'normal',
+    color: '#7A2C9E',
+    intro: 'Esta es la sección más valiosa de todo el proceso. Aquí vamos a extraer el conocimiento que solo alguien con tu experiencia puede tener. La información que para ti ya es obvia, para tu audiencia es un descubrimiento que puede cambiarle la vida.',
+    qs: [
+      { q: '¿Qué errores ves constantemente en tu industria que a ti ya no te sorprenden pero que para otros son reveladores?', ph: 'Ej: "Todo el mundo cree que el proceso tarda 3 meses cuando en realidad puede tardar 2 años..."' },
+      { q: '¿Qué información incorrecta circula en tu industria que tú sabes con certeza que es falsa o engañosa?', ph: 'Ej: Mitos en redes sociales, consejos de "expertos" sin credenciales, información desactualizada...' },
+      { q: '¿Qué mitos existen sobre tu trabajo, tu área de especialidad o el proceso que ayudas a resolver?', ph: 'Ej: "Con un abogado barato el resultado es el mismo", "Esto se puede hacer solo"...' },
+      { q: '¿Qué 3 consejos le darías a alguien que está comenzando a buscar soluciones en tu área y no sabe por dónde empezar?', ph: 'Escribe los 3 consejos más importantes que le darías...' },
+      { q: '¿Qué te hubiera gustado saber antes de empezar en este camino profesional? ¿Qué ojalá alguien te hubiera dicho?', ph: 'Ej: Lecciones aprendidas, errores propios, cosas que nadie te enseñó...' }
+    ]
+  }
+];
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────────
+let S = { step: 0, maxStep: 0, answers: {}, sent: false };
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    if (CLIENT_NAME && raw.clienteName !== CLIENT_NAME) return;
+    S.step    = raw.step    || 0;
+    S.maxStep = raw.maxStep || raw.step || 0;
+    S.answers = raw.answers || {};
+    if (S.step >= TOTAL_SCREENS - 1) { S.step = 0; S.maxStep = 0; }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      clienteName: CLIENT_NAME,
+      step: S.step, maxStep: S.maxStep, answers: S.answers
+    }));
+  } catch(e) {}
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function countAnswered() {
+  return Object.values(S.answers).filter(v => v !== '' && v !== undefined && v !== null).length;
+}
+
+function totalQuestions() {
+  // 15+15+15 + 12 (3 casos×4) + 3 + 5 = 65
+  return 65;
+}
+
+// ─── SCROLL TOP ───────────────────────────────────────────────────────────────
+function scrollTop() {
+  try { document.documentElement.scrollTop = 0; } catch(e) {}
+  try { document.body.scrollTop = 0; } catch(e) {}
+  try { window.scrollTo(0, 0); } catch(e) {}
+}
+
+// ─── NAVEGACIÓN ───────────────────────────────────────────────────────────────
+window.go = function(step) {
+  const current = document.querySelector('.form-card');
+  if (current) {
+    current.classList.add('animate-leave');
+    setTimeout(() => executeGo(step), 400);
+  } else {
+    executeGo(step);
+  }
+};
+
+function executeGo(step) {
+  scrollTop();
+  S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
+  if (S.step > S.maxStep) S.maxStep = S.step;
+  saveState();
+  render();
+  const newCard = document.querySelector('.form-card');
+  if (newCard) newCard.classList.add('animate-enter');
+  requestAnimationFrame(() => scrollTop());
+}
+
+// ─── TOAST GUARDADO ───────────────────────────────────────────────────────────
+let _toastTimer;
+function showSaveToast() {
+  const t = document.getElementById('save-toast');
+  if (!t) return;
+  t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    t.style.opacity = '0'; t.style.transform = 'translateY(8px)';
+  }, 1600);
+}
+
+// ─── UPDATE ANSWERS ───────────────────────────────────────────────────────────
+window.updateAnswer = function(id, val) {
+  S.answers[id] = val;
+  saveState();
+  showSaveToast();
+};
+
+// ─── ENVÍO ────────────────────────────────────────────────────────────────────
+function buildSummary() {
+  const lines = [];
+  lines.push('EXTRACCIÓN DE CONOCIMIENTO');
+  lines.push((CLIENT_NAME || 'Cliente') + ' · Somos2os Studio');
+  lines.push('Fecha: ' + new Date().toLocaleDateString('es-ES'));
+  lines.push('');
+
+  BLOCKS.forEach((blk, bi) => {
+    lines.push('═══ ' + blk.title.toUpperCase() + ' ═══');
+    if (blk.tipo === 'lista') {
+      for (let i = 0; i < blk.count; i++) {
+        const id = 's' + (bi+1) + '_q' + i;
+        const a = S.answers[id];
+        lines.push((i+1) + '. ' + (a || '(sin respuesta)'));
+      }
+    } else if (blk.tipo === 'casos') {
+      blk.casos.forEach((caso, ci) => {
+        lines.push('--- ' + caso.label + ' ---');
+        caso.qs.forEach((q, qi) => {
+          const id = 'c' + (ci+1) + '_q' + qi;
+          lines.push(q);
+          lines.push('   ' + (S.answers[id] || '(sin respuesta)'));
+        });
+      });
+    } else {
+      blk.qs.forEach((item, qi) => {
+        const id = 's' + (bi+1) + '_q' + qi;
+        lines.push(item.q);
+        lines.push('   ' + (S.answers[id] || '(sin respuesta)'));
+        lines.push('');
+      });
+    }
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+window.sendForm = async function() {
+  const btn = document.getElementById('send-btn');
+  if (btn) { btn.innerHTML = '<span>Guardando...</span>'; btn.disabled = true; }
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/extracciones', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        cliente: CLIENT_NAME || 'Cliente',
+        fecha: new Date().toISOString(),
+        answers: S.answers,
+        resumen: buildSummary()
+      })
+    });
+    if (res.ok) {
+      S.sent = true;
+      saveState();
+      render();
+    } else {
+      if (btn) { btn.innerHTML = '<span>Enviar respuestas →</span>'; btn.disabled = false; }
+      alert('Hubo un error al guardar. Intenta de nuevo.');
+    }
+  } catch(e) {
+    if (btn) { btn.innerHTML = '<span>Enviar respuestas →</span>'; btn.disabled = false; }
+    alert('Sin conexión. Verifica tu internet e intenta de nuevo.');
+  }
+};
+
+// ─── ACCESO SECRETO ADMIN ─────────────────────────────────────────────────────
+let _secretTaps = 0, _secretTimer = null;
+window.secretAdmin = function() {
+  _secretTaps++;
+  clearTimeout(_secretTimer);
+  if (_secretTaps >= 5) { _secretTaps = 0; window.location.href = '/dashboard.html'; return; }
+  _secretTimer = setTimeout(() => { _secretTaps = 0; }, 3000);
+};
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const step     = S.step;
+  const isIntro  = step === 0;
+  const isClose  = step === TOTAL_SCREENS - 1;
+  const isResumen = step === TOTAL_SCREENS - 2;
+  const isBlock  = step >= 1 && step <= 6;
+  const blockIdx = isBlock ? step - 1 : -1;
+  const blk      = isBlock ? BLOCKS[blockIdx] : null;
+  const showProg = !isIntro && !isClose;
+
+  // Header
+  const header = document.getElementById('main-header');
+  if (header) {
+    header.style.display = showProg ? 'block' : 'none';
+    if (showProg) header.classList.add('animate-header');
+    const lbl = document.getElementById('header-progress-label');
+    if (lbl) {
+      if (isResumen) lbl.textContent = 'Resumen';
+      else if (isBlock) lbl.textContent = blk.tag;
+      else lbl.textContent = '';
+    }
+  }
+
+  // Barra de progreso
+  const pct = Math.round((step / (TOTAL_SCREENS - 1)) * 100);
+  const progBar = showProg ? `
+    <div style="width:100%;max-width:680px;margin:0 auto 20px;padding:0 4px;">
+      <div style="height:4px;background:rgba(230,226,242,0.6);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;transition:width .5s ease;"></div>
+      </div>
+    </div>` : '';
+
+  const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+
+  let html = '';
+  const wrapClass = showProg ? 'form-wrap has-header' : 'form-wrap';
+  const wrapBg = isIntro ? '' : `background:url('assets/background.png') no-repeat center center fixed;background-size:cover;`;
+
+  html += `<div class="${wrapClass}" style="min-height:100vh;min-height:100dvh;padding:${isIntro ? '40px 20px' : '110px 20px 48px'};display:flex;flex-direction:column;align-items:center;${wrapBg}">`;
+  html += progBar;
+
+  if (isIntro)     html += buildIntroHTML();
+  else if (isBlock) html += buildBlockHTML(blk, blockIdx);
+  else if (isResumen) html += buildResumenHTML();
+  else if (isClose) html += buildCloseHTML();
+
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
+}
+
+// ── INTRO ──
+function buildIntroHTML() {
+  const logo = `<img src="assets/logo-s2-asesorias.png" alt="S2 Asesorías" onclick="secretAdmin()" style="height:44px;width:auto;display:block;margin:0 auto 20px;cursor:default;">`;
+  return `
+  <div class="form-card" style="max-width:580px;padding:44px 44px 36px;text-align:center;">
+    ${logo}
+    ${CLIENT_NAME ? `<p style="font-family:'Sora',sans-serif;font-size:15px;font-weight:500;color:#9A95AD;margin:0 0 4px;">Hola, ${esc(CLIENT_NAME)}</p>` : ''}
+    <h1 class="form-h1" style="font-family:'Sora',sans-serif;font-size:clamp(22px,5vw,30px);font-weight:800;letter-spacing:-.02em;margin:0 0 12px;color:#231D3A;white-space:normal !important;">Extracción de Conocimiento Experto</h1>
+    <p class="form-body" style="font-size:15px;line-height:1.6;color:#5A5470;margin:0 0 28px;">El objetivo de este proceso <strong>no es recopilar datos básicos</strong>. Es extraer el conocimiento, experiencia y aprendizajes que has acumulado durante años de trabajo.</p>
+
+    <div style="background:#F8F7FC;border-radius:16px;padding:20px;text-align:left;margin-bottom:28px;border:1px solid #ECE9F7;">
+      <p style="font-size:12px;font-weight:700;color:#7A2C9E;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;">Esta información se usará para crear:</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${['Estrategias de contenido y autoridad','GPTs personalizados para tu negocio','Respuestas rápidas y automatizaciones','Recursos educativos y sistemas de captación'].map(item => `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span style="font-size:13.5px;color:#231D3A;font-weight:500;">${item}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(46,114,216,.06);border:1px solid rgba(46,114,216,.15);border-radius:12px;padding:14px 16px;margin-bottom:28px;text-align:left;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E72D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span style="font-size:13px;color:#2E72D8;font-weight:600;">Duración aproximada: <strong>20 a 30 minutos</strong>. Puedes pausar y continuar cuando quieras — todo se guarda automáticamente.</span>
+    </div>
+
+    <button onclick="go(1)" class="btn-primary" style="width:100%;padding:16px;font-size:16px;border-radius:12px;">Comenzar →</button>
+  </div>`;
+}
+
+// ── BLOQUE ──
+function buildBlockHTML(blk, bi) {
+  if (blk.tipo === 'lista')   return buildListaHTML(blk, bi);
+  if (blk.tipo === 'casos')   return buildCasosHTML(blk, bi);
+  if (blk.tipo === 'normal')  return buildNormalHTML(blk, bi);
+  return '';
+}
+
+function buildListaHTML(blk, bi) {
+  const sNum = bi + 1;
+  const answered = Array.from({length: blk.count}, (_, i) => S.answers['s' + sNum + '_q' + i]).filter(v => v).length;
+
+  const items = Array.from({length: blk.count}, (_, i) => {
+    const id = 's' + sNum + '_q' + i;
+    const val = esc(S.answers[id] || '');
+    return `
+    <div style="display:flex;gap:10px;align-items:flex-start;">
+      <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#F0EEF8'};color:${S.answers[id] ? '#fff' : '#9A95AD'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:11px;transition:all .2s ease;">${i+1}</div>
+      <textarea id="${id}" class="lista-textarea" rows="1" placeholder="${esc(blk.placeholder)}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
+        style="flex:1;">${val}</textarea>
+    </div>`;
+  }).join('');
+
+  const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+
+  return `
+  <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+      <div style="font-size:12px;color:#B6B2C9;font-weight:600;">${answered}/${blk.count} respondidas</div>
+    </div>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:#231D3A;">${esc(blk.title)}</h2>
+
+    <div style="background:#F8F7FC;border-radius:14px;padding:16px 18px;margin-bottom:20px;border-left:3px solid ${blk.color};">
+      <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 10px;">${blk.que}</p>
+      ${blk.nota ? `<p style="font-size:13px;color:#9A95AD;font-style:italic;margin:0;border-top:1px solid #ECE9F7;padding-top:10px;">💡 ${esc(blk.nota)}</p>` : ''}
+    </div>
+
+    <div style="background:#fff;border:1px solid #ECE9F7;border-radius:14px;padding:16px 18px;margin-bottom:24px;">
+      <p style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px;">Ejemplos:</p>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${blk.ejemplos.map(e => `
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:${blk.color};flex:none;margin-top:6px;"></div>
+          <span style="font-size:13.5px;color:#5A5470;line-height:1.5;">${esc(e)}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;" class="questions-wrapper">
+      ${items}
+    </div>
+    ${mobileSpacerHTML}
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+      <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
+      <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
+    </div>
+  </div>`;
+}
+
+function buildCasosHTML(blk, bi) {
+  const activeCaso = parseInt(sessionStorage.getItem('extraccion_caso') || '1');
+  const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+
+  const tabs = blk.casos.map(c => {
+    const filled = c.qs.filter((_, qi) => S.answers['c' + c.num + '_q' + qi]).length;
+    const isActive = c.num === activeCaso;
+    return `<button onclick="sessionStorage.setItem('extraccion_caso','${c.num}');render()" style="flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid ${isActive ? blk.color : '#E6E3F2'};background:${isActive ? 'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))' : '#fff'};font-size:13px;font-weight:700;color:${isActive ? blk.color : '#9A95AD'};cursor:pointer;transition:all .15s;position:relative;">
+      ${c.label}
+      ${filled > 0 ? `<span style="position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#3DAB7A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">${filled}</span>` : ''}
+    </button>`;
+  }).join('');
+
+  const caso = blk.casos.find(c => c.num === activeCaso);
+  const qsHTML = caso.qs.map((q, qi) => {
+    const id = 'c' + activeCaso + '_q' + qi;
+    const val = esc(S.answers[id] || '');
+    const icons = ['🎯','⚠️','🛠️','✅'];
+    return `
+    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:16px;border-bottom:1px solid #F4F3FB;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:18px;flex:none;margin-top:2px;">${icons[qi]}</span>
+        <p style="margin:0;font-size:14.5px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(q)}</p>
+      </div>
+      <textarea class="q-textarea" rows="2" placeholder="Escribe aquí tu respuesta..."
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
+        style="margin-left:0;width:100%;">${val}</textarea>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+    </div>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#231D3A;">${esc(blk.title)}</h2>
+    <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 20px;">${esc(blk.intro)}</p>
+
+    <div style="display:flex;gap:8px;margin-bottom:24px;">${tabs}</div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;" class="questions-wrapper">
+      ${qsHTML}
+    </div>
+    ${mobileSpacerHTML}
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+      <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
+      <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
+    </div>
+  </div>`;
+}
+
+function buildNormalHTML(blk, bi) {
+  const sNum = bi + 1;
+  const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+
+  const qsHTML = blk.qs.map((item, qi) => {
+    const id = 's' + sNum + '_q' + qi;
+    const val = esc(S.answers[id] || '');
+    return `
+    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,' + blk.color + ',#7A2C9E)' : '#F0EEF8'};color:${S.answers[id] ? '#fff' : '#9A95AD'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s ease;">${qi+1}</div>
+        <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(item.q)}</p>
+      </div>
+      <textarea class="q-textarea" rows="3" placeholder="${esc(item.ph || 'Escribe tu respuesta...')}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)">${val}</textarea>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
+    </div>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#231D3A;">${esc(blk.title)}</h2>
+    <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 24px;border-left:3px solid ${blk.color};padding-left:14px;">${esc(blk.intro)}</p>
+
+    <div style="display:flex;flex-direction:column;gap:0;" class="questions-wrapper">
+      ${qsHTML}
+    </div>
+    ${mobileSpacerHTML}
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+      <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
+      <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
+    </div>
+  </div>`;
+}
+
+// ── RESUMEN ──
+function buildResumenHTML() {
+  const answered = countAnswered();
+  const total = totalQuestions();
+  const pct = Math.round((answered / total) * 100);
+  const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+
+  const seccionesHTML = BLOCKS.map((blk, bi) => {
+    let count = 0, total = 0;
+    if (blk.tipo === 'lista') {
+      total = blk.count;
+      for (let i = 0; i < blk.count; i++) { if (S.answers['s'+(bi+1)+'_q'+i]) count++; }
+    } else if (blk.tipo === 'casos') {
+      total = 12;
+      blk.casos.forEach((c, ci) => { c.qs.forEach((_, qi) => { if (S.answers['c'+(ci+1)+'_q'+qi]) count++; }); });
+    } else {
+      total = blk.qs.length;
+      blk.qs.forEach((_, qi) => { if (S.answers['s'+(bi+1)+'_q'+qi]) count++; });
+    }
+    const ok = count === total;
+    return `
+    <div onclick="go(${bi+1})" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:1.5px solid ${ok ? '#3DAB7A' : '#ECE9F7'};background:${ok ? 'rgba(61,171,122,.06)' : '#FBFAFE'};cursor:pointer;transition:all .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+      <div style="width:36px;height:36px;border-radius:10px;background:${ok ? 'linear-gradient(135deg,#3DAB7A,#2E9E68)' : 'linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15))'};display:flex;align-items:center;justify-content:center;flex:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${ok ? '#fff' : blk.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${ok ? '<polyline points="20 6 9 17 4 12"/>' : '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>'}
+        </svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;color:#231D3A;">${esc(blk.title)}</div>
+        <div style="font-size:12px;color:#9A95AD;">${count} de ${total} respondidas</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:${ok ? '#3DAB7A' : '#9A95AD'};">${count}/${total}</div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-family:'Sora',sans-serif;font-size:48px;font-weight:800;background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1;">${pct}%</div>
+      <p style="font-size:14px;color:#9A95AD;margin:4px 0 0;">${answered} de ${total} preguntas respondidas</p>
+    </div>
+    <div style="height:8px;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:28px;">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;transition:width .5s ease;"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+      ${seccionesHTML}
+    </div>
+
+    ${mobileSpacerHTML}
+    <div class="form-nav" style="display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:20px;border-top:1px solid #F0EEF8;">
+      <button onclick="go(${TOTAL_SCREENS - 1})" class="btn-primary" style="width:100%;padding:15px;font-size:15.5px;border-radius:12px;">${pct===100 ? 'Enviar extracción →' : 'Enviar de todas formas →'}</button>
+      <button onclick="go(${TOTAL_SCREENS - 3})" class="btn-secondary" style="width:100%;text-align:center;">← Volver</button>
+    </div>
+  </div>`;
+}
+
+// ── CIERRE ──
+function buildCloseHTML() {
+  return `
+  <div class="form-card" style="max-width:580px;padding:44px 40px 34px;text-align:center;">
+    <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px -8px rgba(90,52,160,.55);">
+      <span style="color:#fff;font-size:32px;font-weight:800;line-height:1;">✓</span>
+    </div>
+    <h2 class="form-h2-close" style="font-family:'Sora',sans-serif;font-size:clamp(18px,5vw,28px);font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#231D3A;">${CLIENT_NAME ? '¡Gracias, ' + esc(CLIENT_NAME) + '!' : '¡Gracias!'}</h2>
+    <p style="font-size:15px;line-height:1.55;color:#5A5470;margin:0 auto 28px;max-width:480px;">Tu conocimiento ha sido registrado. Con esta información construiremos tu estrategia de contenido, tu GPT personalizado y tus sistemas de autoridad.</p>
+
+    <div style="text-align:left;background:#F8F7FC;padding:24px 20px;border-radius:18px;border:1px solid #ECE9F7;margin-bottom:28px;">
+      <p style="font-size:12px;font-weight:700;color:#7A2C9E;text-transform:uppercase;letter-spacing:.06em;margin:0 0 16px;">¿Qué construiremos con esto?</p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${[
+          ['GPT Personalizado','Un asistente entrenado con tu conocimiento y tu voz para responder como tú.'],
+          ['Estrategia de Contenido','30+ ideas de contenido basadas en tus preguntas, dudas y errores reales.'],
+          ['Respuestas Rápidas','Plantillas listas para WhatsApp, DMs e emails con tu tono exacto.'],
+          ['Sistema de Autoridad','Recursos y automatizaciones que posicionan tu expertise en piloto automático.']
+        ].map(([t,d]) => `
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15));display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6A38B0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;color:#231D3A;">${t}</div>
+            <div style="font-size:12.5px;color:#9A95AD;line-height:1.4;">${d}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      ${S.sent
+        ? `<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(61,171,122,.1);border:1px solid rgba(61,171,122,.3);border-radius:12px;padding:14px 24px;color:#2E9E68;font-weight:700;font-size:15px;">
+             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+             Respuestas enviadas correctamente
+           </div>`
+        : `<button id="send-btn" onclick="sendForm()" class="btn-primary" style="min-width:280px;padding:16px 36px;border-radius:12px;font-size:16px;box-shadow:0 12px 28px -8px rgba(90,52,160,.55);">
+             Enviar respuestas →
+           </button>`
+      }
+      <button onclick="go(${TOTAL_SCREENS - 2})" class="btn-secondary" style="min-width:280px;padding:13px 20px;border-radius:12px;">← Revisar respuestas</button>
+    </div>
+  </div>`;
+}
+
+// ─── PARTÍCULAS ───────────────────────────────────────────────────────────────
+window.introParticlesActive = true;
+document.addEventListener('DOMContentLoaded', () => {
+  if (S.step > 0) {
+    const intro = document.getElementById('intro-screen');
+    if (intro) intro.style.display = 'none';
+    window.introParticlesActive = false;
+    return;
+  }
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
+  const particles = [];
+  const max = width < 600 ? 40 : 90;
+  const interaction = { x: null, y: null, radius: 120 };
+  class Particle {
+    constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4; this.radius = Math.random()*2+.5; this.color = Math.random()>.5 ? 'rgba(167,139,250,0.4)' : 'rgba(129,140,248,0.3)'; }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > width) this.vx *= -1;
+      if (this.y < 0 || this.y > height) this.vy *= -1;
+      if (interaction.x !== null) { const dx=this.x-interaction.x, dy=this.y-interaction.y, dist=Math.sqrt(dx*dx+dy*dy); if (dist<interaction.radius) { const f=(interaction.radius-dist)/interaction.radius; this.x+=(dx/dist)*f*1.5; this.y+=(dy/dist)*f*1.5; } }
+    }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.radius,0,Math.PI*2); ctx.fillStyle=this.color; ctx.fill(); }
+  }
+  for (let i=0; i<max; i++) particles.push(new Particle());
+  const upd = e => { if (e.touches) { interaction.x=e.touches[0].clientX; interaction.y=e.touches[0].clientY; } else { interaction.x=e.clientX; interaction.y=e.clientY; } };
+  const clr = () => { interaction.x=null; interaction.y=null; };
+  window.addEventListener('mousemove',upd); window.addEventListener('mouseout',clr); window.addEventListener('touchmove',upd); window.addEventListener('touchend',clr);
+  function animate() {
+    if (!window.introParticlesActive) return;
+    ctx.clearRect(0,0,width,height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    for (let i=0; i<particles.length; i++) for (let j=i+1; j<particles.length; j++) { const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy); if (dist<100) { ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(167,139,250,${.1*(1-dist/100)})`; ctx.lineWidth=.5; ctx.stroke(); } }
+    requestAnimationFrame(animate);
+  }
+  animate();
+});
+
+window.dismissIntro = function() {
+  const intro = document.getElementById('intro-screen');
+  if (intro) {
+    intro.classList.add('fade-out');
+    sessionStorage.setItem('somos2os_extraccion_intro','true');
+    const card = document.querySelector('.form-card');
+    if (card) { card.classList.remove('animate-enter'); card.style.opacity='0'; void card.offsetWidth; setTimeout(() => { card.style.opacity=''; card.classList.add('animate-enter'); }, 250); }
+    setTimeout(() => { intro.style.display='none'; window.introParticlesActive=false; }, 1200);
+  }
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadState();
+render();
+</script>
+</body>
+</html>
