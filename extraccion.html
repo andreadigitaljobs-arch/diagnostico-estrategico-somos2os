@@ -95,7 +95,7 @@
 
     @media (max-width: 600px) {
       .form-wrap {
-        background: url('assets/background-mobile.png') no-repeat center center fixed !important;
+        background: url('assets/extraccion-bg-mobile.png') no-repeat center center fixed !important;
         background-size: cover !important;
         min-height: 100vh !important; min-height: 100dvh !important;
         padding: 28px 16px 48px !important;
@@ -364,19 +364,19 @@
   <!-- Features con iconos (desktop) -->
   <div class="intro-features">
     <div class="intro-feature-item">
-      <div class="intro-feature-icon">🧠</div>
+      <div class="intro-feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg></div>
       <div class="intro-feature-label">Tu conocimiento<br>tiene valor</div>
     </div>
     <div class="intro-feature-item">
-      <div class="intro-feature-icon">🎯</div>
+      <div class="intro-feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
       <div class="intro-feature-label">Extractamos lo esencial,<br>sin perder tu esencia</div>
     </div>
     <div class="intro-feature-item">
-      <div class="intro-feature-icon">📈</div>
+      <div class="intro-feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
       <div class="intro-feature-label">Lo transformamos<br>en ventaja estratégica</div>
     </div>
     <div class="intro-feature-item">
-      <div class="intro-feature-icon">💎</div>
+      <div class="intro-feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
       <div class="intro-feature-label">Lo convertimos en<br>tu mayor activo</div>
     </div>
   </div>
@@ -406,17 +406,17 @@
 
     <div class="mobile-badges">
       <div class="mobile-badge">
-        <div class="mobile-badge-icon">⏱</div>
+        <div class="mobile-badge-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <div class="mobile-badge-main">20–30 min</div>
         <div class="mobile-badge-sub">Duración</div>
       </div>
       <div class="mobile-badge">
-        <div class="mobile-badge-icon">🎯</div>
+        <div class="mobile-badge-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
         <div class="mobile-badge-main">100% personalizado</div>
         <div class="mobile-badge-sub">Enfoque en ti</div>
       </div>
       <div class="mobile-badge">
-        <div class="mobile-badge-icon">🔒</div>
+        <div class="mobile-badge-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <div class="mobile-badge-main">Confidencial</div>
         <div class="mobile-badge-sub">Seguro y privado</div>
       </div>
@@ -772,7 +772,7 @@ function render() {
 
   let html = '';
   const wrapClass = showProg ? 'form-wrap has-header' : 'form-wrap';
-  const wrapBg = `background:url('assets/background.png') no-repeat center center fixed;background-size:cover;`;
+  const wrapBg = `background:url('assets/extraccion-form-bg.png') no-repeat center center fixed;background-size:cover;`;
 
   html += `<div class="${wrapClass}" style="min-height:100vh;min-height:100dvh;padding:${isIntro ? '40px 20px' : '110px 20px 48px'};display:flex;flex-direction:column;align-items:center;${isIntro ? 'justify-content:center;' : ''}${wrapBg}">`;
   html += progBar;
