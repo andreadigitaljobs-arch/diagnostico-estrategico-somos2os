@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Dashboard Coach · Somos2os Studio</title>
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico">
@@ -167,8 +167,10 @@
       }
       .card-pad h1 { font-size: 22px !important; color: #e8edf8 !important; }
       .card-pad h2 { font-size: 18px !important; color: #e8edf8 !important; }
-      .mob-wrap { padding: 16px 14px 72px !important; }
+      .mob-wrap { padding: max(16px, env(safe-area-inset-top)) 14px max(72px, env(safe-area-inset-bottom)) !important; }
       .mob-full { width: 100% !important; max-width: 100% !important; }
+      /* Logo nítido en mobile — fuerza GPU layer para evitar blur del filter */
+      img[alt="Somos2os Studio"] { transform: translateZ(0); -webkit-transform: translateZ(0); }
     }
   </style>
 </head>
@@ -475,7 +477,7 @@ function buildLogin() {
 function buildLoginMobile() {
   return `
   <div style="height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:0 24px;font-family:'Sora',sans-serif;position:relative;
+    padding:env(safe-area-inset-top,44px) 24px env(safe-area-inset-bottom,20px);font-family:'Sora',sans-serif;position:relative;
     background:linear-gradient(160deg,#0A0F2E 0%,#0D0A2E 40%,#12063B 70%,#0A1540 100%);">
 
     <!-- Orbs decorativos de fondo -->
