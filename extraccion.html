@@ -93,6 +93,41 @@
 
     .questions-wrapper { padding-bottom: 20px; }
 
+    /* ══ DARK FORM CARDS ══ */
+    .form-wrap .form-card {
+      background: rgba(8,14,44,0.85) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) !important;
+    }
+    .form-wrap .form-h2 { color: #e8edf8 !important; }
+    .lista-textarea {
+      background: rgba(255,255,255,0.08) !important;
+      color: #e2e8f5 !important; border-color: rgba(255,255,255,0.14) !important;
+      min-height: 54px !important;
+    }
+    .lista-textarea:focus {
+      background: rgba(59,130,246,0.1) !important; border-color: rgba(59,130,246,0.65) !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.18) !important; color: #fff !important;
+    }
+    .lista-textarea::placeholder { color: rgba(160,180,225,0.45) !important; }
+    .q-textarea {
+      background: rgba(255,255,255,0.08) !important;
+      color: #e2e8f5 !important; border-color: rgba(255,255,255,0.14) !important;
+      min-height: 68px !important;
+    }
+    .q-textarea:focus {
+      background: rgba(59,130,246,0.1) !important; border-color: rgba(59,130,246,0.65) !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.18) !important; color: #fff !important;
+    }
+    .q-textarea::placeholder { color: rgba(160,180,225,0.45) !important; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.09) !important;
+      border-color: rgba(255,255,255,0.2) !important; color: #b8cde8 !important;
+    }
+    .btn-secondary:hover { background: rgba(59,130,246,0.15) !important; border-color: #3B82F6 !important; color: #93c5fd !important; }
+    .form-nav { border-top-color: rgba(255,255,255,0.08) !important; }
+
     @media (max-width: 600px) {
       .form-wrap {
         background: url('assets/extraccion-bg-mobile.png') no-repeat center center fixed !important;
@@ -876,8 +911,8 @@ function buildListaHTML(blk, bi) {
     const val = esc(S.answers[id] || '');
     return `
     <div style="display:flex;gap:10px;align-items:flex-start;">
-      <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#F0EEF8'};color:${S.answers[id] ? '#fff' : '#9A95AD'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:11px;transition:all .2s ease;">${i+1}</div>
-      <textarea id="${id}" class="lista-textarea" rows="1" placeholder="${esc(blk.placeholder)}"
+      <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : 'rgba(255,255,255,0.1)'};color:${S.answers[id] ? '#fff' : 'rgba(170,190,230,0.6)'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:11px;transition:all .2s ease;">${i+1}</div>
+      <textarea id="${id}" class="lista-textarea" rows="2" placeholder="${esc(blk.placeholder)}"
         oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
         style="flex:1;">${val}</textarea>
     </div>`;
@@ -889,22 +924,22 @@ function buildListaHTML(blk, bi) {
   <div class="form-card" style="max-width:680px;padding:36px 36px 28px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
-      <div style="font-size:12px;color:#B6B2C9;font-weight:600;">${answered}/${blk.count} respondidas</div>
+      <div style="font-size:12px;color:rgba(165,185,225,0.7);font-weight:600;">${answered}/${blk.count} respondidas</div>
     </div>
-    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:#231D3A;">${esc(blk.title)}</h2>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:#e8edf8;">${esc(blk.title)}</h2>
 
-    <div style="background:#F8F7FC;border-radius:14px;padding:16px 18px;margin-bottom:20px;border-left:3px solid ${blk.color};">
-      <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 10px;">${blk.que}</p>
-      ${blk.nota ? `<p style="font-size:13px;color:#9A95AD;font-style:italic;margin:0;border-top:1px solid #ECE9F7;padding-top:10px;">💡 ${esc(blk.nota)}</p>` : ''}
+    <div style="background:rgba(255,255,255,0.06);border-radius:14px;padding:16px 18px;margin-bottom:20px;border-left:3px solid ${blk.color};">
+      <p style="font-size:14px;line-height:1.6;color:rgba(195,212,240,0.9);margin:0 0 10px;">${blk.que}</p>
+      ${blk.nota ? `<p style="font-size:13px;color:rgba(155,175,215,0.65);font-style:italic;margin:0;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">💡 ${esc(blk.nota)}</p>` : ''}
     </div>
 
-    <div style="background:#fff;border:1px solid #ECE9F7;border-radius:14px;padding:16px 18px;margin-bottom:24px;">
-      <p style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px;">Ejemplos:</p>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 18px;margin-bottom:24px;">
+      <p style="font-size:12px;font-weight:700;color:rgba(160,185,225,0.6);text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px;">Ejemplos:</p>
       <div style="display:flex;flex-direction:column;gap:6px;">
         ${blk.ejemplos.map(e => `
         <div style="display:flex;align-items:flex-start;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:${blk.color};flex:none;margin-top:6px;"></div>
-          <span style="font-size:13.5px;color:#5A5470;line-height:1.5;">${esc(e)}</span>
+          <div style="width:6px;height:6px;border-radius:50%;background:${blk.color};flex:none;margin-top:6px;opacity:0.85;"></div>
+          <span style="font-size:13.5px;color:rgba(195,212,240,0.88);line-height:1.5;">${esc(e)}</span>
         </div>`).join('')}
       </div>
     </div>
@@ -913,7 +948,7 @@ function buildListaHTML(blk, bi) {
       ${items}
     </div>
     ${mobileSpacerHTML}
-    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
       <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
     </div>
@@ -932,10 +967,10 @@ function buildCasosHTML(blk, bi) {
       const id = 'c' + caso.num + '_q' + qi;
       const val = esc(S.answers[id] || '');
       return `
-      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:16px;${qi < caso.qs.length-1 ? 'border-bottom:1px solid #F4F3FB;' : ''}">
+      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:16px;${qi < caso.qs.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.08);' : ''}">
         <div style="display:flex;align-items:flex-start;gap:10px;">
           <span style="font-size:17px;flex:none;margin-top:1px;">${icons[qi]}</span>
-          <p style="margin:0;font-size:14.5px;font-weight:600;color:#3A3452;line-height:1.4;">${esc(q)}</p>
+          <p style="margin:0;font-size:14.5px;font-weight:600;color:rgba(210,225,250,0.92);line-height:1.4;">${esc(q)}</p>
         </div>
         <textarea class="q-textarea" rows="2" placeholder="Escribe aquí tu respuesta..."
           oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
@@ -961,14 +996,14 @@ function buildCasosHTML(blk, bi) {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
     </div>
-    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#231D3A;">${esc(blk.title)}</h2>
-    <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 20px;">${esc(blk.intro)}</p>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#e8edf8;">${esc(blk.title)}</h2>
+    <p style="font-size:14px;line-height:1.6;color:rgba(195,212,240,0.9);margin:0 0 20px;">${esc(blk.intro)}</p>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       ${casosHTML}
     </div>
     ${mobileSpacerHTML}
-    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
       <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
     </div>
@@ -983,10 +1018,10 @@ function buildNormalHTML(blk, bi) {
     const id = 's' + sNum + '_q' + qi;
     const val = esc(S.answers[id] || '');
     return `
-    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08);">
       <div style="display:flex;align-items:flex-start;gap:10px;">
-        <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,' + blk.color + ',#7A2C9E)' : '#F0EEF8'};color:${S.answers[id] ? '#fff' : '#9A95AD'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s ease;">${qi+1}</div>
-        <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(item.q)}</p>
+        <div style="flex:none;width:26px;height:26px;border-radius:7px;background:${S.answers[id] ? 'linear-gradient(135deg,' + blk.color + ',#7A2C9E)' : 'rgba(255,255,255,0.1)'};color:${S.answers[id] ? '#fff' : 'rgba(170,190,230,0.6)'};font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s ease;">${qi+1}</div>
+        <p style="margin:0;font-size:15px;font-weight:600;color:rgba(210,225,250,0.92);line-height:1.4;">${esc(item.q)}</p>
       </div>
       <textarea class="q-textarea" rows="3" placeholder="${esc(item.ph || 'Escribe tu respuesta...')}"
         oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)">${val}</textarea>
@@ -998,14 +1033,14 @@ function buildNormalHTML(blk, bi) {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;">${esc(blk.tag)}</div>
     </div>
-    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#231D3A;">${esc(blk.title)}</h2>
-    <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 24px;border-left:3px solid ${blk.color};padding-left:14px;">${esc(blk.intro)}</p>
+    <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#e8edf8;">${esc(blk.title)}</h2>
+    <p style="font-size:14px;line-height:1.6;color:rgba(195,212,240,0.9);margin:0 0 24px;border-left:3px solid ${blk.color};padding-left:14px;">${esc(blk.intro)}</p>
 
     <div style="display:flex;flex-direction:column;gap:0;" class="questions-wrapper">
       ${qsHTML}
     </div>
     ${mobileSpacerHTML}
-    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">
+    <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <button onclick="go(${S.step + 1})" class="btn-primary" style="flex:1;padding:14px;">Continuar →</button>
       <button onclick="go(${S.step - 1})" class="btn-secondary" style="padding:14px 20px;">← Volver</button>
     </div>
