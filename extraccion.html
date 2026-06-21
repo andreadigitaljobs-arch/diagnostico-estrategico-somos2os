@@ -258,13 +258,13 @@ const CLIENT_NAME  = new URLSearchParams(window.location.search).get('cliente') 
 const SUPABASE_URL = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4Mzk2NDEsImV4cCI6MjA5NzQxNTY0MX0.3Ej1Cs7yY6Uoo7YPTX6X7MbOMZBHGQDdWmk9q3fEA2w';
 const STORAGE_KEY  = 'somos2os_extraccion_v1';
-const TOTAL_SCREENS = 9; // intro + 6 bloques + resumen + cierre
+const TOTAL_SCREENS = 8; // intro + 5 bloques + resumen + cierre
 
 // ─── CONTENIDO ────────────────────────────────────────────────────────────────
 const BLOCKS = [
   {
     title: 'Preguntas Frecuentes',
-    tag: 'Sección 1 · 6',
+    tag: 'Sección 1 · 5',
     tipo: 'lista',
     color: '#2E72D8',
     que: 'Las <strong>preguntas frecuentes</strong> son las que tus clientes hacen <em>antes</em> de contratarte. Se repiten una y otra vez en tus consultas, DMs y conversaciones de venta. Son el primer filtro que cualquier prospecto aplica antes de tomar una decisión.',
@@ -281,7 +281,7 @@ const BLOCKS = [
   },
   {
     title: 'Dudas Comunes',
-    tag: 'Sección 2 · 6',
+    tag: 'Sección 2 · 5',
     tipo: 'lista',
     color: '#5A45C4',
     que: 'Las <strong>dudas</strong> son diferentes a las preguntas. Una pregunta busca información. Una duda es un <em>miedo, una inseguridad o una preocupación</em> que el cliente no siempre expresa en voz alta. Son las razones por las que alguien duda en contratar aunque ya sabe que te necesita.',
@@ -298,7 +298,7 @@ const BLOCKS = [
   },
   {
     title: 'Errores Comunes',
-    tag: 'Sección 3 · 6',
+    tag: 'Sección 3 · 5',
     tipo: 'lista',
     color: '#7A2C9E',
     que: 'Los <strong>errores comunes</strong> son las equivocaciones que cometen las personas cuando intentan resolver este problema <em>sin orientación profesional</em>. Son las razones por las que después llegan a ti a buscar ayuda. Este conocimiento es oro puro para tu estrategia de contenido.',
@@ -315,7 +315,7 @@ const BLOCKS = [
   },
   {
     title: 'Casos Reales',
-    tag: 'Sección 4 · 6',
+    tag: 'Sección 4 · 5',
     tipo: 'casos',
     color: '#2E72D8',
     intro: 'Los casos reales son tu activo más poderoso. No solo demuestran resultados — cuentan historias con las que otras personas se identifican. Comparte 3 casos que recuerdes con claridad. No necesitan ser perfectos, solo reales.',
@@ -326,20 +326,8 @@ const BLOCKS = [
     ]
   },
   {
-    title: 'Objeciones Frecuentes',
-    tag: 'Sección 5 · 6',
-    tipo: 'normal',
-    color: '#5A45C4',
-    intro: 'Las objeciones son las últimas barreras antes de que alguien tome la decisión de contratarte. Conocerlas te permite anticiparlas, responderlas de forma natural en tu contenido y diseñar mensajes que las disuelvan antes de que aparezcan.',
-    qs: [
-      { q: '¿Cuáles son las objeciones más comunes antes de contratar? ¿Qué te dicen para no avanzar en este momento?', ph: 'Ej: "Ahora no tengo presupuesto", "Quiero pensarlo", "Voy a esperar un poco más"...' },
-      { q: '¿Cuáles son los miedos más frecuentes antes de dar el paso? ¿Qué los frena aunque ya saben que te necesitan?', ph: 'Ej: Miedo a que no funcione, a perder dinero, a que el proceso sea muy complicado...' },
-      { q: '¿Por qué razones algunas personas no avanzan o abandonan el proceso a mitad del camino?', ph: 'Ej: Falta de seguimiento, complicaciones inesperadas, factores externos...' }
-    ]
-  },
-  {
     title: 'Conocimiento Experto',
-    tag: 'Sección 6 · 6',
+    tag: 'Sección 5 · 5',
     tipo: 'normal',
     color: '#7A2C9E',
     intro: 'Esta es la sección más valiosa de todo el proceso. Aquí vamos a extraer el conocimiento que solo alguien con tu experiencia puede tener. La información que para ti ya es obvia, para tu audiencia es un descubrimiento que puede cambiarle la vida.',
@@ -701,32 +689,38 @@ function buildListaHTML(blk, bi) {
 }
 
 function buildCasosHTML(blk, bi) {
-  const activeCaso = parseInt(sessionStorage.getItem('extraccion_caso') || '1');
   const mobileSpacerHTML = '<div class="mobile-spacer" style="height:90px;display:none;"></div>';
+  const colors = ['#2E72D8', '#5A45C4', '#7A2C9E'];
+  const icons = ['🎯','⚠️','🛠️','✅'];
 
-  const tabs = blk.casos.map(c => {
-    const filled = c.qs.filter((_, qi) => S.answers['c' + c.num + '_q' + qi]).length;
-    const isActive = c.num === activeCaso;
-    return `<button onclick="sessionStorage.setItem('extraccion_caso','${c.num}');render()" style="flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid ${isActive ? blk.color : '#E6E3F2'};background:${isActive ? 'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))' : '#fff'};font-size:13px;font-weight:700;color:${isActive ? blk.color : '#9A95AD'};cursor:pointer;transition:all .15s;position:relative;">
-      ${c.label}
-      ${filled > 0 ? `<span style="position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#3DAB7A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">${filled}</span>` : ''}
-    </button>`;
-  }).join('');
+  const casosHTML = blk.casos.map((caso, ci) => {
+    const color = colors[ci];
+    const filled = caso.qs.filter((_, qi) => S.answers['c' + caso.num + '_q' + qi]).length;
+    const qsHTML = caso.qs.map((q, qi) => {
+      const id = 'c' + caso.num + '_q' + qi;
+      const val = esc(S.answers[id] || '');
+      return `
+      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:16px;${qi < caso.qs.length-1 ? 'border-bottom:1px solid #F4F3FB;' : ''}">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="font-size:17px;flex:none;margin-top:1px;">${icons[qi]}</span>
+          <p style="margin:0;font-size:14.5px;font-weight:600;color:#3A3452;line-height:1.4;">${esc(q)}</p>
+        </div>
+        <textarea class="q-textarea" rows="2" placeholder="Escribe aquí tu respuesta..."
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
+          style="margin-left:0;width:100%;">${val}</textarea>
+      </div>`;
+    }).join('');
 
-  const caso = blk.casos.find(c => c.num === activeCaso);
-  const qsHTML = caso.qs.map((q, qi) => {
-    const id = 'c' + activeCaso + '_q' + qi;
-    const val = esc(S.answers[id] || '');
-    const icons = ['🎯','⚠️','🛠️','✅'];
     return `
-    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:16px;border-bottom:1px solid #F4F3FB;">
-      <div style="display:flex;align-items:flex-start;gap:10px;">
-        <span style="font-size:18px;flex:none;margin-top:2px;">${icons[qi]}</span>
-        <p style="margin:0;font-size:14.5px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(q)}</p>
+    <div style="border-radius:16px;overflow:hidden;border:1.5px solid ${filled===4 ? '#3DAB7A' : color+'33'};">
+      <div style="background:linear-gradient(135deg,${color}18,${color}0a);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ${color}22;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${color},${color}CC);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${caso.num}</div>
+        <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:${color};">${caso.label}</span>
+        <span style="margin-left:auto;font-size:12px;font-weight:600;color:${filled===4?'#3DAB7A':'#B6B2C9'};">${filled}/4 ${filled===4?'✓ completo':'respondidas'}</span>
       </div>
-      <textarea class="q-textarea" rows="2" placeholder="Escribe aquí tu respuesta..."
-        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';updateAnswer('${id}',this.value)"
-        style="margin-left:0;width:100%;">${val}</textarea>
+      <div style="padding:20px 18px;display:flex;flex-direction:column;gap:16px;" class="questions-wrapper">
+        ${qsHTML}
+      </div>
     </div>`;
   }).join('');
 
@@ -738,10 +732,8 @@ function buildCasosHTML(blk, bi) {
     <h2 class="form-h2" style="font-family:'Sora',sans-serif;font-size:clamp(18px,4.5vw,26px);font-weight:700;letter-spacing:-.02em;margin:0 0 10px;color:#231D3A;">${esc(blk.title)}</h2>
     <p style="font-size:14px;line-height:1.6;color:#5A5470;margin:0 0 20px;">${esc(blk.intro)}</p>
 
-    <div style="display:flex;gap:8px;margin-bottom:24px;">${tabs}</div>
-
-    <div style="display:flex;flex-direction:column;gap:16px;" class="questions-wrapper">
-      ${qsHTML}
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${casosHTML}
     </div>
     ${mobileSpacerHTML}
     <div class="form-nav" style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #F0EEF8;">

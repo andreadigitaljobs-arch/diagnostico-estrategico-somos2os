@@ -875,20 +875,17 @@ function buildDetailExtraccion() {
   const answers = r.answers || {};
 
   const blockDefs = [
-    { prefix: 's1', title: 'Preguntas Frecuentes',   tag: 'Sección 1 · 6', color: '#2E72D8', tipo: 'lista',   count: 15 },
-    { prefix: 's2', title: 'Dudas Comunes',           tag: 'Sección 2 · 6', color: '#5A45C4', tipo: 'lista',   count: 15 },
-    { prefix: 's3', title: 'Errores Comunes',         tag: 'Sección 3 · 6', color: '#7A2C9E', tipo: 'lista',   count: 15 },
-    {               title: 'Casos Reales',            tag: 'Sección 4 · 6', color: '#2E72D8', tipo: 'casos',
+    { prefix: 's1', title: 'Preguntas Frecuentes',   tag: 'Sección 1 · 5', color: '#2E72D8', tipo: 'lista',   count: 15 },
+    { prefix: 's2', title: 'Dudas Comunes',           tag: 'Sección 2 · 5', color: '#5A45C4', tipo: 'lista',   count: 15 },
+    { prefix: 's3', title: 'Errores Comunes',         tag: 'Sección 3 · 5', color: '#7A2C9E', tipo: 'lista',   count: 15 },
+    {               title: 'Casos Reales',            tag: 'Sección 4 · 5', color: '#2E72D8', tipo: 'casos',
       casos: [
         { num: 1, label: 'Caso 1', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
         { num: 2, label: 'Caso 2', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
         { num: 3, label: 'Caso 3', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] }
       ]
     },
-    { prefix: 's5', title: 'Objeciones Frecuentes',  tag: 'Sección 5 · 6', color: '#5A45C4', tipo: 'normal',
-      qs: ['¿Cuáles son las objeciones más comunes antes de contratar?', '¿Cuáles son los miedos más frecuentes antes de dar el paso?', '¿Por qué razones algunas personas no avanzan o abandonan el proceso?']
-    },
-    { prefix: 's6', title: 'Conocimiento Experto',   tag: 'Sección 6 · 6', color: '#7A2C9E', tipo: 'normal',
+    { prefix: 's5', title: 'Conocimiento Experto',   tag: 'Sección 5 · 5', color: '#7A2C9E', tipo: 'normal',
       qs: ['¿Qué errores ves constantemente en tu industria que a ti ya no te sorprenden?', '¿Qué información incorrecta circula en tu industria que sabes que es falsa?', '¿Qué mitos existen sobre tu trabajo o el proceso que ayudas a resolver?', '¿Qué 3 consejos le darías a alguien que está comenzando a buscar soluciones?', '¿Qué te hubiera gustado saber antes de empezar en este camino profesional?']
     }
   ];
@@ -896,7 +893,7 @@ function buildDetailExtraccion() {
   let totalAnswered = 0, totalQ = 0;
   ['s1','s2','s3'].forEach(p => { for (let i=0;i<15;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
   for (let c=1;c<=3;c++) { for (let q=0;q<4;q++) { totalQ++; if(answers['c'+c+'_q'+q]) totalAnswered++; } }
-  [['s5',3],['s6',5]].forEach(([p,n]) => { for(let i=0;i<n;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
+  for (let i=0;i<5;i++) { totalQ++; if(answers['s5_q'+i]) totalAnswered++; }
   const pct = Math.round((totalAnswered / totalQ) * 100);
 
   const blocksHTML = blockDefs.map(blk => {
