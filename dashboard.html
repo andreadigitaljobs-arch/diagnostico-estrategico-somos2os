@@ -181,8 +181,12 @@ let S = {
   auth: false,
   loading: false,
   records: [],
+  extracciones: [],
   sesiones: [],
   selected: null,
+  selectedExtraccion: null,
+  tab: 'diagnosticos',
+  linkTipo: 'diagnostico',
   error: null
 };
 
@@ -190,15 +194,18 @@ let S = {
 async function fetchRecords() {
   S.loading = true; render();
   try {
-    const [resD, resS] = await Promise.all([
+    const [resD, resS, resE] = await Promise.all([
       fetch(SUPABASE_URL + '/rest/v1/diagnosticos?select=*&order=created_at.desc',
         { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } }),
       fetch(SUPABASE_URL + '/rest/v1/link_sesiones?select=*&order=ultimo_acceso.desc',
+        { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } }),
+      fetch(SUPABASE_URL + '/rest/v1/extracciones?select=*&order=created_at.desc',
         { headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE } })
     ]);
     if (!resD.ok) throw new Error('Error ' + resD.status);
     S.records = await resD.json();
     S.sesiones = resS.ok ? await resS.json() : [];
+    S.extracciones = resE.ok ? await resE.json() : [];
     S.error = null;
   } catch(e) {
     S.error = 'No se pudieron cargar las respuestas. Verifica la conexión.';
@@ -353,10 +360,40 @@ function countAnswered(answers) {
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
-  if (!S.auth)          { app.innerHTML = buildLogin();  return; }
-  if (S.selected)       { app.innerHTML = buildDetail(); return; }
+  if (!S.auth)                   { app.innerHTML = buildLogin();             return; }
+  if (S.selected)                { app.innerHTML = buildDetail();            return; }
+  if (S.selectedExtraccion)      { app.innerHTML = buildDetailExtraccion();  return; }
   app.innerHTML = buildList();
 }
+
+window.openExtraccion = function(id) {
+  S.selectedExtraccion = S.extracciones.find(r => r.id === id) || null;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.closeExtraccion = function() {
+  S.selectedExtraccion = null;
+  S.tab = 'extracciones';
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.deleteExtraccion = async function(id) {
+  if (!confirm('¿Eliminar esta extracción de conocimiento? No se puede deshacer.')) return;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/extracciones?id=eq.' + id, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE }
+    });
+    if (!res.ok) throw new Error();
+    if (S.selectedExtraccion?.id === id) S.selectedExtraccion = null;
+    await fetchRecords();
+  } catch(e) { alert('No se pudo eliminar.'); }
+};
+
+window.setTab = function(tab) { S.tab = tab; render(); };
+window.setLinkTipo = function(tipo) { S.linkTipo = tipo; render(); };
 
 // ── LOGIN ──
 function buildLogin() {
@@ -679,6 +716,10 @@ function buildList() {
   const linkCard = `
   <div class="card-pad mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:22px 28px;border:1px solid #ECE9F7;margin-bottom:20px;">
     <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Generar enlace personalizado</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button onclick="setLinkTipo('diagnostico')" style="flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid ${S.linkTipo==='diagnostico'?'#7A2C9E':'#E6E3F2'};background:${S.linkTipo==='diagnostico'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='diagnostico'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">Diagnóstico</button>
+      <button onclick="setLinkTipo('extraccion')" style="flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid ${S.linkTipo==='extraccion'?'#7A2C9E':'#E6E3F2'};background:${S.linkTipo==='extraccion'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='extraccion'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">Extracción</button>
+    </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
       <input type="text" id="link-nombre" placeholder="Nombre del cliente…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;outline:none;font-family:inherit;" oninput="actualizarLink()" onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'">
       <button onclick="copiarLink()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
@@ -740,44 +781,216 @@ function buildList() {
     </div>`;
   })();
 
-  if (S.records.length === 0) {
-    return wrap(header + linkCard + sesionesHTML + `
-    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
-      <div style="font-size:32px;margin-bottom:12px;">📋</div>
-      <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay respuestas enviadas.</p>
-    </div>`);
+  // ── Tabs ──
+  const tabs = `
+  <div class="mob-full" style="width:100%;max-width:820px;display:flex;gap:8px;margin-bottom:20px;">
+    <button onclick="setTab('diagnosticos')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${S.tab==='diagnosticos'?'#7A2C9E':'#E6E3F2'};background:${S.tab==='diagnosticos'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:13px;font-weight:700;color:${S.tab==='diagnosticos'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">
+      Diagnósticos <span style="font-size:11px;background:${S.tab==='diagnosticos'?'#7A2C9E':'#E6E3F2'};color:${S.tab==='diagnosticos'?'#fff':'#9A95AD'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.records.length}</span>
+    </button>
+    <button onclick="setTab('extracciones')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${S.tab==='extracciones'?'#7A2C9E':'#E6E3F2'};background:${S.tab==='extracciones'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:13px;font-weight:700;color:${S.tab==='extracciones'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">
+      Extracciones <span style="font-size:11px;background:${S.tab==='extracciones'?'#7A2C9E':'#E6E3F2'};color:${S.tab==='extracciones'?'#fff':'#9A95AD'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.extracciones.length}</span>
+    </button>
+  </div>`;
+
+  // ── Tab Diagnósticos ──
+  if (S.tab === 'diagnosticos') {
+    if (S.records.length === 0) {
+      return wrap(header + linkCard + sesionesHTML + tabs + `
+      <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px;">📋</div>
+        <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay respuestas enviadas.</p>
+      </div>`);
+    }
+    const cards = S.records.map(r => {
+      const answered  = countAnswered(r.answers);
+      const total     = 45;
+      const pct       = Math.round((answered / total) * 100);
+      const tareaCount = r.tarea ? Object.values(r.tarea).filter(Boolean).length : 0;
+      return `
+      <div onclick="openRecord('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
+        onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+          <div>
+            <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Sin nombre')}</h3>
+            <p style="font-size:13px;color:#9A95AD;margin:0;">${formatDate(r.created_at)}</p>
+          </div>
+          <div class="pill" style="font-size:12px;">${pct}% completo</div>
+        </div>
+        <div style="height:6px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:16px;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <span style="font-size:13px;font-weight:600;color:#6B6680;">✏️ ${answered} de ${total} preguntas respondidas</span>
+          <span style="font-size:13px;font-weight:600;color:#6B6680;">✓ ${tareaCount} de 7 materiales</span>
+        </div>
+      </div>`;
+    }).join('');
+    const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
+    return wrap(header + linkCard + sesionesHTML + tabs + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
   }
 
-  const cards = S.records.map(r => {
-    const answered  = countAnswered(r.answers);
-    const total     = 45;
-    const pct       = Math.round((answered / total) * 100);
-    const tareaCount = r.tarea ? Object.values(r.tarea).filter(Boolean).length : 0;
+  // ── Tab Extracciones ──
+  if (S.extracciones.length === 0) {
+    return wrap(header + linkCard + tabs + `
+    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">🧠</div>
+      <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay extracciones enviadas.</p>
+    </div>`);
+  }
+  const extCards = S.extracciones.map(r => {
+    const answered = Object.values(r.answers || {}).filter(v => v).length;
     return `
-    <div onclick="openRecord('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;
-      cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
+    <div onclick="openExtraccion('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
       onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
       onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">
         <div>
           <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Sin nombre')}</h3>
           <p style="font-size:13px;color:#9A95AD;margin:0;">${formatDate(r.created_at)}</p>
         </div>
-        <div class="pill" style="font-size:12px;">${pct}% completo</div>
+        <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;white-space:nowrap;">${answered} respuestas</div>
       </div>
-      <div style="height:6px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:16px;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
-      </div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <span style="font-size:13px;font-weight:600;color:#6B6680;">✏️ ${answered} de ${total} preguntas respondidas</span>
-        <span style="font-size:13px;font-weight:600;color:#6B6680;">✓ ${tareaCount} de 7 materiales</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Preguntas Frecuentes</span>
+        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Casos Reales</span>
+        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Conocimiento Experto</span>
       </div>
     </div>`;
   }).join('');
+  const extLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.extracciones.length} extracción${S.extracciones.length !== 1 ? 'es' : ''} recibida${S.extracciones.length !== 1 ? 's' : ''}</p>`;
+  return wrap(header + linkCard + tabs + extLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${extCards}</div>`);
+}
 
-  const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
+// ── DETALLE EXTRACCIÓN ──
+function buildDetailExtraccion() {
+  const r = S.selectedExtraccion;
+  if (!r) return buildList();
 
-  return wrap(header + linkCard + sesionesHTML + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
+  const answers = r.answers || {};
+
+  const blockDefs = [
+    { prefix: 's1', title: 'Preguntas Frecuentes',   tag: 'Sección 1 · 6', color: '#2E72D8', tipo: 'lista',   count: 15 },
+    { prefix: 's2', title: 'Dudas Comunes',           tag: 'Sección 2 · 6', color: '#5A45C4', tipo: 'lista',   count: 15 },
+    { prefix: 's3', title: 'Errores Comunes',         tag: 'Sección 3 · 6', color: '#7A2C9E', tipo: 'lista',   count: 15 },
+    {               title: 'Casos Reales',            tag: 'Sección 4 · 6', color: '#2E72D8', tipo: 'casos',
+      casos: [
+        { num: 1, label: 'Caso 1', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
+        { num: 2, label: 'Caso 2', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] },
+        { num: 3, label: 'Caso 3', qs: ['¿Cuál era la situación inicial del cliente? ¿De dónde venía?', '¿Cuál era el problema principal que enfrentaba?', '¿Cómo trabajaste con él/ella? ¿Qué hiciste?', '¿Cuál fue el resultado final?'] }
+      ]
+    },
+    { prefix: 's5', title: 'Objeciones Frecuentes',  tag: 'Sección 5 · 6', color: '#5A45C4', tipo: 'normal',
+      qs: ['¿Cuáles son las objeciones más comunes antes de contratar?', '¿Cuáles son los miedos más frecuentes antes de dar el paso?', '¿Por qué razones algunas personas no avanzan o abandonan el proceso?']
+    },
+    { prefix: 's6', title: 'Conocimiento Experto',   tag: 'Sección 6 · 6', color: '#7A2C9E', tipo: 'normal',
+      qs: ['¿Qué errores ves constantemente en tu industria que a ti ya no te sorprenden?', '¿Qué información incorrecta circula en tu industria que sabes que es falsa?', '¿Qué mitos existen sobre tu trabajo o el proceso que ayudas a resolver?', '¿Qué 3 consejos le darías a alguien que está comenzando a buscar soluciones?', '¿Qué te hubiera gustado saber antes de empezar en este camino profesional?']
+    }
+  ];
+
+  let totalAnswered = 0, totalQ = 0;
+  ['s1','s2','s3'].forEach(p => { for (let i=0;i<15;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
+  for (let c=1;c<=3;c++) { for (let q=0;q<4;q++) { totalQ++; if(answers['c'+c+'_q'+q]) totalAnswered++; } }
+  [['s5',3],['s6',5]].forEach(([p,n]) => { for(let i=0;i<n;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
+  const pct = Math.round((totalAnswered / totalQ) * 100);
+
+  const blocksHTML = blockDefs.map(blk => {
+    let contentHTML = '';
+    if (blk.tipo === 'lista') {
+      const items = [];
+      for (let i=0;i<blk.count;i++) {
+        const val = answers[blk.prefix+'_q'+i];
+        if (val) items.push(`
+          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F4F3FB;align-items:flex-start;">
+            <div style="flex:none;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,${blk.color},#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+            <p style="margin:0;font-size:15px;line-height:1.5;color:#231D3A;white-space:pre-wrap;">${esc(String(val))}</p>
+          </div>`);
+      }
+      contentHTML = items.length === 0
+        ? `<p style="font-size:14px;color:#B3AECA;font-style:italic;margin:0;">(sin respuestas)</p>`
+        : `<div style="display:flex;flex-direction:column;">${items.join('')}</div>`;
+    } else if (blk.tipo === 'casos') {
+      contentHTML = blk.casos.map(caso => {
+        const qsHTML = caso.qs.map((q, qi) => {
+          const val = answers['c'+caso.num+'_q'+qi];
+          return `
+          <div style="margin-bottom:14px;">
+            <p style="font-size:12.5px;font-weight:700;color:#6B6680;margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em;">${esc(q)}</p>
+            ${!val
+              ? `<p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p>`
+              : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:12px 16px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;">${esc(String(val))}</p></div>`
+            }
+          </div>`;
+        }).join('');
+        return `
+        <div style="border:1px solid #ECE9F7;border-radius:14px;padding:18px 20px;background:#FDFDFF;margin-bottom:12px;">
+          <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:${blk.color};margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em;">${caso.label}</div>
+          ${qsHTML}
+        </div>`;
+      }).join('');
+    } else {
+      const qsHTML = blk.qs.map((q, qi) => {
+        const val = answers[blk.prefix+'_q'+qi];
+        return `
+        <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,${blk.color},#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${qi+1}</div>
+            <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(q)}</p>
+          </div>
+          <div style="margin-left:36px;">
+            ${!val
+              ? `<div style="background:#FDFDFD;border:1.5px dashed #E5E1F2;border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p></div>`
+              : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:14px 18px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`
+            }
+          </div>
+        </div>`;
+      }).join('');
+      contentHTML = `<div style="display:flex;flex-direction:column;gap:0;">${qsHTML}</div>`;
+    }
+    return `
+    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+      <div style="margin-bottom:6px;"><div class="pill" style="font-size:12px;">${esc(blk.tag)}</div></div>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#231D3A;">${esc(blk.title)}</h2>
+      ${contentHTML}
+    </div>`;
+  }).join('');
+
+  return wrap(`
+  <div class="mob-full" style="width:100%;max-width:820px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="closeExtraccion()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span class="dash-btn-text">Volver</span>
+        </button>
+        <button onclick="deleteExtraccion('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          <span class="dash-btn-text">Eliminar</span>
+        </button>
+        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#6B6680;border-color:#ECE9F7;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span class="dash-btn-text">Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
+      <div class="pill-soft" style="margin-bottom:14px;">Extracción de Conocimiento Experto</div>
+      <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+      <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
+      <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s ease;"></div>
+      </div>
+      <p style="font-size:13px;color:#9A95AD;margin:0;">${totalAnswered} de ${totalQ} preguntas respondidas · ${pct}% completado</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">${blocksHTML}</div>
+
+    <div style="margin-top:24px;text-align:center;">
+      <button onclick="closeExtraccion()" class="btn-secondary">← Volver a la lista</button>
+    </div>
+  </div>`);
 }
 
 // ── DETALLE ──
@@ -948,6 +1161,9 @@ const FORM_BASE_URL = 'https://formularios.somosdostudio.com';
 function buildLink(sid) {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
   if (!nombre) return '';
+  if (S.linkTipo === 'extraccion') {
+    return FORM_BASE_URL + '/extraccion.html?cliente=' + encodeURIComponent(nombre);
+  }
   let url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
   if (sid) url += '&sid=' + sid;
   return url;
@@ -967,16 +1183,17 @@ window.copiarLink = async function() {
   if (!nombre) { alert('Escribe el nombre del cliente primero.'); return; }
   const btn = document.querySelector('[onclick="copiarLink()"]');
 
-  // Crear registro en link_sesiones (estado: generado, no abierto)
   let sid = null;
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ cliente: nombre, ultimo_paso: -1 })
-    });
-    if (res.ok) { const data = await res.json(); sid = data[0]?.id || null; }
-  } catch(e) {}
+  if (S.linkTipo === 'diagnostico') {
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/link_sesiones', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify({ cliente: nombre, ultimo_paso: -1 })
+      });
+      if (res.ok) { const data = await res.json(); sid = data[0]?.id || null; }
+    } catch(e) {}
+  }
 
   const url = buildLink(sid);
   navigator.clipboard.writeText(url).then(() => {
@@ -986,8 +1203,7 @@ window.copiarLink = async function() {
       btn.style.color = '#3DAB7A'; btn.style.borderColor = '#3DAB7A';
       setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
     }
-    // Recargar sesiones para mostrar el nuevo estado
-    fetchRecords();
+    if (S.linkTipo === 'diagnostico') fetchRecords();
   });
 };
 
