@@ -160,14 +160,19 @@
         position: fixed !important; bottom: 16px !important;
         left: 50% !important; transform: translateX(-50%) !important;
         width: calc(100% - 32px) !important; max-width: 500px !important;
-        background: rgba(255,255,255,0.88) !important;
+        background: rgba(8,12,45,0.92) !important;
         backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
         padding: 12px 18px !important; border-radius: 16px !important;
-        border: 1px solid rgba(255,255,255,0.6) !important;
-        z-index: 1000 !important; box-shadow: 0 10px 30px rgba(60,40,120,0.12) !important;
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        z-index: 1000 !important; box-shadow: 0 10px 40px rgba(0,0,0,0.45) !important;
       }
       .btn-primary { font-size: 14.5px !important; padding: 12px 20px !important; border-radius: 10px !important; }
-      .btn-secondary { font-size: 14px !important; padding: 11px 16px !important; border-radius: 10px !important; }
+      .btn-secondary {
+        font-size: 14px !important; padding: 11px 16px !important; border-radius: 10px !important;
+        background: rgba(255,255,255,0.07) !important;
+        border: 1.5px solid rgba(255,255,255,0.18) !important;
+        color: rgba(180,205,255,0.9) !important;
+      }
       .mobile-spacer { display: block !important; }
     }
 
@@ -399,6 +404,32 @@
     <div class="intro-btn">
       <button onclick="dismissIntro()" class="intro-btn-action">Comenzar →</button>
     </div>
+  </div>
+
+  <!-- Panel de ajuste de posición (solo desktop, solo visible con ?ajustar=1) -->
+  <div id="pos-controls" style="display:none;position:fixed;top:50%;right:18px;transform:translateY(-50%);background:rgba(5,10,35,0.92);border:1px solid rgba(120,140,255,0.3);border-radius:14px;padding:16px 18px;width:190px;font-family:'Sora',sans-serif;color:#fff;font-size:12px;z-index:10001;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <div style="font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(140,170,255,0.7);margin-bottom:14px;">⚙ Ajustar posición</div>
+
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;color:rgba(190,215,255,0.85);">
+        <span>Logo arriba</span><span id="logo-val" style="color:#93c5fd;font-weight:700;">6vh</span>
+      </div>
+      <input type="range" min="2" max="20" value="6" step="0.5"
+        oninput="adjustLogoPos(this.value)"
+        style="width:100%;accent-color:#3B82F6;">
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;color:rgba(190,215,255,0.85);">
+        <span>Iconos abajo</span><span id="feat-val" style="color:#a78bfa;font-weight:700;">5vh</span>
+      </div>
+      <input type="range" min="1" max="18" value="5" step="0.5"
+        oninput="adjustFeatPos(this.value)"
+        style="width:100%;accent-color:#7B4EDB;">
+    </div>
+
+    <button onclick="copyPosValues()" style="width:100%;padding:8px 6px;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Sora',sans-serif;">Copiar valores</button>
+    <div id="pos-copied" style="display:none;text-align:center;margin-top:8px;font-size:10px;color:#6ee7b7;">✓ Copiado al portapapeles</div>
   </div>
 
   <!-- Features con iconos (desktop) -->
@@ -1175,6 +1206,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   animate();
 });
+
+// ─── CONTROLES DE POSICIÓN (solo con ?ajustar=1) ─────────────────────────────
+(function() {
+  if (new URLSearchParams(window.location.search).get('ajustar') !== '1') return;
+  const panel = document.getElementById('pos-controls');
+  if (panel) panel.style.display = 'block';
+})();
+
+window.adjustLogoPos = function(val) {
+  const el = document.querySelector('.intro-pos-logo');
+  if (el) el.style.top = val + 'vh';
+  const lbl = document.getElementById('logo-val');
+  if (lbl) lbl.textContent = val + 'vh';
+};
+window.adjustFeatPos = function(val) {
+  const el = document.querySelector('.intro-features');
+  if (el) el.style.bottom = val + 'vh';
+  const lbl = document.getElementById('feat-val');
+  if (lbl) lbl.textContent = val + 'vh';
+};
+window.copyPosValues = function() {
+  const lv = (document.getElementById('logo-val') || {}).textContent || '?';
+  const fv = (document.getElementById('feat-val') || {}).textContent || '?';
+  const txt = 'Logo top: ' + lv + '\nIconos bottom: ' + fv;
+  try { navigator.clipboard.writeText(txt); } catch(e) { prompt('Copia estos valores:', txt); }
+  const msg = document.getElementById('pos-copied');
+  if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
+};
 
 window.dismissIntro = function() {
   trackOpenExt();
