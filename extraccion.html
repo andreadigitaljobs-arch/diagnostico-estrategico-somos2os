@@ -220,28 +220,106 @@
 
     @keyframes fadeInUp { to { opacity:1; transform:translateY(0); } }
 
-    /* Mobile: sin imagen de fondo, layout vertical centrado */
+    /* ── Visibilidad desktop/mobile ── */
+    .m-only { display: none; }
+
     @media (max-width: 768px) {
+      /* Ocultar todo el layout desktop */
+      .intro-pos-logo, .intro-pos-heading, .intro-pos-phrase,
+      .intro-pos-btn, .intro-features { display: none !important; }
+
       .intro-overlay {
-        background: radial-gradient(ellipse at 30% 40%, rgba(122,44,158,0.55) 0%, transparent 60%),
-                    radial-gradient(ellipse at 72% 62%, rgba(46,114,216,0.45) 0%, transparent 60%),
-                    #040E1C;
+        background: url('assets/extraccion-bg-mobile.png') center top / cover no-repeat, #040E1C;
+        display: block; overflow-y: auto; padding: 0;
+      }
+      .m-only { display: block; }
+
+      /* Contenedor principal mobile */
+      .mobile-content {
+        width: 100%; min-height: 100dvh;
+        padding: 56px 22px 32px;
         display: flex; flex-direction: column; align-items: center;
-        justify-content: center; padding: 0 28px;
+        font-family: 'Sora', sans-serif; color: #fff;
       }
-      .intro-pos-logo, .intro-pos-heading, .intro-pos-phrase, .intro-pos-btn {
-        position: static; transform: none; width: 100%; text-align: center;
+
+      /* Logo */
+      .mobile-logo-wrap { margin-bottom: 26px; }
+      .mobile-logo-circle {
+        width: 86px; height: 86px; border-radius: 50%;
+        border: 2px solid rgba(167,100,255,0.7);
+        background: rgba(10,15,45,0.65);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto; overflow: hidden;
+        opacity: 0; animation: fadeInUp .8s ease forwards; animation-delay: .3s;
       }
-      .intro-pos-logo    { margin-bottom: 22px; }
-      .intro-logo-circle { margin: 0 auto; }
-      .intro-pos-heading { margin-bottom: 14px; }
-      .intro-pos-phrase  { margin-bottom: 36px; }
-      .intro-pos-btn     { margin-bottom: 44px; }
-      .intro-heading     { font-size: 42px; }
-      .intro-phrase      { font-size: 15px; max-width: 340px; }
-      .intro-btn-action  { width: 82vw; max-width: 320px; }
-      .intro-features    { position: static; transform: none; width: 100%; bottom: auto; }
-      .intro-feature-item { font-size: 10px; width: 22%; }
+
+      /* Encabezado: ¡Hola, / Name! */
+      .mobile-heading-wrap {
+        width: 100%; margin-bottom: 20px;
+        opacity: 0; animation: fadeInUp 1s ease forwards; animation-delay: .6s;
+      }
+      .mobile-hola { font-size: 30px; font-weight: 700; color: #fff; line-height: 1.2; }
+      .mobile-name {
+        font-size: clamp(52px, 14vw, 66px); font-weight: 800; line-height: 1.0;
+        background: linear-gradient(135deg, #A855F7 0%, #3B82F6 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        letter-spacing: -0.02em;
+      }
+      .mobile-underline {
+        width: 72px; height: 3px; margin-top: 10px;
+        background: linear-gradient(90deg, #7B4EDB, #3B82F6); border-radius: 99px;
+      }
+
+      /* Tarjeta de info */
+      .mobile-info-card {
+        width: 100%; background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+        padding: 18px; margin-bottom: 20px;
+        opacity: 0; animation: fadeInUp 1s ease forwards; animation-delay: 1s;
+      }
+      .mobile-info-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+      .mobile-brain-icon {
+        width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%;
+        background: rgba(100,60,180,0.45);
+        display: flex; align-items: center; justify-content: center; font-size: 22px;
+      }
+      .mobile-info-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.3; margin: 0; padding-top: 2px; }
+      .mobile-info-desc { font-size: 14px; color: rgba(255,255,255,0.72); line-height: 1.6; margin: 0; }
+      .mobile-highlight { color: #818CF8; font-weight: 600; }
+
+      /* 3 badges */
+      .mobile-badges {
+        display: flex; gap: 8px; width: 100%; margin-bottom: 26px;
+        opacity: 0; animation: fadeInUp 1s ease forwards; animation-delay: 1.4s;
+      }
+      .mobile-badge {
+        flex: 1; background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+        padding: 12px 6px; text-align: center;
+        display: flex; flex-direction: column; align-items: center; gap: 3px;
+      }
+      .mobile-badge-icon { font-size: 21px; margin-bottom: 3px; }
+      .mobile-badge-main { font-size: 10.5px; font-weight: 700; color: #fff; line-height: 1.2; }
+      .mobile-badge-sub { font-size: 9.5px; color: rgba(255,255,255,0.45); }
+
+      /* Botón */
+      .mobile-cta {
+        width: 100%; padding: 17px 24px; border-radius: 99px;
+        font-size: 17px; font-weight: 700; color: #fff; font-family: 'Sora', sans-serif;
+        border: none; cursor: pointer;
+        background: linear-gradient(90deg, #7B4EDB, #3B82F6);
+        box-shadow: 0 8px 32px rgba(123,78,219,0.45);
+        margin-bottom: 22px;
+        opacity: 0; animation: fadeInUp .8s ease forwards; animation-delay: 1.8s;
+      }
+
+      /* Dots */
+      .mobile-dots {
+        display: flex; gap: 8px; justify-content: center;
+        opacity: 0; animation: fadeInUp .6s ease forwards; animation-delay: 2.1s;
+      }
+      .mobile-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.22); }
+      .mobile-dot.active { background: #7B4EDB; width: 10px; height: 10px; }
     }
   </style>
 </head>
@@ -274,7 +352,7 @@
     </div>
   </div>
 
-  <!-- Textos bajo los 4 iconos ya dibujados en el fondo -->
+  <!-- Textos bajo los 4 iconos ya dibujados en el fondo (solo desktop) -->
   <div class="intro-features">
     <div class="intro-feature-item">Tu conocimiento<br>tiene valor</div>
     <div class="intro-feature-item">Extractamos lo esencial,<br>sin perder tu esencia</div>
@@ -282,12 +360,66 @@
     <div class="intro-feature-item">Lo convertimos en<br>tu mayor activo</div>
   </div>
 
+  <!-- ── LAYOUT MÓVIL ── -->
+  <div class="m-only mobile-content">
+
+    <div class="mobile-logo-wrap">
+      <div class="mobile-logo-circle">
+        <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1);">
+      </div>
+    </div>
+
+    <div class="mobile-heading-wrap">
+      <div class="mobile-hola">¡Hola,</div>
+      <div class="mobile-name" id="intro-nombre">!</div>
+      <div class="mobile-underline"></div>
+    </div>
+
+    <div class="mobile-info-card">
+      <div class="mobile-info-top">
+        <div class="mobile-brain-icon">🧠</div>
+        <p class="mobile-info-title">Lo que sabes vale más<br>de lo que crees.</p>
+      </div>
+      <p class="mobile-info-desc">En los próximos <span class="mobile-highlight">20–30 minutos</span> vamos a extraer el conocimiento que has acumulado durante años para convertirlo en tu mayor activo.</p>
+    </div>
+
+    <div class="mobile-badges">
+      <div class="mobile-badge">
+        <div class="mobile-badge-icon">⏱</div>
+        <div class="mobile-badge-main">20–30 min</div>
+        <div class="mobile-badge-sub">Duración</div>
+      </div>
+      <div class="mobile-badge">
+        <div class="mobile-badge-icon">🎯</div>
+        <div class="mobile-badge-main">100% personalizado</div>
+        <div class="mobile-badge-sub">Enfoque en ti</div>
+      </div>
+      <div class="mobile-badge">
+        <div class="mobile-badge-icon">🔒</div>
+        <div class="mobile-badge-main">Confidencial</div>
+        <div class="mobile-badge-sub">Seguro y privado</div>
+      </div>
+    </div>
+
+    <button onclick="dismissIntro()" class="mobile-cta">Comenzar →</button>
+
+    <div class="mobile-dots">
+      <div class="mobile-dot active"></div>
+      <div class="mobile-dot"></div>
+      <div class="mobile-dot"></div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
 try {
   const _n = new URLSearchParams(window.location.search).get('cliente');
-  if (_n) { const _el = document.getElementById('intro-saludo'); if (_el) _el.textContent = '¡Hola, ' + _n + '!'; }
+  if (_n) {
+    const _el = document.getElementById('intro-saludo'); if (_el) _el.textContent = '¡Hola, ' + _n + '!';
+    const _nm = document.getElementById('intro-nombre'); if (_nm) _nm.textContent = _n + '!';
+  }
 } catch(e) {}
 try {
   var _st = JSON.parse(localStorage.getItem('somos2os_extraccion_v1'));
@@ -485,6 +617,22 @@ window.updateAnswer = function(id, val) {
   S.answers[id] = val;
   saveState();
   showSaveToast();
+  // Actualizar badge de caso en tiempo real
+  const m = id.match(/^c(\d+)_q\d+$/);
+  if (m) {
+    const num = parseInt(m[1]);
+    const casosBlk = BLOCKS.find(b => b.tipo === 'casos');
+    if (casosBlk) {
+      const caso = casosBlk.casos.find(c => c.num === num);
+      if (caso) {
+        const filled = caso.qs.filter((_, qi) => S.answers['c'+num+'_q'+qi]).length;
+        const badge = document.querySelector('[data-caso-badge="'+num+'"]');
+        if (badge) { badge.textContent = filled+'/4 '+(filled===4?'✓ completo':'respondidas'); badge.style.color = filled===4?'#3DAB7A':'#B6B2C9'; }
+        const div = document.querySelector('[data-caso-div="'+num+'"]');
+        if (div) { const cols=['#2E72D8','#5A45C4','#7A2C9E']; div.style.borderColor = filled===4?'#3DAB7A':(cols[num-1]+'33'); }
+      }
+    }
+  }
 };
 
 // ─── ENVÍO ────────────────────────────────────────────────────────────────────
@@ -774,11 +922,11 @@ function buildCasosHTML(blk, bi) {
     }).join('');
 
     return `
-    <div style="border-radius:16px;overflow:hidden;border:1.5px solid ${filled===4 ? '#3DAB7A' : color+'33'};">
+    <div data-caso-div="${caso.num}" style="border-radius:16px;overflow:hidden;border:1.5px solid ${filled===4 ? '#3DAB7A' : color+'33'};">
       <div style="background:linear-gradient(135deg,${color}18,${color}0a);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ${color}22;">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${color},${color}CC);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${caso.num}</div>
         <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:${color};">${caso.label}</span>
-        <span style="margin-left:auto;font-size:12px;font-weight:600;color:${filled===4?'#3DAB7A':'#B6B2C9'};">${filled}/4 ${filled===4?'✓ completo':'respondidas'}</span>
+        <span data-caso-badge="${caso.num}" style="margin-left:auto;font-size:12px;font-weight:600;color:${filled===4?'#3DAB7A':'#B6B2C9'};">${filled}/4 ${filled===4?'✓ completo':'respondidas'}</span>
       </div>
       <div style="padding:20px 18px;display:flex;flex-direction:column;gap:16px;" class="questions-wrapper">
         ${qsHTML}
