@@ -2,9 +2,9 @@
   "name": "Asesorías SomosDos",
   "short_name": "Asesorías S2",
   "description": "Diagnóstico Estratégico · Somos2os Studio",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#F0EEF8",
+  "background_color": "#0A0F2E",
   "theme_color": "#7A2C9E",
   "orientation": "portrait",
   "icons": [
