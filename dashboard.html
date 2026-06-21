@@ -739,10 +739,16 @@ function buildList() {
       const enviado = esExtraccion
         ? S.extracciones.some(e => (e.cliente || '').toLowerCase() === (ses.cliente || '').toLowerCase())
         : ses.enviado;
+      const EXT_SECTIONS = ['Preguntas', 'Dudas', 'Errores', 'Casos', 'Conocimiento'];
       let badge, color, bg;
       if (enviado) {
         badge = '✓ Enviado'; color = '#3DAB7A'; bg = 'rgba(61,171,122,.1)';
-      } else if (esExtraccion || paso === -1) {
+      } else if (esExtraccion) {
+        if (paso === -1)      { badge = '📤 Generado'; color = '#9A95AD'; bg = 'rgba(154,149,173,.1)'; }
+        else if (paso === 0)  { badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)'; }
+        else if (paso >= 1 && paso <= 5) { badge = `⏳ Sección ${paso}/5 · ${EXT_SECTIONS[paso-1]}`; color = '#2E72D8'; bg = 'rgba(46,114,216,.1)'; }
+        else                  { badge = '📋 Casi listo'; color = '#6A38B0'; bg = 'rgba(106,56,176,.1)'; }
+      } else if (paso === -1) {
         badge = '📤 Generado'; color = '#9A95AD'; bg = 'rgba(154,149,173,.1)';
       } else if (paso === 0) {
         badge = '👁 Solo abrió'; color = '#E09A2B'; bg = 'rgba(224,154,43,.1)';
@@ -751,7 +757,7 @@ function buildList() {
       } else {
         badge = '📋 Casi listo'; color = '#6A38B0'; bg = 'rgba(106,56,176,.1)';
       }
-      const pct = esExtraccion ? (enviado ? 100 : 0) : (paso <= 0 ? 0 : Math.min(100, Math.round((paso / 8) * 100)));
+      const pct = esExtraccion ? (enviado ? 100 : paso <= 0 ? 0 : Math.min(100, Math.round((paso / 7) * 100))) : (paso <= 0 ? 0 : Math.min(100, Math.round((paso / 8) * 100)));
       const cuando = ses.ultimo_acceso ? (() => {
         const diff = Math.round((Date.now() - new Date(ses.ultimo_acceso)) / 60000);
         if (diff < 1) return 'ahora';
@@ -1164,7 +1170,9 @@ function buildLink(sid) {
   const nombre = (document.getElementById('link-nombre')?.value || '').trim();
   if (!nombre) return '';
   if (S.linkTipo === 'extraccion') {
-    return FORM_BASE_URL + '/extraccion?cliente=' + encodeURIComponent(nombre);
+    let url = FORM_BASE_URL + '/extraccion?cliente=' + encodeURIComponent(nombre);
+    if (sid) url += '&sid=' + sid;
+    return url;
   }
   let url = FORM_BASE_URL + '?cliente=' + encodeURIComponent(nombre);
   if (sid) url += '&sid=' + sid;

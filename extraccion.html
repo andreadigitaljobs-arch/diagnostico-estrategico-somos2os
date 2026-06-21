@@ -399,6 +399,7 @@ function executeGo(step) {
   scrollTop();
   S.step = Math.max(0, Math.min(TOTAL_SCREENS - 1, step));
   if (S.step > S.maxStep) S.maxStep = S.step;
+  trackStepExt(S.step);
   saveState();
   render();
   const newCard = document.querySelector('.form-card');
@@ -542,7 +543,7 @@ function render() {
   const wrapClass = showProg ? 'form-wrap has-header' : 'form-wrap';
   const wrapBg = isIntro ? '' : `background:url('assets/background.png') no-repeat center center fixed;background-size:cover;`;
 
-  html += `<div class="${wrapClass}" style="min-height:100vh;min-height:100dvh;padding:${isIntro ? '40px 20px' : '110px 20px 48px'};display:flex;flex-direction:column;align-items:center;${wrapBg}">`;
+  html += `<div class="${wrapClass}" style="min-height:100vh;min-height:100dvh;padding:${isIntro ? '40px 20px' : '110px 20px 48px'};display:flex;flex-direction:column;align-items:center;${isIntro ? 'justify-content:center;' : ''}${wrapBg}">`;
   html += progBar;
 
   if (isIntro)     html += buildIntroHTML();
@@ -925,6 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.dismissIntro = function() {
+  trackOpenExt();
   const intro = document.getElementById('intro-screen');
   if (intro) {
     intro.classList.add('fade-out');
@@ -934,6 +936,63 @@ window.dismissIntro = function() {
     setTimeout(() => { intro.style.display='none'; window.introParticlesActive=false; }, 1200);
   }
 };
+
+// ─── TRACKING ────────────────────────────────────────────────────────────────
+const SESSION_KEY_EXT = 'somos2os_extraccion_sesion';
+let _sesionIdExt = null;
+
+function _saveSesionIdExt(id) {
+  _sesionIdExt = id;
+  try { localStorage.setItem(SESSION_KEY_EXT, JSON.stringify({ id, cliente: CLIENT_NAME })); } catch(e) {}
+}
+
+(async function initTrackingExt() {
+  if (!CLIENT_NAME) return;
+  try {
+    const sidFromUrl = new URLSearchParams(window.location.search).get('sid');
+    if (sidFromUrl) { _saveSesionIdExt(sidFromUrl); return; }
+    const stored = JSON.parse(localStorage.getItem(SESSION_KEY_EXT) || 'null');
+    if (stored?.id && stored.cliente === CLIENT_NAME) { _sesionIdExt = stored.id; }
+  } catch(e) {}
+})();
+
+async function trackOpenExt() {
+  if (!CLIENT_NAME) return;
+  try {
+    if (_sesionIdExt) {
+      fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionIdExt, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
+      });
+      return;
+    }
+    const lookup = await fetch(
+      SUPABASE_URL + '/rest/v1/link_sesiones?cliente=eq.' + encodeURIComponent(CLIENT_NAME) + '&tipo=eq.extraccion&order=created_at.desc&limit=1',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (lookup.ok) {
+      const data = await lookup.json();
+      if (data[0]) {
+        _saveSesionIdExt(data[0].id);
+        fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + data[0].id, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ultimo_paso: 0, ultimo_acceso: new Date().toISOString() })
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+function trackStepExt(step) {
+  if (!_sesionIdExt) return;
+  fetch(SUPABASE_URL + '/rest/v1/link_sesiones?id=eq.' + _sesionIdExt, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ultimo_paso: step, ultimo_acceso: new Date().toISOString() })
+  }).catch(() => {});
+}
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 loadState();
