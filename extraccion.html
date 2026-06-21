@@ -383,8 +383,8 @@
 
   <!-- Logo: se posa dentro del círculo dibujado en el fondo -->
   <div class="intro-pos-logo">
-    <div class="intro-logo-circle">
-      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);">
+    <div class="intro-logo-circle" onclick="secretAdmin(event)" style="cursor:pointer;touch-action:manipulation;user-select:none;">
+      <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);pointer-events:none;">
       <div class="logo-shine"></div>
     </div>
   </div>
@@ -465,8 +465,8 @@
   <div class="m-only mobile-content">
 
     <div class="mobile-logo-wrap">
-      <div class="mobile-logo-circle">
-        <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1);">
+      <div class="mobile-logo-circle" onclick="secretAdmin(event)" style="cursor:pointer;touch-action:manipulation;user-select:none;">
+        <img src="assets/logo-welcome-circular.png" alt="S2 Asesorías" style="width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1);pointer-events:none;">
       </div>
     </div>
 
@@ -793,11 +793,12 @@ window.sendForm = async function() {
 
 // ─── ACCESO SECRETO ADMIN ─────────────────────────────────────────────────────
 let _secretTaps = 0, _secretTimer = null;
-window.secretAdmin = function() {
+window.secretAdmin = function(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
   _secretTaps++;
   clearTimeout(_secretTimer);
-  if (_secretTaps >= 3) { _secretTaps = 0; window.location.href = '/dashboard'; return; }
-  _secretTimer = setTimeout(() => { _secretTaps = 0; }, 3000);
+  if (_secretTaps >= 2) { _secretTaps = 0; window.location.href = '/dashboard'; return; }
+  _secretTimer = setTimeout(() => { _secretTaps = 0; }, 2000);
 };
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
