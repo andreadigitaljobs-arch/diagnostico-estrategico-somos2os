@@ -21,46 +21,46 @@
     html, body { margin: 0; padding: 0; overflow-x: hidden; max-width: 100vw; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: url('assets/background.png') no-repeat center center fixed;
+      background: url('assets/extraccion-bg-compu.png') no-repeat center center fixed;
       background-size: cover;
-      color: #1C1830;
+      color: #e8edf8;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Desktop: cards get glassmorphism over photo bg */
     .card-pad {
-      background: rgba(255, 255, 255, 0.82) !important;
-      backdrop-filter: blur(18px) !important;
-      -webkit-backdrop-filter: blur(18px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.55) !important;
-      box-shadow: 0 8px 32px rgba(60, 40, 120, 0.13) !important;
+      background: rgba(8,12,48,0.72) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35) !important;
     }
-    ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-thumb { background: #D8D4EA; border-radius: 8px; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.35); border-radius: 8px; }
 
     .btn-primary {
       border: none; cursor: pointer;
       padding: 14px 30px; border-radius: 12px;
-      background: linear-gradient(120deg, #2E72D8, #5A45C4 55%, #7A2C9E);
+      background: linear-gradient(120deg, #3B82F6, #7B4EDB);
       color: #fff; font-size: 15.5px; font-weight: 700;
-      box-shadow: 0 14px 26px -12px rgba(90,52,160,.6);
+      box-shadow: 0 8px 28px rgba(123,78,219,0.45);
       transition: transform .18s ease;
       font-family: inherit;
     }
     .btn-primary:hover { transform: translateY(-2px); }
 
     .btn-secondary {
-      border: 1.5px solid #E0DCEF; background: #fff; color: #5A5470;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.07); color: rgba(190,210,255,0.9);
       cursor: pointer; padding: 10px 20px; border-radius: 10px;
       font-size: 14px; font-weight: 600; transition: background .15s ease;
       font-family: inherit;
     }
-    .btn-secondary:hover { background: #F7F6FC; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
 
     .pill {
       display: inline-flex; align-items: center;
       padding: 5px 12px; border-radius: 99px;
-      background: linear-gradient(135deg, #2E72D8, #7A2C9E);
+      background: linear-gradient(135deg, #3B82F6, #7B4EDB);
       color: #fff; font-family: 'Sora', sans-serif;
       font-size: 12px; font-weight: 700; letter-spacing: .04em;
       white-space: nowrap;
@@ -69,21 +69,25 @@
     .pill-soft {
       display: inline-flex; align-items: center;
       padding: 5px 12px; border-radius: 99px;
-      background: linear-gradient(135deg, rgba(46,114,216,.12), rgba(122,44,158,.12));
-      color: #5A2E9E; font-size: 12px; font-weight: 700;
+      background: rgba(139,92,246,0.18);
+      border: 1px solid rgba(139,92,246,0.3);
+      color: #c4b5fd; font-size: 12px; font-weight: 700;
       letter-spacing: .07em; text-transform: uppercase; white-space: nowrap;
     }
 
     input[type="password"], input[type="text"] {
-      width: 100%; padding: 13px 15px; border: 1.5px solid #E6E3F2;
-      border-radius: 14px; font-size: 15.5px; color: #2C2742;
-      background: #FBFAFE; outline: none; font-family: inherit;
+      width: 100%; padding: 13px 15px;
+      border: 1.5px solid rgba(139,92,246,0.3);
+      border-radius: 14px; font-size: 15.5px;
+      color: #fff; background: rgba(255,255,255,0.07);
+      outline: none; font-family: inherit;
       transition: border-color .18s ease, box-shadow .18s ease;
     }
+    input::placeholder { color: rgba(180,200,255,0.4); }
     input:focus {
-      border-color: #5A45C4;
-      box-shadow: 0 0 0 4px rgba(90,69,196,.13);
-      background: #fff;
+      border-color: rgba(139,92,246,0.7);
+      box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+      background: rgba(255,255,255,0.1);
     }
 
     @keyframes shake {
@@ -93,25 +97,34 @@
     }
     .shake { animation: shake .4s ease; }
 
+    /* ── Clases de texto para dark theme ── */
+    .dk-label   { color: rgba(150,175,230,0.55) !important; }
+    .dk-body    { color: rgba(190,210,250,0.85) !important; }
+    .dk-heading { color: #e8edf8 !important; }
+    .dk-muted   { color: rgba(140,165,220,0.5) !important; }
+    .dk-divider { border-color: rgba(255,255,255,0.08) !important; }
+    .dk-card    { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.09) !important; }
+    .dk-input   { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.15) !important; color: #fff !important; }
+
     @media (max-width: 600px) {
       body {
-        background: url('assets/background-mobile.png') no-repeat center center fixed !important;
+        background: url('assets/extraccion-bg-mobile.png') no-repeat center top fixed !important;
         background-size: cover !important;
       }
       .dash-pill { display: none !important; }
       .dash-btn-text { display: none !important; }
       .btn-secondary { padding: 10px 12px !important; }
-      .card-pad { 
-        padding: 18px 16px !important; 
-        background: rgba(255, 255, 255, 0.85) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      .card-pad {
+        padding: 18px 16px !important;
+        background: rgba(8,12,48,0.78) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-radius: 18px !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
       }
-      .card-pad h1 { font-size: 22px !important; }
-      .card-pad h2 { font-size: 18px !important; }
-      .mob-wrap { padding: 16px 12px 48px !important; }
+      .card-pad h1 { font-size: 22px !important; color: #e8edf8 !important; }
+      .card-pad h2 { font-size: 18px !important; color: #e8edf8 !important; }
+      .mob-wrap { padding: 16px 14px 72px !important; }
       .mob-full { width: 100% !important; max-width: 100% !important; }
     }
   </style>
@@ -295,18 +308,18 @@ window.borrarSesion = async function(id) {
 window.editarNombre = function(id, currentName) {
   const overlay = document.createElement('div');
   overlay.id = 'rename-modal';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(35,29,58,.5);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(4,6,28,.6);backdrop-filter:blur(10px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
   overlay.innerHTML = `
-    <div style="background:#fff;border-radius:20px;padding:30px 28px;width:100%;max-width:420px;box-shadow:0 30px 80px -20px rgba(60,40,120,.3);">
-      <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#231D3A;margin:0 0 6px;">Cambiar nombre</h3>
-      <p style="font-size:13px;color:#9A95AD;margin:0 0 18px;">Este cambio solo aplica en el dashboard, no afecta las respuestas.</p>
+    <div style="background:rgba(12,16,52,0.95);border:1px solid rgba(139,92,246,0.3);border-radius:20px;padding:30px 28px;width:100%;max-width:420px;box-shadow:0 30px 80px -10px rgba(0,0,0,0.6);">
+      <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#e8edf8;margin:0 0 6px;">Cambiar nombre</h3>
+      <p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0 0 18px;">Este cambio solo aplica en el dashboard, no afecta las respuestas.</p>
       <input id="rename-input" type="text" value="${esc(currentName)}" placeholder="Nombre del cliente…"
-        style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:15px;border-radius:12px;border:1.5px solid #E6E3F2;background:#FBFAFE;font-family:inherit;outline:none;margin-bottom:16px;"
-        onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'"
+        style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:15px;border-radius:12px;border:1.5px solid rgba(139,92,246,0.3);background:rgba(255,255,255,0.07);color:#e8edf8;font-family:inherit;outline:none;margin-bottom:16px;"
+        onfocus="this.style.borderColor='rgba(139,92,246,0.7)';this.style.boxShadow='0 0 0 4px rgba(139,92,246,0.15)'" onblur="this.style.borderColor='rgba(139,92,246,0.3)';this.style.boxShadow='none'"
         onkeydown="if(event.key==='Enter')guardarNombre('${id}');if(event.key==='Escape')document.getElementById('rename-modal').remove()">
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button onclick="document.getElementById('rename-modal').remove()" class="btn-secondary">Cancelar</button>
-        <button onclick="guardarNombre('${id}')" style="padding:10px 20px;background:linear-gradient(120deg,#2E72D8,#7A2C9E);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
+        <button onclick="guardarNombre('${id}')" style="padding:10px 20px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -475,170 +488,153 @@ function buildLoginMobile() {
 
 function buildLoginDesktop() {
   return `
-  <div style="height:100vh;display:flex;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;">
+  <div style="height:100vh;display:flex;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;
+    background:url('assets/extraccion-bg-compu.png') no-repeat center center fixed;background-size:cover;">
 
     <!-- ── COLUMNA IZQUIERDA ── -->
-    <div style="flex:1;background:#F4F3FB;padding:28px 36px;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+    <div style="flex:1;padding:32px 40px;display:flex;flex-direction:column;position:relative;overflow:hidden;
+      background:rgba(8,12,48,0.55);backdrop-filter:blur(2px);">
 
-      <!-- Círculo decorativo de fondo -->
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-40%,-50%);width:480px;height:480px;border-radius:50%;border:2px dashed rgba(122,44,158,.15);pointer-events:none;"></div>
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-40%,-50%);width:340px;height:340px;border-radius:50%;border:1.5px dashed rgba(46,114,216,.1);pointer-events:none;"></div>
+      <!-- Orbs decorativos -->
+      <div style="position:absolute;top:15%;left:20%;width:400px;height:400px;border-radius:50%;
+        background:radial-gradient(circle,rgba(123,78,219,0.12) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:10%;right:10%;width:300px;height:300px;border-radius:50%;
+        background:radial-gradient(circle,rgba(59,130,246,0.1) 0%,transparent 70%);pointer-events:none;"></div>
 
       <!-- Header izq -->
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;position:relative;">
-        <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:28px;width:auto;">
-        <div style="width:1px;height:20px;background:#D8D4EA;"></div>
-        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9A95AD;">Panel Admin</span>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:36px;position:relative;">
+        <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:28px;width:auto;filter:brightness(0) invert(1);">
+        <div style="width:1px;height:20px;background:rgba(255,255,255,0.2);"></div>
+        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(150,175,230,0.55);">Panel Admin</span>
       </div>
 
       <!-- Headline -->
-      <div style="position:relative;margin-bottom:20px;">
-        <h1 style="font-family:'Sora',sans-serif;font-size:36px;font-weight:800;line-height:1.1;letter-spacing:-.03em;margin:0 0 10px;color:#1C1830;">
+      <div style="position:relative;margin-bottom:28px;">
+        <h1 style="font-family:'Sora',sans-serif;font-size:38px;font-weight:800;line-height:1.1;letter-spacing:-.03em;margin:0 0 12px;color:#e8edf8;">
           Accede a las<br>
-          <span style="background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">respuestas y diagnósticos</span>
+          <span style="background:linear-gradient(120deg,#3B82F6,#7B4EDB);-webkit-background-clip:text;background-clip:text;color:transparent;">respuestas y diagnósticos</span>
         </h1>
-        <p style="font-size:13.5px;color:#6B6680;line-height:1.55;margin:0;max-width:320px;">Ingresa tus credenciales para revisar formularios, respuestas y seguimiento de clientes.</p>
+        <p style="font-size:14px;color:rgba(180,200,255,0.65);line-height:1.6;margin:0;max-width:340px;">Revisa formularios, diagnósticos y seguimiento de clientes en tiempo real.</p>
       </div>
 
       <!-- 3 mini features -->
-      <div style="display:flex;gap:10px;margin-bottom:18px;position:relative;">
+      <div style="display:flex;gap:12px;margin-bottom:24px;position:relative;">
         ${[
           { icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', label:'Respuestas', desc:'Revisa cada formulario y su historial.' },
           { icon:'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z', label:'Diagnósticos', desc:'Visualiza resultados e insights clave.' },
           { icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', label:'Seguimiento', desc:'Monitorea el progreso de tus clientes.' }
         ].map(f => `
-        <div style="flex:1;background:#fff;border-radius:14px;padding:12px 14px;border:1px solid #ECE9F7;box-shadow:0 2px 12px -4px rgba(60,40,120,.08);">
-          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6A38B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${f.icon}"/></svg>
+        <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;border:1px solid rgba(255,255,255,0.1);">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${f.icon}"/></svg>
           </div>
-          <div style="font-size:12px;font-weight:700;color:#231D3A;margin-bottom:2px;">${f.label}</div>
-          <div style="font-size:11px;color:#9A95AD;line-height:1.35;">${f.desc}</div>
+          <div style="font-size:12px;font-weight:700;color:#e8edf8;margin-bottom:3px;">${f.label}</div>
+          <div style="font-size:11px;color:rgba(150,175,230,0.5);line-height:1.4;">${f.desc}</div>
         </div>`).join('')}
       </div>
 
-      <!-- Preview card del dashboard -->
-      <div style="flex:1;background:#fff;border-radius:16px;border:1px solid #ECE9F7;box-shadow:0 8px 32px -8px rgba(60,40,120,.14);overflow:hidden;display:flex;min-height:0;position:relative;">
-        <!-- Sidebar -->
-        <div style="width:44px;background:#FAFAFE;border-right:1px solid #F0EEF8;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:12px;">
+      <!-- Preview card del dashboard (dark) -->
+      <div style="flex:1;background:rgba(8,12,48,0.7);backdrop-filter:blur(16px);border-radius:16px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;display:flex;min-height:0;position:relative;">
+        <!-- Sidebar mini -->
+        <div style="width:44px;background:rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:12px;">
           ${['M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z','M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z','M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'].map((p,i) => `
-          <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${i===0?'linear-gradient(135deg,#2E72D8,#7A2C9E)':'transparent'};">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${i===0?'#fff':'#B6B2C9'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>
+          <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${i===0?'linear-gradient(135deg,#3B82F6,#7B4EDB)':'rgba(255,255,255,0.05)'};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${i===0?'#fff':'rgba(150,175,230,0.35)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>
           </div>`).join('')}
         </div>
-        <!-- Contenido -->
+        <!-- Contenido preview -->
         <div style="flex:1;padding:18px 20px;overflow:hidden;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;">S</div>
+              <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#3B82F6,#7B4EDB);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:#fff;">S</div>
               <div>
-                <div style="font-size:13px;font-weight:700;color:#231D3A;">¡Hola, Coach! 👋</div>
-                <div style="font-size:11px;color:#9A95AD;">Aquí tienes un resumen de la actividad reciente.</div>
+                <div style="font-size:13px;font-weight:700;color:#e8edf8;">¡Hola, Coach! 👋</div>
+                <div style="font-size:11px;color:rgba(150,175,230,0.5);">Aquí tienes un resumen de la actividad reciente.</div>
               </div>
             </div>
-            <div style="font-size:11px;color:#9A95AD;background:#F7F6FC;padding:4px 10px;border-radius:8px;border:1px solid #ECE9F7;">Últimos 7 días</div>
+            <div style="font-size:11px;color:rgba(150,175,230,0.45);background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">Últimos 7 días</div>
           </div>
           <!-- Stats -->
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-            ${[['128','Formularios enviados','↑ 18%'],['86','Respuestas nuevas','↑ 24%'],['62','Diagnósticos generados','↑ 15%'],['43','Clientes activos','↑ 12%']].map(([n,l,t])=>`
-            <div style="background:#F7F6FC;border-radius:12px;padding:10px 12px;border:1px solid #ECE9F7;">
-              <div style="font-size:10px;color:#9A95AD;margin-bottom:4px;">${l}</div>
-              <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#231D3A;line-height:1;">${n}</div>
-              <div style="font-size:10px;color:#3DAB7A;font-weight:700;margin-top:2px;">${t}</div>
+            ${[['128','Formularios','↑ 18%'],['86','Respuestas','↑ 24%'],['62','Diagnósticos','↑ 15%'],['43','Activos','↑ 12%']].map(([n,l,t])=>`
+            <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:10px;color:rgba(150,175,230,0.45);margin-bottom:4px;">${l}</div>
+              <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#e8edf8;line-height:1;">${n}</div>
+              <div style="font-size:10px;color:#34d399;font-weight:700;margin-top:2px;">${t}</div>
             </div>`).join('')}
           </div>
-          <!-- Recientes + gráfica -->
-          <div style="display:flex;gap:12px;">
-            <div style="flex:1;">
-              <div style="font-size:11px;font-weight:700;color:#5A5470;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Respuestas recientes</div>
-              ${[['MC','María Camila G.','Formulario de Coaching','Hoy, 10:24 AM'],['JR','Juan Ricardo P.','Evaluación Inicial','Ayer, 04:15 PM'],['LA','Laura A.','Diagnóstico de Marca','Ayer, 11:03 AM']].map(([initials,name,type,time])=>`
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F4F3FB;">
-                <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(46,114,216,.15),rgba(122,44,158,.15));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6A38B0;flex:none;">${initials}</div>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-size:12px;font-weight:700;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
-                  <div style="font-size:11px;color:#9A95AD;">${type}</div>
-                </div>
-                <div style="font-size:10px;color:#B6B2C9;white-space:nowrap;">${time}</div>
-              </div>`).join('')}
-              <div style="font-size:12px;color:#5A45C4;font-weight:600;margin-top:10px;cursor:pointer;">Ver todas las respuestas →</div>
-            </div>
-            <!-- Donut -->
-            <div style="width:130px;flex:none;">
-              <div style="font-size:11px;font-weight:700;color:#5A5470;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Distribución</div>
-              <div style="position:relative;width:80px;height:80px;margin:0 auto 10px;">
-                <svg viewBox="0 0 36 36" style="width:80px;height:80px;transform:rotate(-90deg);">
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E5E1F2" stroke-width="4"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#2E72D8" stroke-width="4" stroke-dasharray="32 88" stroke-dashoffset="0"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#7A2C9E" stroke-width="4" stroke-dasharray="28 88" stroke-dashoffset="-32"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#5A45C4" stroke-width="4" stroke-dasharray="20 88" stroke-dashoffset="-60"/>
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#E5E1F2" stroke-width="4" stroke-dasharray="20 88" stroke-dashoffset="-80"/>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                  <span style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:#231D3A;">62</span>
-                  <span style="font-size:9px;color:#9A95AD;">Total</span>
-                </div>
+          <!-- Recientes -->
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:rgba(150,175,230,0.45);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Respuestas recientes</div>
+            ${[['MC','María Camila G.','Formulario de Coaching','Hoy, 10:24 AM'],['JR','Juan Ricardo P.','Evaluación Inicial','Ayer, 04:15 PM'],['LA','Laura A.','Diagnóstico de Marca','Ayer, 11:03 AM']].map(([initials,name,type,time])=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c4b5fd;flex:none;">${initials}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:700;color:#e8edf8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+                <div style="font-size:11px;color:rgba(150,175,230,0.45);">${type}</div>
               </div>
-              ${[['#2E72D8','Fortalezas','32%'],['#7A2C9E','Oportunidades','28%'],['#5A45C4','Riesgos','20%'],['#E5E1F2','Pendientes','20%']].map(([c,l,p])=>`
-              <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
-                <div style="width:8px;height:8px;border-radius:2px;background:${c};flex:none;"></div>
-                <span style="font-size:10px;color:#6B6680;flex:1;">${l}</span>
-                <span style="font-size:10px;font-weight:700;color:#231D3A;">${p}</span>
-              </div>`).join('')}
-            </div>
+              <div style="font-size:10px;color:rgba(140,165,220,0.4);white-space:nowrap;">${time}</div>
+            </div>`).join('')}
           </div>
         </div>
       </div>
     </div>
 
     <!-- ── COLUMNA DERECHA (LOGIN) ── -->
-    <div style="width:440px;flex:none;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 44px;border-left:1px solid #ECE9F7;">
-      <div id="login-card" style="width:100%;max-width:360px;text-align:center;">
+    <div style="width:420px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 44px;
+      background:rgba(8,12,48,0.82);backdrop-filter:blur(24px);border-left:1px solid rgba(255,255,255,0.1);">
+      <div id="login-card" style="width:100%;max-width:340px;text-align:center;">
 
-        <!-- App icon + logo -->
-        <div style="width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
-          background:linear-gradient(135deg,#2E72D8,#7A2C9E);
-          display:flex;align-items:center;justify-content:center;
-          box-shadow:0 14px 30px -8px rgba(90,52,160,.5);">
-          <span style="font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1;">S</span>
+        <!-- Logo -->
+        <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 18px;border:2px solid rgba(139,92,246,0.5);
+          background:rgba(8,12,45,0.7);box-shadow:0 0 28px rgba(139,92,246,0.25),0 0 0 5px rgba(139,92,246,0.07);
+          display:flex;align-items:center;justify-content:center;">
+          <img src="assets/logo-welcome-circular.png" alt="S2" style="width:72%;height:72%;object-fit:contain;">
         </div>
-        <img src="assets/logo-somos2os.svg" alt="Somos2os" style="height:28px;width:auto;margin-bottom:36px;">
+        <img src="assets/logo-somos2os.svg" alt="Somos2os" style="height:26px;width:auto;margin-bottom:28px;filter:brightness(0) invert(1);">
 
-        <!-- Lock icon -->
-        <div style="margin-bottom:10px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B6B2C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
+        <!-- Chip -->
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+          background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);margin-bottom:16px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a78bfa;">Panel privado</span>
         </div>
 
-        <h2 style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em;color:#1C1830;">Acceso privado</h2>
-        <p style="font-size:14px;color:#9A95AD;margin:0 0 28px;">Ingresa tu contraseña para continuar.</p>
+        <h2 style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em;color:#e8edf8;">Acceso privado</h2>
+        <p style="font-size:13.5px;color:rgba(180,200,255,0.6);margin:0 0 28px;line-height:1.5;">Ingresa tu contraseña para continuar.</p>
 
         <!-- Campo contraseña -->
         <div style="text-align:left;margin-bottom:6px;">
-          <label style="font-size:13px;font-weight:700;color:#5A5470;display:block;margin-bottom:8px;">Contraseña</label>
+          <label style="font-size:13px;font-weight:700;color:rgba(150,175,230,0.6);display:block;margin-bottom:8px;">Contraseña</label>
           <div style="position:relative;">
             <input id="pwd-input" type="password" placeholder="••••••••••••••••" onkeydown="pwdKeydown(event)"
-              style="width:100%;padding:14px 44px 14px 16px;border:1.5px solid #E6E3F2;border-radius:14px;
-              font-size:16px;letter-spacing:.1em;color:#2C2742;background:#FBFAFE;outline:none;font-family:inherit;
+              style="width:100%;padding:15px 44px 15px 16px;border:1.5px solid rgba(139,92,246,0.3);border-radius:14px;
+              font-size:16px;letter-spacing:.1em;color:#fff;background:rgba(255,255,255,0.07);outline:none;font-family:inherit;
               transition:border-color .18s ease,box-shadow .18s ease;"
-              onfocus="this.style.borderColor='#5A45C4';this.style.boxShadow='0 0 0 4px rgba(90,69,196,.13)';this.style.background='#fff'"
-              onblur="this.style.borderColor='#E6E3F2';this.style.boxShadow='none';this.style.background='#FBFAFE'">
-            <button onclick="togglePwd()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#B6B2C9;padding:0;display:flex;">
+              onfocus="this.style.borderColor='rgba(139,92,246,0.7)';this.style.boxShadow='0 0 0 4px rgba(139,92,246,0.15)'"
+              onblur="this.style.borderColor='rgba(139,92,246,0.3)';this.style.boxShadow='none'">
+            <button type="button" onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(160,180,255,0.6);padding:8px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
             </button>
           </div>
         </div>
-        <p id="pwd-hint" style="font-size:13px;color:#E05555;margin:0 0 20px;min-height:18px;text-align:left;"></p>
+        <p id="pwd-hint" style="font-size:13px;color:#f87171;margin:0 0 20px;min-height:18px;text-align:left;"></p>
 
         <!-- Botón -->
-        <button onclick="tryLogin()" class="btn-primary" style="width:100%;padding:16px;font-size:16px;border-radius:14px;margin-bottom:20px;">
+        <button onclick="tryLogin()" style="width:100%;padding:17px;border-radius:14px;border:none;cursor:pointer;
+          font-size:16px;font-weight:700;font-family:'Sora',sans-serif;color:#fff;
+          background:linear-gradient(90deg,#7B4EDB,#3B82F6);
+          box-shadow:0 8px 28px rgba(123,78,219,0.45);margin-bottom:20px;
+          touch-action:manipulation;transition:transform .15s ease;"
+          onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
           Entrar al panel →
         </button>
 
         <!-- Seguridad -->
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px;color:#B6B2C9;font-size:12.5px;font-weight:600;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;color:rgba(140,160,220,0.4);font-size:12px;font-weight:600;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
           Conexión segura y encriptada
@@ -655,14 +651,14 @@ function buildLoginDesktop() {
 function buildList() {
   const header = `
   <div class="mob-full" style="width:100%;max-width:820px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
-    <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:32px;width:auto;object-fit:contain;">
+    <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:32px;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
     <div style="display:flex;align-items:center;gap:10px;">
       <div class="pill-soft dash-pill">Dashboard Coach</div>
       <button onclick="fetchRecords()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
         <span class="dash-btn-text">Actualizar</span>
       </button>
-      <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+      <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#f87171;border-color:rgba(248,113,113,0.3);">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
         <span class="dash-btn-text">Cerrar sesión</span>
       </button>
@@ -671,33 +667,36 @@ function buildList() {
 
   if (S.loading) {
     return wrap(header + `
-    <div style="width:100%;max-width:820px;text-align:center;padding:60px 0;color:#9A95AD;font-size:15px;font-weight:600;">
+    <div style="width:100%;max-width:820px;text-align:center;padding:60px 0;color:rgba(150,175,230,0.6);font-size:15px;font-weight:600;">
       Cargando respuestas…
     </div>`);
   }
 
   if (S.error) {
     return wrap(header + `
-    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:32px;border:1px solid #ECE9F7;text-align:center;color:#E05555;">
+    <div class="card-pad mob-full" style="width:100%;max-width:820px;border-radius:20px;padding:32px;text-align:center;color:#f87171;">
       ${esc(S.error)}
     </div>`);
   }
 
   const linkCard = `
-  <div class="card-pad mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:22px 28px;border:1px solid #ECE9F7;margin-bottom:20px;">
-    <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Generar enlace personalizado</div>
-    <div style="display:flex;gap:6px;margin-bottom:12px;">
-      <button onclick="setLinkTipo('diagnostico')" style="flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid ${S.linkTipo==='diagnostico'?'#7A2C9E':'#E6E3F2'};background:${S.linkTipo==='diagnostico'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='diagnostico'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">Diagnóstico</button>
-      <button onclick="setLinkTipo('extraccion')" style="flex:1;padding:8px 10px;border-radius:9px;border:1.5px solid ${S.linkTipo==='extraccion'?'#7A2C9E':'#E6E3F2'};background:${S.linkTipo==='extraccion'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='extraccion'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">Extracción</button>
+  <div class="card-pad mob-full" style="width:100%;max-width:820px;border-radius:20px;padding:22px 28px;margin-bottom:20px;">
+    <div style="font-size:11px;font-weight:700;color:rgba(150,175,230,0.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      Generar enlace personalizado
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button onclick="setLinkTipo('diagnostico')" style="flex:1;padding:9px 10px;border-radius:10px;border:1.5px solid ${S.linkTipo==='diagnostico'?'rgba(139,92,246,0.7)':'rgba(255,255,255,0.12)'};background:${S.linkTipo==='diagnostico'?'rgba(139,92,246,0.18)':'rgba(255,255,255,0.05)'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='diagnostico'?'#c4b5fd':'rgba(190,210,255,0.5)'};cursor:pointer;transition:all .15s;font-family:inherit;">Diagnóstico</button>
+      <button onclick="setLinkTipo('extraccion')" style="flex:1;padding:9px 10px;border-radius:10px;border:1.5px solid ${S.linkTipo==='extraccion'?'rgba(139,92,246,0.7)':'rgba(255,255,255,0.12)'};background:${S.linkTipo==='extraccion'?'rgba(139,92,246,0.18)':'rgba(255,255,255,0.05)'};font-size:12.5px;font-weight:700;color:${S.linkTipo==='extraccion'?'#c4b5fd':'rgba(190,210,255,0.5)'};cursor:pointer;transition:all .15s;font-family:inherit;">Extracción</button>
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <input type="text" id="link-nombre" placeholder="Nombre del cliente…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid #E6E3F2;background:#FBFAFE;outline:none;font-family:inherit;" oninput="actualizarLink()" onfocus="this.style.borderColor='#7A2C9E'" onblur="this.style.borderColor='#E6E3F2'">
+      <input type="text" id="link-nombre" placeholder="Nombre del cliente…" style="flex:1;min-width:180px;padding:10px 14px;font-size:14px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.07);outline:none;font-family:inherit;color:#e8edf8;" oninput="actualizarLink()" onfocus="this.style.borderColor='rgba(139,92,246,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.13)'">
       <button onclick="copiarLink()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         Copiar enlace
       </button>
     </div>
-    <div id="link-preview" style="margin-top:10px;font-size:12px;color:#B6B2C9;font-family:monospace;word-break:break-all;display:none;"></div>
+    <div id="link-preview" style="margin-top:10px;font-size:12px;color:rgba(140,165,220,0.5);font-family:monospace;word-break:break-all;display:none;"></div>
   </div>`;
 
   // ── Sección de seguimiento de sesiones (se construye ANTES del early return) ──
@@ -738,26 +737,29 @@ function buildList() {
       const link = esExtraccion
         ? FORM_BASE_URL + '/extraccion?cliente=' + encodeURIComponent(ses.cliente)
         : FORM_BASE_URL + '?cliente=' + encodeURIComponent(ses.cliente);
-      return `<div style="padding:12px 0;border-bottom:1px solid #F0EEF8;">
+      return `<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <div style="flex:1;min-width:0;font-size:14px;font-weight:600;color:#231D3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
+          <div style="flex:1;min-width:0;font-size:14px;font-weight:600;color:#e8edf8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(ses.cliente)}</div>
           <div style="font-size:11.5px;font-weight:700;color:${color};background:${bg};padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0;">${badge}</div>
-          <button onclick="borrarSesion('${ses.id}')" title="Eliminar" style="flex-shrink:0;width:26px;height:26px;border-radius:6px;border:1.5px solid #F0EEF8;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#C2BDCF;transition:all .15s;" onmouseover="this.style.borderColor='#E05555';this.style.color='#E05555'" onmouseout="this.style.borderColor='#F0EEF8';this.style.color='#C2BDCF'">
+          <button onclick="borrarSesion('${ses.id}')" title="Eliminar" style="flex-shrink:0;width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.12);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(180,200,255,0.35);transition:all .15s;" onmouseover="this.style.borderColor='rgba(248,113,113,0.5)';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(180,200,255,0.35)'">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
           </button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <a href="${link}" target="_blank" style="flex:1;min-width:0;font-size:11px;color:#9A95AD;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;" title="${link}">${link}</a>
-          <div style="height:4px;width:48px;background:#E5E1F2;border-radius:99px;flex-shrink:0;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+          <a href="${link}" target="_blank" style="flex:1;min-width:0;font-size:11px;color:rgba(140,165,220,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;" title="${link}">${link}</a>
+          <div style="height:4px;width:48px;background:rgba(255,255,255,0.1);border-radius:99px;flex-shrink:0;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border-radius:99px;"></div>
           </div>
-          <div style="font-size:11px;color:#C2BDCF;flex-shrink:0;white-space:nowrap;">${cuando}</div>
+          <div style="font-size:11px;color:rgba(140,165,220,0.45);flex-shrink:0;white-space:nowrap;">${cuando}</div>
         </div>
       </div>`;
     }).join('');
-    return `<div class="mob-full" style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:20px 24px;border:1px solid #ECE9F7;margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:700;color:#9A95AD;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Seguimiento de sesiones</div>
-      <div style="font-size:12px;color:#C2BDCF;margin-bottom:14px;">Clientes que abrieron su enlace personalizado</div>
+    return `<div class="card-pad mob-full" style="width:100%;max-width:820px;border-radius:20px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(150,175,230,0.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Seguimiento de sesiones
+      </div>
+      <div style="font-size:12px;color:rgba(140,165,220,0.45);margin-bottom:14px;">Clientes que abrieron su enlace personalizado</div>
       ${rows}
     </div>`;
   })();
@@ -765,11 +767,11 @@ function buildList() {
   // ── Tabs ──
   const tabs = `
   <div class="mob-full" style="width:100%;max-width:820px;display:flex;gap:8px;margin-bottom:20px;">
-    <button onclick="setTab('diagnosticos')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${S.tab==='diagnosticos'?'#7A2C9E':'#E6E3F2'};background:${S.tab==='diagnosticos'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:13px;font-weight:700;color:${S.tab==='diagnosticos'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">
-      Diagnósticos <span style="font-size:11px;background:${S.tab==='diagnosticos'?'#7A2C9E':'#E6E3F2'};color:${S.tab==='diagnosticos'?'#fff':'#9A95AD'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.records.length}</span>
+    <button onclick="setTab('diagnosticos')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid ${S.tab==='diagnosticos'?'rgba(139,92,246,0.7)':'rgba(255,255,255,0.12)'};background:${S.tab==='diagnosticos'?'rgba(139,92,246,0.18)':'rgba(255,255,255,0.05)'};font-size:13px;font-weight:700;color:${S.tab==='diagnosticos'?'#c4b5fd':'rgba(190,210,255,0.5)'};cursor:pointer;transition:all .15s;font-family:inherit;">
+      Diagnósticos <span style="font-size:11px;background:${S.tab==='diagnosticos'?'rgba(139,92,246,0.4)':'rgba(255,255,255,0.1)'};color:${S.tab==='diagnosticos'?'#e9d5ff':'rgba(190,210,255,0.5)'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.records.length}</span>
     </button>
-    <button onclick="setTab('extracciones')" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${S.tab==='extracciones'?'#7A2C9E':'#E6E3F2'};background:${S.tab==='extracciones'?'linear-gradient(135deg,rgba(46,114,216,.1),rgba(122,44,158,.1))':'#fff'};font-size:13px;font-weight:700;color:${S.tab==='extracciones'?'#7A2C9E':'#9A95AD'};cursor:pointer;transition:all .15s;">
-      Extracciones <span style="font-size:11px;background:${S.tab==='extracciones'?'#7A2C9E':'#E6E3F2'};color:${S.tab==='extracciones'?'#fff':'#9A95AD'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.extracciones.length}</span>
+    <button onclick="setTab('extracciones')" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid ${S.tab==='extracciones'?'rgba(139,92,246,0.7)':'rgba(255,255,255,0.12)'};background:${S.tab==='extracciones'?'rgba(139,92,246,0.18)':'rgba(255,255,255,0.05)'};font-size:13px;font-weight:700;color:${S.tab==='extracciones'?'#c4b5fd':'rgba(190,210,255,0.5)'};cursor:pointer;transition:all .15s;font-family:inherit;">
+      Extracciones <span style="font-size:11px;background:${S.tab==='extracciones'?'rgba(139,92,246,0.4)':'rgba(255,255,255,0.1)'};color:${S.tab==='extracciones'?'#e9d5ff':'rgba(190,210,255,0.5)'};padding:1px 7px;border-radius:99px;margin-left:4px;">${S.extracciones.length}</span>
     </button>
   </div>`;
 
@@ -777,9 +779,9 @@ function buildList() {
   if (S.tab === 'diagnosticos') {
     if (S.records.length === 0) {
       return wrap(header + linkCard + sesionesHTML + tabs + `
-      <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
+      <div class="card-pad mob-full" style="width:100%;max-width:820px;border-radius:20px;padding:48px;text-align:center;">
         <div style="font-size:32px;margin-bottom:12px;">📋</div>
-        <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay respuestas enviadas.</p>
+        <p style="font-size:16px;color:rgba(180,200,255,0.65);margin:0;">Aún no hay respuestas enviadas.</p>
       </div>`);
     }
     const cards = S.records.map(r => {
@@ -788,58 +790,58 @@ function buildList() {
       const pct       = Math.round((answered / total) * 100);
       const tareaCount = r.tarea ? Object.values(r.tarea).filter(Boolean).length : 0;
       return `
-      <div onclick="openRecord('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
-        onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
-        onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
+      <div onclick="openRecord('${r.id}')" class="card-pad" style="border-radius:20px;padding:24px 28px;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease,background .2s ease;"
+        onmouseover="this.style.background='rgba(139,92,246,0.12)';this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.background='';this.style.transform='translateY(0)'">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
           <div>
-            <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Sin nombre')}</h3>
-            <p style="font-size:13px;color:#9A95AD;margin:0;">${formatDate(r.created_at)}</p>
+            <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#e8edf8;">${esc(r.cliente || 'Sin nombre')}</h3>
+            <p style="font-size:13px;color:rgba(150,175,230,0.55);margin:0;">${formatDate(r.created_at)}</p>
           </div>
-          <div class="pill" style="font-size:12px;">${pct}% completo</div>
+          <div class="pill" style="font-size:12px;flex-shrink:0;">${pct}% completo</div>
         </div>
-        <div style="height:6px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:16px;">
-          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+        <div style="height:5px;width:100%;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-bottom:16px;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border-radius:99px;"></div>
         </div>
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
-          <span style="font-size:13px;font-weight:600;color:#6B6680;">✏️ ${answered} de ${total} preguntas respondidas</span>
-          <span style="font-size:13px;font-weight:600;color:#6B6680;">✓ ${tareaCount} de 7 materiales</span>
+          <span style="font-size:13px;font-weight:600;color:rgba(190,210,255,0.75);">✏️ ${answered} de ${total} preguntas</span>
+          <span style="font-size:13px;font-weight:600;color:rgba(190,210,255,0.75);">✓ ${tareaCount} de 7 materiales</span>
         </div>
       </div>`;
     }).join('');
-    const countLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
+    const countLabel = `<p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0 0 16px;">${S.records.length} diagnóstico${S.records.length !== 1 ? 's' : ''} recibido${S.records.length !== 1 ? 's' : ''}</p>`;
     return wrap(header + linkCard + sesionesHTML + tabs + countLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${cards}</div>`);
   }
 
   // ── Tab Extracciones ──
   if (S.extracciones.length === 0) {
     return wrap(header + linkCard + tabs + `
-    <div style="width:100%;max-width:820px;background:#fff;border-radius:20px;padding:48px;border:1px solid #ECE9F7;text-align:center;">
+    <div class="card-pad mob-full" style="width:100%;max-width:820px;border-radius:20px;padding:48px;text-align:center;">
       <div style="font-size:32px;margin-bottom:12px;">🧠</div>
-      <p style="font-size:16px;color:#6B6680;margin:0;">Aún no hay extracciones enviadas.</p>
+      <p style="font-size:16px;color:rgba(180,200,255,0.65);margin:0;">Aún no hay extracciones enviadas.</p>
     </div>`);
   }
   const extCards = S.extracciones.map(r => {
     const answered = Object.values(r.answers || {}).filter(v => v).length;
     return `
-    <div onclick="openExtraccion('${r.id}')" class="card-pad" style="background:#fff;border-radius:20px;padding:24px 28px;border:1px solid #ECE9F7;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);"
-      onmouseover="this.style.boxShadow='0 12px 36px -8px rgba(60,40,120,.22)';this.style.transform='translateY(-2px)'"
-      onmouseout="this.style.boxShadow='0 4px 20px -8px rgba(60,40,120,.12)';this.style.transform='translateY(0)'">
+    <div onclick="openExtraccion('${r.id}')" class="card-pad" style="border-radius:20px;padding:24px 28px;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease,background .2s ease;"
+      onmouseover="this.style.background='rgba(139,92,246,0.12)';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.background='';this.style.transform='translateY(0)'">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">
         <div>
-          <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Sin nombre')}</h3>
-          <p style="font-size:13px;color:#9A95AD;margin:0;">${formatDate(r.created_at)}</p>
+          <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0 0 4px;color:#e8edf8;">${esc(r.cliente || 'Sin nombre')}</h3>
+          <p style="font-size:13px;color:rgba(150,175,230,0.55);margin:0;">${formatDate(r.created_at)}</p>
         </div>
-        <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(46,114,216,.12),rgba(122,44,158,.12));color:#5A2E9E;font-size:11px;font-weight:700;white-space:nowrap;">${answered} respuestas</div>
+        <div style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);color:#c4b5fd;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">${answered} respuestas</div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Preguntas Frecuentes</span>
-        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Casos Reales</span>
-        <span style="font-size:12.5px;color:#6B6680;background:#F7F6FC;padding:4px 10px;border-radius:8px;">Conocimiento Experto</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:rgba(190,210,255,0.6);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:8px;">Preguntas Frecuentes</span>
+        <span style="font-size:12px;color:rgba(190,210,255,0.6);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:8px;">Casos Reales</span>
+        <span style="font-size:12px;color:rgba(190,210,255,0.6);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:8px;">Conocimiento Experto</span>
       </div>
     </div>`;
   }).join('');
-  const extLabel = `<p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${S.extracciones.length} extracción${S.extracciones.length !== 1 ? 'es' : ''} recibida${S.extracciones.length !== 1 ? 's' : ''}</p>`;
+  const extLabel = `<p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0 0 16px;">${S.extracciones.length} extracción${S.extracciones.length !== 1 ? 'es' : ''} recibida${S.extracciones.length !== 1 ? 's' : ''}</p>`;
   return wrap(header + linkCard + tabs + extLabel + `<div class="mob-full" style="width:100%;max-width:820px;display:flex;flex-direction:column;gap:14px;">${extCards}</div>`);
 }
 
@@ -879,13 +881,13 @@ function buildDetailExtraccion() {
       for (let i=0;i<blk.count;i++) {
         const val = answers[blk.prefix+'_q'+i];
         if (val) items.push(`
-          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F4F3FB;align-items:flex-start;">
-            <div style="flex:none;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,${blk.color},#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
-            <p style="margin:0;font-size:15px;line-height:1.5;color:#231D3A;white-space:pre-wrap;">${esc(String(val))}</p>
+          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:flex-start;">
+            <div style="flex:none;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,${blk.color},#7B4EDB);color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+            <p style="margin:0;font-size:15px;line-height:1.5;color:#e8edf8;white-space:pre-wrap;">${esc(String(val))}</p>
           </div>`);
       }
       contentHTML = items.length === 0
-        ? `<p style="font-size:14px;color:#B3AECA;font-style:italic;margin:0;">(sin respuestas)</p>`
+        ? `<p style="font-size:14px;color:rgba(150,175,230,0.4);font-style:italic;margin:0;">(sin respuestas)</p>`
         : `<div style="display:flex;flex-direction:column;">${items.join('')}</div>`;
     } else if (blk.tipo === 'casos') {
       contentHTML = blk.casos.map(caso => {
@@ -893,15 +895,15 @@ function buildDetailExtraccion() {
           const val = answers['c'+caso.num+'_q'+qi];
           return `
           <div style="margin-bottom:14px;">
-            <p style="font-size:12.5px;font-weight:700;color:#6B6680;margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em;">${esc(q)}</p>
+            <p style="font-size:12px;font-weight:700;color:rgba(150,175,230,0.5);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;">${esc(q)}</p>
             ${!val
-              ? `<p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p>`
-              : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:12px 16px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;">${esc(String(val))}</p></div>`
+              ? `<p style="margin:0;font-size:14px;color:rgba(150,175,230,0.35);font-style:italic;">(sin respuesta)</p>`
+              : `<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-left:3px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:12px 16px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#e8edf8;white-space:pre-wrap;">${esc(String(val))}</p></div>`
             }
           </div>`;
         }).join('');
         return `
-        <div style="border:1px solid #ECE9F7;border-radius:14px;padding:18px 20px;background:#FDFDFF;margin-bottom:12px;">
+        <div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 20px;background:rgba(255,255,255,0.04);margin-bottom:12px;">
           <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:${blk.color};margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em;">${caso.label}</div>
           ${qsHTML}
         </div>`;
@@ -910,15 +912,15 @@ function buildDetailExtraccion() {
       const qsHTML = blk.qs.map((q, qi) => {
         const val = answers[blk.prefix+'_q'+qi];
         return `
-        <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+        <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.07);">
           <div style="display:flex;align-items:flex-start;gap:10px;">
-            <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,${blk.color},#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${qi+1}</div>
-            <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(q)}</p>
+            <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,${blk.color},#7B4EDB);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${qi+1}</div>
+            <p style="margin:0;font-size:15px;font-weight:600;color:rgba(190,210,255,0.75);line-height:1.4;">${esc(q)}</p>
           </div>
           <div style="margin-left:36px;">
             ${!val
-              ? `<div style="background:#FDFDFD;border:1.5px dashed #E5E1F2;border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p></div>`
-              : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:14px 18px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`
+              ? `<div style="background:rgba(255,255,255,0.04);border:1.5px dashed rgba(255,255,255,0.12);border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:rgba(150,175,230,0.35);font-style:italic;">(sin respuesta)</p></div>`
+              : `<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-left:3px solid ${blk.color};border-radius:8px 14px 14px 8px;padding:14px 18px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#e8edf8;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`
             }
           </div>
         </div>`;
@@ -926,9 +928,9 @@ function buildDetailExtraccion() {
       contentHTML = `<div style="display:flex;flex-direction:column;gap:0;">${qsHTML}</div>`;
     }
     return `
-    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+    <div class="card-pad" style="border-radius:20px;padding:28px 32px;">
       <div style="margin-bottom:6px;"><div class="pill" style="font-size:12px;">${esc(blk.tag)}</div></div>
-      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#231D3A;">${esc(blk.title)}</h2>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#e8edf8;">${esc(blk.title)}</h2>
       ${contentHTML}
     </div>`;
   }).join('');
@@ -936,31 +938,31 @@ function buildDetailExtraccion() {
   return wrap(`
   <div class="mob-full" style="width:100%;max-width:820px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
-      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;">
+      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;filter:brightness(0) invert(1);">
       <div style="display:flex;align-items:center;gap:10px;">
         <button onclick="closeExtraccion()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span class="dash-btn-text">Volver</span>
         </button>
-        <button onclick="deleteExtraccion('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+        <button onclick="deleteExtraccion('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#f87171;border-color:rgba(248,113,113,0.3);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           <span class="dash-btn-text">Eliminar</span>
         </button>
-        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#6B6680;border-color:#ECE9F7;">
+        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
           <span class="dash-btn-text">Cerrar sesión</span>
         </button>
       </div>
     </div>
 
-    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
+    <div class="card-pad" style="border-radius:20px;padding:28px 32px;margin-bottom:20px;">
       <div class="pill-soft" style="margin-bottom:14px;">Extracción de Conocimiento Experto</div>
-      <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
-      <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
-      <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:10px;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s ease;"></div>
+      <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+      <p style="font-size:14px;color:rgba(150,175,230,0.55);margin:0 0 20px;">${formatDate(r.created_at)}</p>
+      <div style="height:8px;width:100%;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border-radius:99px;transition:width .45s ease;"></div>
       </div>
-      <p style="font-size:13px;color:#9A95AD;margin:0;">${totalAnswered} de ${totalQ} preguntas respondidas · ${pct}% completado</p>
+      <p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0;">${totalAnswered} de ${totalQ} preguntas respondidas · ${pct}% completado</p>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">${blocksHTML}</div>
@@ -992,37 +994,37 @@ function buildDetail() {
         const num = empty ? '—' : Number(val);
         const pct = empty ? 0 : ((Number(val) - 1) / 9) * 100;
         answerHTML = `
-        <div style="background:#F7F6FC;border:1px solid #ECE9F7;border-radius:12px;padding:14px 18px;">
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 18px;">
           <div style="display:flex;align-items:center;gap:16px;">
-            <span style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(120deg,#2E72D8,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${num}</span>
-            <div style="flex:1;height:6px;background:#E5E1F2;border-radius:99px;overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#7A2C9E);border-radius:99px;"></div>
+            <span style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(120deg,#3B82F6,#7B4EDB);-webkit-background-clip:text;background-clip:text;color:transparent;">${num}</span>
+            <div style="flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border-radius:99px;"></div>
             </div>
-            <span style="font-size:13px;color:#9A95AD;font-weight:600;">/ 10</span>
+            <span style="font-size:13px;color:rgba(150,175,230,0.5);font-weight:600;">/ 10</span>
           </div>
         </div>`;
       } else {
         answerHTML = empty
-          ? `<div style="background:#FDFDFD;border:1.5px dashed #E5E1F2;border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:#B3AECA;font-style:italic;">(sin respuesta)</p></div>`
-          : `<div style="background:#FBFAFE;border:1.5px solid #ECE9F7;border-left:4px solid #7A2C9E;border-radius:8px 14px 14px 8px;padding:14px 18px;box-shadow:0 2px 10px rgba(60,40,120,0.02);"><p style="margin:0;font-size:15px;line-height:1.6;color:#231D3A;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`;
+          ? `<div style="background:rgba(255,255,255,0.04);border:1.5px dashed rgba(255,255,255,0.12);border-radius:12px;padding:12px 18px;"><p style="margin:0;font-size:14px;color:rgba(150,175,230,0.35);font-style:italic;">(sin respuesta)</p></div>`
+          : `<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-left:3px solid #7B4EDB;border-radius:8px 14px 14px 8px;padding:14px 18px;"><p style="margin:0;font-size:15px;line-height:1.6;color:#e8edf8;white-space:pre-wrap;font-weight:500;">${esc(String(val))}</p></div>`;
       }
 
       return `
-      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid #F4F3FB;">
+      <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.07);">
         <div style="display:flex;align-items:flex-start;gap:10px;">
-          <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2E72D8,#7A2C9E);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i + 1}</div>
-          <p style="margin:0;font-size:15px;font-weight:600;color:#5A5470;line-height:1.4;">${esc(text)}</p>
+          <div style="flex:none;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#3B82F6,#7B4EDB);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i + 1}</div>
+          <p style="margin:0;font-size:15px;font-weight:600;color:rgba(190,210,255,0.75);line-height:1.4;">${esc(text)}</p>
         </div>
         <div style="margin-left:36px;">${answerHTML}</div>
       </div>`;
     }).join('');
 
     return `
-    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+    <div class="card-pad" style="border-radius:20px;padding:28px 32px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
         <div class="pill" style="font-size:12px;">${esc(blk.time)}</div>
       </div>
-      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#231D3A;">${esc(blk.title)}</h2>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 22px;color:#e8edf8;">${esc(blk.title)}</h2>
       <div style="display:flex;flex-direction:column;gap:0;">
         ${qsHTML}
       </div>
@@ -1044,26 +1046,26 @@ function buildDetail() {
       if (isUrl) {
         linkHTML = `
           <div style="margin-top:8px; margin-left:34px;">
-            <a href="${esc(linkVal.trim())}" target="_blank" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:12.5px;text-decoration:none;border-color:#7A2C9E;color:#7A2C9E;background:rgba(122,44,158,0.03);border-radius:8px;">
+            <a href="${esc(linkVal.trim())}" target="_blank" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:12.5px;text-decoration:none;border-color:rgba(139,92,246,0.4);color:#c4b5fd;background:rgba(139,92,246,0.1);border-radius:8px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               Ver enlace cargado
             </a>
           </div>`;
       } else {
         linkHTML = `
-          <div style="margin-top:8px; margin-left:34px; font-size:13px; color:#5A5470; background:#F7F6FC; border:1px solid #ECE9F7; border-radius:8px; padding:8px 12px; white-space:pre-wrap; line-height:1.4;">
+          <div style="margin-top:8px; margin-left:34px; font-size:13px; color:rgba(190,210,255,0.7); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:8px; padding:8px 12px; white-space:pre-wrap; line-height:1.4;">
             ${esc(linkVal)}
           </div>`;
       }
     }
 
-    const badgeHTML = isKey ? `<span style="font-size:11px;font-weight:700;color:#7A2C9E;background:rgba(122,44,158,0.08);padding:3px 10px;border-radius:99px;margin-left:auto;letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;font-family:'Sora',sans-serif;">Recomendado</span>` : '';
+    const badgeHTML = isKey ? `<span style="font-size:11px;font-weight:700;color:#c4b5fd;background:rgba(139,92,246,0.2);padding:3px 10px;border-radius:99px;margin-left:auto;letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;font-family:'Sora',sans-serif;">Recomendado</span>` : '';
 
     return `
-    <div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:12px;border:1.5px solid ${on ? '#7A2C9E' : '#E6E3F2'};background:${on ? 'linear-gradient(135deg,rgba(46,114,216,.07),rgba(122,44,158,.07))' : '#FBFAFE'};">
+    <div style="display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:12px;border:1.5px solid ${on ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.1)'};background:${on ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)'};">
       <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap;">
-        <div style="flex:none;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:${on ? 'linear-gradient(135deg,#2E72D8,#7A2C9E)' : '#fff'};border:2px solid ${on ? '#7A2C9E' : '#CFC9E3'};color:#fff;font-size:13px;font-weight:800;">${on ? '✓' : ''}</div>
-        <span style="font-size:15px;font-weight:600;color:${on ? '#2C2742' : '#9A95AD'};">${esc(label)}</span>
+        <div style="flex:none;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:${on ? 'linear-gradient(135deg,#3B82F6,#7B4EDB)' : 'rgba(255,255,255,0.08)'};border:2px solid ${on ? 'rgba(139,92,246,0.6)' : 'rgba(255,255,255,0.18)'};color:#fff;font-size:13px;font-weight:800;">${on ? '✓' : ''}</div>
+        <span style="font-size:15px;font-weight:600;color:${on ? '#e8edf8' : 'rgba(150,175,230,0.45)'};">${esc(label)}</span>
         ${badgeHTML}
       </div>
       ${linkHTML}
@@ -1077,21 +1079,21 @@ function buildDetail() {
   <div class="mob-full" style="width:100%;max-width:820px;">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
-      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;">
+      <img src="assets/logo-somos2os.svg" alt="Somos2os Studio" style="height:30px;width:auto;filter:brightness(0) invert(1);">
       <div style="display:flex;align-items:center;gap:10px;">
         <button onclick="closeRecord()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span class="dash-btn-text">Volver a la lista</span>
         </button>
-        <button onclick="exportarPDF()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#2E72D8;border-color:#D0E2F8;">
+        <button onclick="exportarPDF()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#93c5fd;border-color:rgba(147,197,253,0.3);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           <span class="dash-btn-text">Exportar PDF</span>
         </button>
-        <button onclick="deleteRecord('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#E05555;border-color:#F5DCDC;">
+        <button onclick="deleteRecord('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#f87171;border-color:rgba(248,113,113,0.3);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
           <span class="dash-btn-text">Eliminar diagnóstico</span>
         </button>
-        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#6B6680;border-color:#ECE9F7;">
+        <button onclick="logout()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
           <span class="dash-btn-text">Cerrar sesión</span>
         </button>
@@ -1099,19 +1101,19 @@ function buildDetail() {
     </div>
 
     <!-- Info del cliente -->
-    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.12);margin-bottom:20px;">
+    <div class="card-pad" style="border-radius:20px;padding:28px 32px;margin-bottom:20px;">
       <div class="pill-soft" style="margin-bottom:14px;">Diagnóstico Estratégico · Sesión 1</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-        <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0;background:linear-gradient(120deg,#2E72D8,#6A38B0 55%,#7A2C9E);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
-        <button onclick="editarNombre('${r.id}','${esc(r.cliente || '')}')" title="Cambiar nombre" style="flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid #E6E3F2;background:#FBFAFE;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9A95AD;transition:all .15s;" onmouseover="this.style.borderColor='#7A2C9E';this.style.color='#7A2C9E'" onmouseout="this.style.borderColor='#E6E3F2';this.style.color='#9A95AD'">
+        <h1 style="font-family:'Sora',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0;background:linear-gradient(120deg,#3B82F6,#7B4EDB);-webkit-background-clip:text;background-clip:text;color:transparent;">${esc(r.cliente || 'Cliente')}</h1>
+        <button onclick="editarNombre('${r.id}','${esc(r.cliente || '')}')" title="Cambiar nombre" style="flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(180,200,255,0.5);transition:all .15s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.color='#c4b5fd'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(180,200,255,0.5)'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
       </div>
-      <p style="font-size:14px;color:#9A95AD;margin:0 0 20px;">${formatDate(r.created_at)}</p>
-      <div style="height:8px;width:100%;background:#E5E1F2;border-radius:99px;overflow:hidden;margin-bottom:10px;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2E72D8,#5A45C4 55%,#7A2C9E);border-radius:99px;transition:width .45s ease;"></div>
+      <p style="font-size:14px;color:rgba(150,175,230,0.55);margin:0 0 20px;">${formatDate(r.created_at)}</p>
+      <div style="height:8px;width:100%;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3B82F6,#7B4EDB);border-radius:99px;transition:width .45s ease;"></div>
       </div>
-      <p style="font-size:13px;color:#9A95AD;margin:0;">${answered} de 45 preguntas respondidas · ${pct}% completado</p>
+      <p style="font-size:13px;color:rgba(150,175,230,0.5);margin:0;">${answered} de 45 preguntas respondidas · ${pct}% completado</p>
     </div>
 
     <!-- Bloques de preguntas -->
@@ -1120,9 +1122,9 @@ function buildDetail() {
     </div>
 
     <!-- Checklist de materiales -->
-    <div class="card-pad" style="background:#fff;border-radius:20px;padding:28px 32px;border:1px solid #ECE9F7;box-shadow:0 4px 20px -8px rgba(60,40,120,.1);">
+    <div class="card-pad" style="border-radius:20px;padding:28px 32px;">
       <div class="pill-soft" style="margin-bottom:14px;">Tarea final</div>
-      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 18px;color:#231D3A;">Materiales para la auditoría</h2>
+      <h2 style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 18px;color:#e8edf8;">Materiales para la auditoría</h2>
       <div style="display:flex;flex-direction:column;gap:10px;">${tareaHTML}</div>
     </div>
 
