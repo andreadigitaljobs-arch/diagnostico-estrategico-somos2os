@@ -1613,6 +1613,7 @@ window.mostrarPreviaPDF = function(tipo) {
 
   window.__closePDFPreview = function() {
     document.getElementById('pdf-preview-modal')?.remove();
+    document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
   };
 
@@ -1651,7 +1652,8 @@ window.mostrarPreviaPDF = function(tipo) {
       </div>
     </div>`;
   document.body.appendChild(overlay);
-  // Block background scroll while modal is open
+  // Block ALL background scroll — must set both html and body
+  document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
 
   requestAnimationFrame(() => {
