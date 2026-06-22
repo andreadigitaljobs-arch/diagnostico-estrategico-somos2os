@@ -1416,7 +1416,28 @@ async function loadPDFLibs() {
   await load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 }
 
-function buildDiagnosticoPDFHTML(r) {
+async function getWhiteLogoDataURL() {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const d = ctx.getImageData(0, 0, c.width, c.height);
+      for (let i = 0; i < d.data.length; i += 4) {
+        if (d.data[i+3] > 10) { d.data[i] = 255; d.data[i+1] = 255; d.data[i+2] = 255; }
+      }
+      ctx.putImageData(d, 0, 0);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(null);
+    img.src = window.location.origin + '/assets/logo-somos2os.png';
+  });
+}
+
+function buildDiagnosticoPDFHTML(r, logoSrc) {
   const answers = r.answers || {};
   const tarea   = r.tarea   || {};
   const answered = countAnswered(answers);
@@ -1473,7 +1494,7 @@ function buildDiagnosticoPDFHTML(r) {
 
   return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
     <div style="background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#3b82f6 100%);padding:44px 56px 36px;">
-      <img src="${logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;filter:brightness(0) invert(1);">
+      <img src="${logoSrc || logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;${logoSrc ? '' : 'filter:brightness(0) invert(1);'}">
       <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.15);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(255,255,255,0.95);">Diagnóstico Estratégico</div>
       <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
       <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
@@ -1495,7 +1516,7 @@ function buildDiagnosticoPDFHTML(r) {
   </div>`;
 }
 
-function buildExtraccionPDFHTML(r) {
+function buildExtraccionPDFHTML(r, logoSrc) {
   const answers = r.answers || {};
   let totalAnswered = 0, totalQ = 0;
   ['s1','s2','s3'].forEach(p => { for (let i=0;i<15;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
@@ -1567,7 +1588,7 @@ function buildExtraccionPDFHTML(r) {
 
   return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
     <div style="background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#3b82f6 100%);padding:44px 56px 36px;">
-      <img src="${logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;filter:brightness(0) invert(1);">
+      <img src="${logoSrc || logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;${logoSrc ? '' : 'filter:brightness(0) invert(1);'}">
       <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.15);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(255,255,255,0.95);">Extracción de Conocimiento Experto</div>
       <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
       <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
@@ -1647,7 +1668,8 @@ window.descargarPDF = async function(tipo) {
 
   try {
     await loadPDFLibs();
-    const content = tipo === 'diagnostico' ? buildDiagnosticoPDFHTML(r) : buildExtraccionPDFHTML(r);
+    const whiteLogo = await getWhiteLogoDataURL().catch(() => null);
+    const content = tipo === 'diagnostico' ? buildDiagnosticoPDFHTML(r, whiteLogo) : buildExtraccionPDFHTML(r, whiteLogo);
     const temp = document.createElement('div');
     temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;z-index:-100;';
     temp.innerHTML = content;
@@ -1657,18 +1679,19 @@ window.descargarPDF = async function(tipo) {
     if (document.body.contains(temp)) document.body.removeChild(temp);
 
     const { jsPDF } = window.jspdf;
-    const pdf   = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const pageW = pdf.internal.pageSize.getWidth();   // 210 mm
-    const pageH = pdf.internal.pageSize.getHeight();  // 297 mm
-    const pxPerMm = canvas.width / pageW;
-    const pageHpx = Math.round(pageH * pxPerMm);
+    const pdf        = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW      = pdf.internal.pageSize.getWidth();   // 210 mm
+    const pageH      = pdf.internal.pageSize.getHeight();  // 297 mm
+    const marginMM   = 12;
+    const contentHmm = pageH - 2 * marginMM;               // 273 mm usable per page
+    const pxPerMm    = canvas.width / pageW;
+    const pageHpx    = Math.round(contentHmm * pxPerMm);
     const ctx = canvas.getContext('2d');
 
-    // Split canvas at natural white-row boundaries (avoids cutting text)
+    // Split canvas at natural white-row boundaries; content placed inside top+bottom margins
     let startY = 0, pageIdx = 0;
     while (startY < canvas.height) {
       let endY = Math.min(startY + pageHpx, canvas.height);
-      // Look backwards up to 8% of page height for the whitest row
       if (endY < canvas.height) {
         const limit = Math.max(startY + 1, endY - Math.round(pageHpx * 0.08));
         let bestY = endY, bestScore = -1;
@@ -1691,7 +1714,8 @@ window.descargarPDF = async function(tipo) {
       pctx.drawImage(canvas, 0, -startY);
 
       if (pageIdx > 0) pdf.addPage();
-      pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, pageW, pc.height / pxPerMm);
+      // Offset by marginMM so content never touches the page edge
+      pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, marginMM, pageW, pc.height / pxPerMm);
       pageIdx++;
       startY = endY;
     }
