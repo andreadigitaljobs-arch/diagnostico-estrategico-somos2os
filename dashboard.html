@@ -1663,26 +1663,51 @@ window.descargarPDF = async function(tipo) {
     temp.innerHTML = content;
     document.body.appendChild(temp);
 
-    const slug = (r.cliente || 'cliente').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const canvas = await html2canvas(temp, { scale:2, useCORS:true, backgroundColor:'#ffffff', width:794, windowWidth:794 });
+    if (document.body.contains(temp)) document.body.removeChild(temp);
 
-    await new Promise((resolve, reject) => {
-      pdf.html(temp, {
-        callback: function(doc) {
-          if (document.body.contains(temp)) document.body.removeChild(temp);
-          doc.save(tipo + '-' + slug + '.pdf');
-          resolve();
-        },
-        x: 0,
-        y: 0,
-        width: 210,
-        windowWidth: 794,
-        autoPaging: 'text',
-        margin: [8, 0, 8, 0],
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }
-      });
-    });
+    const { jsPDF } = window.jspdf;
+    const pdf   = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();   // 210 mm
+    const pageH = pdf.internal.pageSize.getHeight();  // 297 mm
+    const pxPerMm = canvas.width / pageW;
+    const pageHpx = Math.round(pageH * pxPerMm);
+    const ctx = canvas.getContext('2d');
+
+    // Split canvas at natural white-row boundaries (avoids cutting text)
+    let startY = 0, pageIdx = 0;
+    while (startY < canvas.height) {
+      let endY = Math.min(startY + pageHpx, canvas.height);
+      // Look backwards up to 8% of page height for the whitest row
+      if (endY < canvas.height) {
+        const limit = Math.max(startY + 1, endY - Math.round(pageHpx * 0.08));
+        let bestY = endY, bestScore = -1;
+        for (let y = endY; y >= limit; y--) {
+          const d = ctx.getImageData(0, y, canvas.width, 1).data;
+          let white = 0;
+          for (let i = 0; i < d.length; i += 4) { if (d[i]>230 && d[i+1]>230 && d[i+2]>230) white++; }
+          const score = white / canvas.width;
+          if (score > bestScore) { bestScore = score; bestY = y; }
+          if (score > 0.92) break;
+        }
+        endY = bestY;
+      }
+
+      const pc = document.createElement('canvas');
+      pc.width = canvas.width;
+      pc.height = Math.max(1, endY - startY);
+      const pctx = pc.getContext('2d');
+      pctx.fillStyle = '#fff'; pctx.fillRect(0, 0, pc.width, pc.height);
+      pctx.drawImage(canvas, 0, -startY);
+
+      if (pageIdx > 0) pdf.addPage();
+      pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, pageW, pc.height / pxPerMm);
+      pageIdx++;
+      startY = endY;
+    }
+
+    const slug = (r.cliente || 'cliente').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    pdf.save(tipo + '-' + slug + '.pdf');
   } catch(e) {
     console.error(e);
     alert('No se pudo generar el PDF. Verifica tu conexión e intenta nuevamente.');
