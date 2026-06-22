@@ -1154,6 +1154,10 @@ function buildDetailExtraccion() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span class="dash-btn-text">Volver</span>
         </button>
+        <button onclick="mostrarPreviaPDF('extraccion')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#93c5fd;border-color:rgba(147,197,253,0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <span class="dash-btn-text">Exportar PDF</span>
+        </button>
         <button onclick="deleteExtraccion('${r.id}')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#f87171;border-color:rgba(248,113,113,0.3);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           <span class="dash-btn-text">Eliminar</span>
@@ -1295,7 +1299,7 @@ function buildDetail() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           <span class="dash-btn-text">Volver a la lista</span>
         </button>
-        <button onclick="exportarPDF()" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#93c5fd;border-color:rgba(147,197,253,0.3);">
+        <button onclick="mostrarPreviaPDF('diagnostico')" class="btn-secondary" style="display:flex;align-items:center;gap:6px;color:#93c5fd;border-color:rgba(147,197,253,0.3);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           <span class="dash-btn-text">Exportar PDF</span>
         </button>
@@ -1399,63 +1403,293 @@ window.copiarLink = async function() {
   });
 };
 
-// ── EXPORTAR PDF ──────────────────────────────────────────────────────────────
-window.exportarPDF = function() {
-  const r = S.selected;
-  if (!r) return;
+// ── GENERADOR DE PDF ──────────────────────────────────────────────────────────
+async function loadPDFLibs() {
+  if (window.html2canvas && window.jspdf) return;
+  const load = src => new Promise((res, rej) => {
+    if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = () => rej(new Error('Error cargando ' + src));
+    document.head.appendChild(s);
+  });
+  await load('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  await load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+}
+
+function buildDiagnosticoPDFHTML(r) {
   const answers = r.answers || {};
-  const tarea = r.tarea || {};
+  const tarea   = r.tarea   || {};
+  const social  = answers._social || {};
+  const answered = countAnswered(answers);
+  const pct = Math.round((answered / 45) * 100);
+  const today = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
 
   const blocksHTML = BLOCKS.map((blk, bi) => {
     const qsHTML = blk.qs.map((raw, i) => {
-      const text = typeof raw === 'string' ? raw : raw.q;
       const isScale = typeof raw === 'object' && raw.scale;
+      const text = typeof raw === 'string' ? raw : raw.q;
       const val = answers['b' + bi + '_q' + i];
       const empty = val === undefined || val === '' || val === null;
-      const answer = isScale
-        ? `<span style="font-weight:700;color:#7A2C9E;">${empty ? '—' : val} / 10</span>`
-        : empty
-          ? `<em style="color:#B3AECA;">Sin respuesta</em>`
-          : `<span style="white-space:pre-wrap;">${esc(String(val))}</span>`;
-      return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F0EEF8;">
-        <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#5A5470;">${i+1}. ${esc(text)}</p>
-        <p style="margin:0;font-size:13px;color:#231D3A;line-height:1.5;">${answer}</p>
+      let ansBlock;
+      if (isScale) {
+        const num = empty ? '—' : Number(val);
+        const w = empty ? 0 : ((Number(val) - 1) / 9) * 100;
+        ansBlock = `<div style="display:flex;align-items:center;gap:14px;margin-top:6px;">
+          <span style="font-size:26px;font-weight:800;color:#4338ca;">${num}</span>
+          <div style="flex:1;height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${w}%;background:#4338ca;border-radius:99px;"></div>
+          </div>
+          <span style="font-size:12px;color:#9ca3af;font-weight:600;">/ 10</span>
+        </div>`;
+      } else {
+        ansBlock = empty
+          ? `<p style="margin:0;font-size:13px;color:#9ca3af;font-style:italic;">Sin respuesta</p>`
+          : `<p style="margin:0;font-size:14px;color:#1e1b4b;line-height:1.65;white-space:pre-wrap;">${esc(String(val))}</p>`;
+      }
+      return `<div style="margin-bottom:10px;padding:13px 16px;background:${empty ? '#fafafa' : '#f5f3ff'};border-radius:9px;border-left:3px solid ${empty ? '#e5e7eb' : '#7c3aed'};">
+        <p style="margin:0 0 7px;font-size:10px;font-weight:700;color:#6d28d9;text-transform:uppercase;letter-spacing:.06em;">${i+1}. ${esc(text)}</p>
+        ${ansBlock}
       </div>`;
     }).join('');
-    return `<div style="margin-bottom:20px;">
-      <h3 style="font-family:sans-serif;font-size:14px;font-weight:700;color:#7A2C9E;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid #7A2C9E;">${esc(blk.title)}</h3>
-      ${qsHTML}
+    return `<div style="padding:28px 0;border-bottom:1px solid #f3f4f6;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;">
+        <div style="width:4px;height:32px;background:#7c3aed;border-radius:2px;flex:none;margin-top:3px;"></div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:3px;">${esc(blk.time)}</div>
+          <div style="font-size:18px;font-weight:700;color:#1e1b4b;margin:0;">${esc(blk.title)}</div>
+        </div>
+      </div>${qsHTML}
     </div>`;
   }).join('');
 
-  const tareaItems = TAREA_LABELS.map((item, i) => {
+  const tareaHTML = TAREA_LABELS.map((item, i) => {
     const label = typeof item === 'string' ? item : item.label;
     const on = !!tarea[i];
-    return `<div style="margin-bottom:6px;font-size:12px;color:${on ? '#231D3A' : '#B3AECA'};">${on ? '✓' : '○'} ${esc(label)}</div>`;
+    return `<div style="display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:8px;background:${on ? '#f5f3ff' : '#fafafa'};border:1.5px solid ${on ? '#c4b5fd' : '#e5e7eb'};">
+      <div style="width:17px;height:17px;border-radius:4px;flex:none;background:${on ? '#7c3aed' : '#e5e7eb'};color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;">${on ? '✓' : ''}</div>
+      <span style="font-size:12.5px;font-weight:600;color:${on ? '#1e1b4b' : '#9ca3af'};">${esc(label)}</span>
+    </div>`;
   }).join('');
 
-  const answered = Object.keys(answers).filter(k => !k.startsWith('_') && answers[k] !== '' && answers[k] !== null && answers[k] !== undefined).length;
+  const socialDefs2 = [
+    { key:'instagram', label:'Instagram' }, { key:'tiktok', label:'TikTok' },
+    { key:'facebook', label:'Facebook' }, { key:'web', label:'Página web' }, { key:'whatsapp', label:'WhatsApp' },
+  ];
+  const socialRows = socialDefs2.filter(p => social[p.key]).map(p =>
+    `<div style="font-size:12px;color:#374151;padding:5px 0;"><strong style="color:#6d28d9;">${p.label}:</strong> ${esc(social[p.key])}</div>`
+  ).join('');
 
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Diagnóstico – ${esc(r.cliente || 'Cliente')}</title>
-  <style>
-    body { font-family: 'Georgia', serif; margin: 0; padding: 40px; color: #231D3A; font-size: 13px; }
-    @media print { body { padding: 20px; } }
-  </style></head><body>
-  <div style="text-align:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #7A2C9E;">
-    <h1 style="font-family:sans-serif;font-size:22px;font-weight:800;margin:0 0 4px;color:#7A2C9E;">Diagnóstico Estratégico</h1>
-    <h2 style="font-family:sans-serif;font-size:18px;font-weight:600;margin:0 0 4px;color:#231D3A;">${esc(r.cliente || 'Cliente')}</h2>
-    <p style="margin:0;font-size:12px;color:#9A95AD;">${formatDate(r.created_at)} · ${answered} de 45 preguntas respondidas</p>
-  </div>
-  ${blocksHTML}
-  <div style="margin-top:20px;padding-top:16px;border-top:2px solid #7A2C9E;">
-    <h3 style="font-family:sans-serif;font-size:14px;font-weight:700;color:#7A2C9E;margin:0 0 10px;">Tarea final – Materiales</h3>
-    ${tareaItems}
-  </div>
-  <script>window.onload = function(){ window.print(); }<\/script>
-  </body></html>`);
-  win.document.close();
+  return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
+    <div style="background:#1e1b4b;padding:44px 56px 36px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(199,210,254,0.55);margin-bottom:10px;">Somos2os Studio</div>
+      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.12);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(199,210,254,0.9);">Diagnóstico Estratégico</div>
+      <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
+      <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
+      <div style="background:rgba(255,255,255,0.15);border-radius:99px;height:7px;overflow:hidden;max-width:400px;margin-bottom:8px;">
+        <div style="background:rgba(255,255,255,0.85);height:100%;width:${pct}%;border-radius:99px;"></div>
+      </div>
+      <p style="font-size:12px;color:rgba(199,210,254,0.7);margin:0;">${answered} de 45 preguntas respondidas · ${pct}% completado</p>
+    </div>
+    ${socialRows ? `<div style="padding:18px 56px;background:#faf5ff;border-bottom:1px solid #ede9fe;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:8px;">Redes sociales y contacto</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 20px;">${socialRows}</div></div>` : ''}
+    <div style="padding:0 56px;">${blocksHTML}</div>
+    <div style="padding:28px 56px;background:#faf5ff;border-top:1px solid #ede9fe;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:6px;">Tarea final</div>
+      <div style="font-size:18px;font-weight:700;color:#1e1b4b;margin:0 0 16px;">Materiales para la auditoría</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${tareaHTML}</div>
+    </div>
+    <div style="padding:16px 56px;border-top:2px solid #ede9fe;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;font-weight:700;color:#6d28d9;letter-spacing:.04em;">SOMOS2OS STUDIO</span>
+      <span style="font-size:11px;color:#9ca3af;">Generado el ${today}</span>
+    </div>
+  </div>`;
+}
+
+function buildExtraccionPDFHTML(r) {
+  const answers = r.answers || {};
+  let totalAnswered = 0, totalQ = 0;
+  ['s1','s2','s3'].forEach(p => { for (let i=0;i<15;i++) { totalQ++; if(answers[p+'_q'+i]) totalAnswered++; } });
+  for (let c=1;c<=3;c++) { for (let q=0;q<4;q++) { totalQ++; if(answers['c'+c+'_q'+q]) totalAnswered++; } }
+  for (let i=0;i<5;i++) { totalQ++; if(answers['s5_q'+i]) totalAnswered++; }
+  const pct = Math.round((totalAnswered / totalQ) * 100);
+  const today = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+
+  const pdfBlocks = [
+    { prefix:'s1', title:'Preguntas Frecuentes', color:'#2E72D8', tipo:'lista', count:15 },
+    { prefix:'s2', title:'Dudas Comunes',        color:'#5A45C4', tipo:'lista', count:15 },
+    { prefix:'s3', title:'Errores Comunes',      color:'#7A2C9E', tipo:'lista', count:15 },
+    { title:'Casos Reales', color:'#2E72D8', tipo:'casos', casos:[
+      { num:1, label:'Caso 1', qs:['¿Cuál era la situación inicial del cliente? ¿De dónde venía?','¿Cuál era el problema principal que enfrentaba?','¿Cómo trabajaste con él/ella? ¿Qué hiciste?','¿Cuál fue el resultado final?'] },
+      { num:2, label:'Caso 2', qs:['¿Cuál era la situación inicial del cliente? ¿De dónde venía?','¿Cuál era el problema principal que enfrentaba?','¿Cómo trabajaste con él/ella? ¿Qué hiciste?','¿Cuál fue el resultado final?'] },
+      { num:3, label:'Caso 3', qs:['¿Cuál era la situación inicial del cliente? ¿De dónde venía?','¿Cuál era el problema principal que enfrentaba?','¿Cómo trabajaste con él/ella? ¿Qué hiciste?','¿Cuál fue el resultado final?'] },
+    ]},
+    { prefix:'s5', title:'Conocimiento Experto', color:'#7A2C9E', tipo:'normal', qs:[
+      '¿Qué errores ves constantemente en tu industria que a ti ya no te sorprenden?',
+      '¿Qué información incorrecta circula en tu industria que sabes que es falsa?',
+      '¿Qué mitos existen sobre tu trabajo o el proceso que ayudas a resolver?',
+      '¿Qué 3 consejos le darías a alguien que está comenzando a buscar soluciones?',
+      '¿Qué te hubiera gustado saber antes de empezar en este camino profesional?'
+    ]},
+  ];
+
+  const blocksHTML = pdfBlocks.map(blk => {
+    let content = '';
+    if (blk.tipo === 'lista') {
+      const items = [];
+      for (let i=0; i<blk.count; i++) {
+        const val = answers[blk.prefix + '_q' + i];
+        if (val) items.push(`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+          <div style="flex:none;width:20px;height:20px;border-radius:5px;background:${blk.color};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+          <p style="margin:0;font-size:13px;line-height:1.55;color:#1e1b4b;white-space:pre-wrap;">${esc(String(val))}</p>
+        </div>`);
+      }
+      content = items.length ? `<div>${items.join('')}</div>` : `<p style="font-size:13px;color:#9ca3af;font-style:italic;">(sin respuestas)</p>`;
+    } else if (blk.tipo === 'casos') {
+      content = blk.casos.map(caso => {
+        const qs = caso.qs.map((q, qi) => {
+          const val = answers['c'+caso.num+'_q'+qi];
+          return `<div style="margin-bottom:11px;">
+            <p style="font-size:10px;font-weight:700;color:#6b7280;margin:0 0 5px;text-transform:uppercase;letter-spacing:.05em;">${esc(q)}</p>
+            ${val ? `<div style="padding:10px 14px;background:#f5f3ff;border-radius:8px;border-left:3px solid ${blk.color};"><p style="margin:0;font-size:13px;color:#1e1b4b;line-height:1.6;white-space:pre-wrap;">${esc(String(val))}</p></div>` : `<p style="margin:0;font-size:12px;color:#9ca3af;font-style:italic;">Sin respuesta</p>`}
+          </div>`;
+        }).join('');
+        return `<div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;background:#fafafa;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;color:${blk.color};text-transform:uppercase;letter-spacing:.07em;margin-bottom:11px;">${esc(caso.label)}</div>${qs}
+        </div>`;
+      }).join('');
+    } else {
+      content = blk.qs.map((q, qi) => {
+        const val = answers[blk.prefix + '_q' + qi];
+        return `<div style="margin-bottom:10px;padding:13px 16px;background:${val ? '#f5f3ff' : '#fafafa'};border-radius:9px;border-left:3px solid ${val ? blk.color : '#e5e7eb'};">
+          <p style="margin:0 0 7px;font-size:10px;font-weight:700;color:#6d28d9;text-transform:uppercase;letter-spacing:.06em;">${qi+1}. ${esc(q)}</p>
+          ${val ? `<p style="margin:0;font-size:14px;color:#1e1b4b;line-height:1.65;white-space:pre-wrap;">${esc(String(val))}</p>` : `<p style="margin:0;font-size:13px;color:#9ca3af;font-style:italic;">Sin respuesta</p>`}
+        </div>`;
+      }).join('');
+    }
+    return `<div style="padding:28px 0;border-bottom:1px solid #f3f4f6;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;">
+        <div style="width:4px;height:32px;background:${blk.color};border-radius:2px;flex:none;margin-top:3px;"></div>
+        <div style="font-size:18px;font-weight:700;color:#1e1b4b;">${esc(blk.title)}</div>
+      </div>${content}
+    </div>`;
+  }).join('');
+
+  return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
+    <div style="background:#0f172a;padding:44px 56px 36px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(199,210,254,0.5);margin-bottom:10px;">Somos2os Studio</div>
+      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.12);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(199,210,254,0.9);">Extracción de Conocimiento Experto</div>
+      <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
+      <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
+      <div style="background:rgba(255,255,255,0.15);border-radius:99px;height:7px;overflow:hidden;max-width:400px;margin-bottom:8px;">
+        <div style="background:rgba(255,255,255,0.85);height:100%;width:${pct}%;border-radius:99px;"></div>
+      </div>
+      <p style="font-size:12px;color:rgba(199,210,254,0.7);margin:0;">${totalAnswered} de ${totalQ} preguntas respondidas · ${pct}% completado</p>
+    </div>
+    <div style="padding:0 56px;">${blocksHTML}</div>
+    <div style="padding:16px 56px;border-top:2px solid #ede9fe;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;font-weight:700;color:#6d28d9;letter-spacing:.04em;">SOMOS2OS STUDIO</span>
+      <span style="font-size:11px;color:#9ca3af;">Generado el ${today}</span>
+    </div>
+  </div>`;
+}
+
+window.mostrarPreviaPDF = function(tipo) {
+  const r = tipo === 'diagnostico' ? S.selected : S.selectedExtraccion;
+  if (!r) return;
+  const content = tipo === 'diagnostico' ? buildDiagnosticoPDFHTML(r) : buildExtraccionPDFHTML(r);
+  const prev = document.getElementById('pdf-preview-modal');
+  if (prev) prev.remove();
+
+  const dlBtn = `<button id="pdf-dl-btn" onclick="descargarPDF('${tipo}')" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Descargar PDF</button>`;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'pdf-preview-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(4,6,28,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:9999;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:20px 16px 48px;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:870px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:12px 18px;background:rgba(12,16,52,0.97);border:1px solid rgba(139,92,246,0.3);border-radius:14px;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div style="display:flex;gap:5px;"><div style="width:11px;height:11px;border-radius:50%;background:#ef4444;"></div><div style="width:11px;height:11px;border-radius:50%;background:#f59e0b;"></div><div style="width:11px;height:11px;border-radius:50%;background:#22c55e;"></div></div>
+          <span style="font-size:12px;color:rgba(190,210,255,0.5);font-weight:500;margin-left:5px;">Vista previa · PDF</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="pdf-status" style="font-size:12px;color:rgba(190,210,255,0.5);display:none;">Generando…</span>
+          ${dlBtn}
+          <button onclick="document.getElementById('pdf-preview-modal').remove()" style="padding:9px 14px;background:rgba(255,255,255,0.06);color:rgba(190,210,255,0.65);border:1.5px solid rgba(255,255,255,0.12);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✕ Cerrar</button>
+        </div>
+      </div>
+      <div id="pdf-scroll-wrap" style="overflow-x:hidden;border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+        <div id="pdf-preview-content" style="transform-origin:top left;">${content}</div>
+      </div>
+      <div style="margin-top:22px;text-align:center;">
+        <button id="pdf-dl-btn2" onclick="descargarPDF('${tipo}')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 34px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 32px rgba(123,78,219,0.45);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar PDF
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    const el = document.getElementById('pdf-preview-content');
+    const wrap2 = document.getElementById('pdf-scroll-wrap');
+    if (!el) return;
+    const availW = Math.min(window.innerWidth - 32, 870);
+    const scale = Math.min(1, availW / 794);
+    el.style.transform = 'scale(' + scale + ')';
+    el.style.width = '794px';
+    if (wrap2) wrap2.style.height = Math.ceil(el.scrollHeight * scale) + 'px';
+  });
+};
+
+window.descargarPDF = async function(tipo) {
+  const r = tipo === 'diagnostico' ? S.selected : S.selectedExtraccion;
+  if (!r) return;
+  const btn = document.getElementById('pdf-dl-btn');
+  const btn2 = document.getElementById('pdf-dl-btn2');
+  const status = document.getElementById('pdf-status');
+  if (btn)   { btn.textContent = 'Generando…'; btn.disabled = true; }
+  if (btn2)  { btn2.textContent = 'Generando…'; btn2.disabled = true; }
+  if (status) status.style.display = 'block';
+
+  try {
+    await loadPDFLibs();
+    const content = tipo === 'diagnostico' ? buildDiagnosticoPDFHTML(r) : buildExtraccionPDFHTML(r);
+    const temp = document.createElement('div');
+    temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;z-index:-100;';
+    temp.innerHTML = content;
+    document.body.appendChild(temp);
+
+    const canvas = await html2canvas(temp, { scale:2, useCORS:true, backgroundColor:'#ffffff', width:794, windowWidth:794 });
+    document.body.removeChild(temp);
+
+    const { jsPDF } = window.jspdf;
+    const pdf   = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW  = pageW;
+    const imgH  = (canvas.height * imgW) / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.93);
+    const pages = Math.ceil(imgH / pageH);
+
+    pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
+    for (let p = 1; p < pages; p++) {
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, -(p * pageH), imgW, imgH);
+    }
+
+    const slug = (r.cliente || 'cliente').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    pdf.save(tipo + '-' + slug + '.pdf');
+  } catch(e) {
+    console.error(e);
+    alert('No se pudo generar el PDF. Verifica tu conexión e intenta nuevamente.');
+  } finally {
+    const dlLabel = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar PDF`;
+    if (btn)   { btn.innerHTML = dlLabel; btn.disabled = false; }
+    if (btn2)  { btn2.innerHTML = dlLabel; btn2.disabled = false; }
+    if (status) status.style.display = 'none';
+  }
 };
 
 function wrap(content) {
