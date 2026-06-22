@@ -1467,12 +1467,12 @@ function buildDiagnosticoPDFHTML(r, logoSrc) {
           ? `<p style="margin:0;font-size:13px;color:#9ca3af;font-style:italic;">Sin respuesta</p>`
           : `<p style="margin:0;font-size:14px;color:#1e1b4b;line-height:1.65;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;">${esc(String(val))}</p>`;
       }
-      return `<div style="margin-bottom:10px;padding:13px 16px;background:${empty ? '#fafafa' : '#f5f3ff'};border-radius:9px;border-left:3px solid ${empty ? '#e5e7eb' : '#7c3aed'};">
+      return `<div style="margin-bottom:18px;padding:13px 16px;background:${empty ? '#fafafa' : '#f5f3ff'};border-radius:9px;border-left:3px solid ${empty ? '#e5e7eb' : '#7c3aed'};">
         <p style="margin:0 0 7px;font-size:10px;font-weight:700;color:#6d28d9;text-transform:uppercase;letter-spacing:.06em;">${i+1}. ${esc(text)}</p>
         ${ansBlock}
       </div>`;
     }).join('');
-    return `<div style="padding:28px 0;border-bottom:1px solid #f3f4f6;">
+    return `<div style="padding:28px 0 48px;border-bottom:1px solid #f3f4f6;">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;">
         <div style="width:4px;height:32px;background:#7c3aed;border-radius:2px;flex:none;margin-top:3px;"></div>
         <div>
@@ -1578,7 +1578,7 @@ function buildExtraccionPDFHTML(r, logoSrc) {
         </div>`;
       }).join('');
     }
-    return `<div style="padding:28px 0;border-bottom:1px solid #f3f4f6;">
+    return `<div style="padding:28px 0 48px;border-bottom:1px solid #f3f4f6;">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;">
         <div style="width:4px;height:32px;background:${blk.color};border-radius:2px;flex:none;margin-top:3px;"></div>
         <div style="font-size:18px;font-weight:700;color:#1e1b4b;">${esc(blk.title)}</div>
@@ -1682,26 +1682,26 @@ window.descargarPDF = async function(tipo) {
     const pdf        = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
     const pageW      = pdf.internal.pageSize.getWidth();   // 210 mm
     const pageH      = pdf.internal.pageSize.getHeight();  // 297 mm
-    const marginMM   = 12;
-    const contentHmm = pageH - 2 * marginMM;               // 273 mm usable per page
+    // Leave 18mm at the bottom; no top margin so page 1 header bleeds to edge
+    const contentHmm = pageH - 18;
     const pxPerMm    = canvas.width / pageW;
     const pageHpx    = Math.round(contentHmm * pxPerMm);
     const ctx = canvas.getContext('2d');
 
-    // Split canvas at natural white-row boundaries; content placed inside top+bottom margins
+    // Split canvas at natural white-row boundaries (no early exit = finds the best gap)
     let startY = 0, pageIdx = 0;
     while (startY < canvas.height) {
       let endY = Math.min(startY + pageHpx, canvas.height);
       if (endY < canvas.height) {
-        const limit = Math.max(startY + 1, endY - Math.round(pageHpx * 0.08));
+        // Scan the last 22% of page height for the whitest row
+        const limit = Math.max(startY + 1, endY - Math.round(pageHpx * 0.22));
         let bestY = endY, bestScore = -1;
         for (let y = endY; y >= limit; y--) {
           const d = ctx.getImageData(0, y, canvas.width, 1).data;
           let white = 0;
-          for (let i = 0; i < d.length; i += 4) { if (d[i]>230 && d[i+1]>230 && d[i+2]>230) white++; }
+          for (let i = 0; i < d.length; i += 4) { if (d[i]>240 && d[i+1]>240 && d[i+2]>240) white++; }
           const score = white / canvas.width;
           if (score > bestScore) { bestScore = score; bestY = y; }
-          if (score > 0.92) break;
         }
         endY = bestY;
       }
@@ -1714,8 +1714,8 @@ window.descargarPDF = async function(tipo) {
       pctx.drawImage(canvas, 0, -startY);
 
       if (pageIdx > 0) pdf.addPage();
-      // Offset by marginMM so content never touches the page edge
-      pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, marginMM, pageW, pc.height / pxPerMm);
+      // Y=0 so header on page 1 touches the top edge; bottom 18mm stays blank
+      pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, pageW, pc.height / pxPerMm);
       pageIdx++;
       startY = endY;
     }
