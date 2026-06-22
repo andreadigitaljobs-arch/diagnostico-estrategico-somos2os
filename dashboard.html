@@ -1621,7 +1621,7 @@ window.mostrarPreviaPDF = function(tipo) {
           <button onclick="document.getElementById('pdf-preview-modal').remove()" style="padding:9px 14px;background:rgba(255,255,255,0.06);color:rgba(190,210,255,0.65);border:1.5px solid rgba(255,255,255,0.12);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✕ Cerrar</button>
         </div>
       </div>
-      <div id="pdf-scroll-wrap" style="overflow-x:hidden;border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+      <div id="pdf-scroll-wrap" style="overflow:visible;border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
         <div id="pdf-preview-content" style="transform-origin:top left;">${content}</div>
       </div>
       <div style="margin-top:22px;text-align:center;">
@@ -1641,7 +1641,7 @@ window.mostrarPreviaPDF = function(tipo) {
     const scale = Math.min(1, availW / 794);
     el.style.transform = 'scale(' + scale + ')';
     el.style.width = '794px';
-    if (wrap2) wrap2.style.height = Math.ceil(el.scrollHeight * scale) + 'px';
+    el.style.marginBottom = '-' + Math.round(el.scrollHeight * (1 - scale)) + 'px';
   });
 };
 
