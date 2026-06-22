@@ -1423,6 +1423,7 @@ function buildDiagnosticoPDFHTML(r) {
   const answered = countAnswered(answers);
   const pct = Math.round((answered / 45) * 100);
   const today = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+  const logoURL = window.location.origin + '/assets/logo-somos2os.png';
 
   const blocksHTML = BLOCKS.map((blk, bi) => {
     const qsHTML = blk.qs.map((raw, i) => {
@@ -1480,9 +1481,9 @@ function buildDiagnosticoPDFHTML(r) {
   ).join('');
 
   return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
-    <div style="background:#1e1b4b;padding:44px 56px 36px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(199,210,254,0.55);margin-bottom:10px;">Somos2os Studio</div>
-      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.12);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(199,210,254,0.9);">Diagnóstico Estratégico</div>
+    <div style="background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#3b82f6 100%);padding:44px 56px 36px;">
+      <img src="${logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;filter:brightness(0) invert(1);">
+      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.15);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(255,255,255,0.95);">Diagnóstico Estratégico</div>
       <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
       <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
       <div style="background:rgba(255,255,255,0.15);border-radius:99px;height:7px;overflow:hidden;max-width:400px;margin-bottom:8px;">
@@ -1512,6 +1513,7 @@ function buildExtraccionPDFHTML(r) {
   for (let i=0;i<5;i++) { totalQ++; if(answers['s5_q'+i]) totalAnswered++; }
   const pct = Math.round((totalAnswered / totalQ) * 100);
   const today = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+  const logoURL = window.location.origin + '/assets/logo-somos2os.png';
 
   const pdfBlocks = [
     { prefix:'s1', title:'Preguntas Frecuentes', color:'#2E72D8', tipo:'lista', count:15 },
@@ -1574,9 +1576,9 @@ function buildExtraccionPDFHTML(r) {
   }).join('');
 
   return `<div style="width:794px;background:#ffffff;font-family:Arial,sans-serif;color:#1e1b4b;">
-    <div style="background:#0f172a;padding:44px 56px 36px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(199,210,254,0.5);margin-bottom:10px;">Somos2os Studio</div>
-      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.12);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(199,210,254,0.9);">Extracción de Conocimiento Experto</div>
+    <div style="background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#3b82f6 100%);padding:44px 56px 36px;">
+      <img src="${logoURL}" alt="Somos2os Studio" style="height:26px;width:auto;display:block;margin-bottom:18px;filter:brightness(0) invert(1);">
+      <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.15);padding:5px 16px;border-radius:99px;margin-bottom:18px;color:rgba(255,255,255,0.95);">Extracción de Conocimiento Experto</div>
       <div style="font-size:36px;font-weight:800;margin:0 0 8px;color:#ffffff;letter-spacing:-.02em;">${esc(r.cliente || 'Cliente')}</div>
       <p style="font-size:13px;color:rgba(199,210,254,0.6);margin:0 0 26px;">${formatDate(r.created_at)}</p>
       <div style="background:rgba(255,255,255,0.15);border-radius:99px;height:7px;overflow:hidden;max-width:400px;margin-bottom:8px;">
@@ -1661,26 +1663,26 @@ window.descargarPDF = async function(tipo) {
     temp.innerHTML = content;
     document.body.appendChild(temp);
 
-    const canvas = await html2canvas(temp, { scale:2, useCORS:true, backgroundColor:'#ffffff', width:794, windowWidth:794 });
-    document.body.removeChild(temp);
-
-    const { jsPDF } = window.jspdf;
-    const pdf   = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const imgW  = pageW;
-    const imgH  = (canvas.height * imgW) / canvas.width;
-    const imgData = canvas.toDataURL('image/jpeg', 0.93);
-    const pages = Math.ceil(imgH / pageH);
-
-    pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
-    for (let p = 1; p < pages; p++) {
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, -(p * pageH), imgW, imgH);
-    }
-
     const slug = (r.cliente || 'cliente').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-    pdf.save(tipo + '-' + slug + '.pdf');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+    await new Promise((resolve, reject) => {
+      pdf.html(temp, {
+        callback: function(doc) {
+          if (document.body.contains(temp)) document.body.removeChild(temp);
+          doc.save(tipo + '-' + slug + '.pdf');
+          resolve();
+        },
+        x: 0,
+        y: 0,
+        width: 210,
+        windowWidth: 794,
+        autoPaging: 'text',
+        margin: [8, 0, 8, 0],
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }
+      });
+    });
   } catch(e) {
     console.error(e);
     alert('No se pudo generar el PDF. Verifica tu conexión e intenta nuevamente.');
