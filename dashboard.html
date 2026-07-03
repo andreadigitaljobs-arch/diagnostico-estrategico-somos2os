@@ -361,13 +361,13 @@ window.editarNombre = function(id, currentName) {
       <input id="rename-input" type="text" value="${esc(currentName)}" placeholder="Nombre del cliente…"
         style="width:100%;box-sizing:border-box;padding:12px 14px;font-size:15px;border-radius:12px;border:1.5px solid rgba(139,92,246,0.3);background:rgba(255,255,255,0.07);color:#e8edf8;font-family:inherit;outline:none;margin-bottom:16px;"
         onfocus="this.style.borderColor='rgba(139,92,246,0.7)';this.style.boxShadow='0 0 0 4px rgba(139,92,246,0.15)'" onblur="this.style.borderColor='rgba(139,92,246,0.3)';this.style.boxShadow='none'"
-        onkeydown="if(event.key==='Enter')guardarNombre('${id}');if(event.key==='Escape')document.getElementById('rename-modal').remove()">
+        onkeydown="if(event.key==='Enter')guardarNombre('${id}');if(event.key==='Escape')_closeModal('rename-modal')">
       <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button onclick="document.getElementById('rename-modal').remove()" class="btn-secondary">Cancelar</button>
+        <button onclick="_closeModal('rename-modal')" class="btn-secondary">Cancelar</button>
         <button onclick="guardarNombre('${id}')" style="padding:10px 20px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
       </div>
     </div>`;
-  document.body.appendChild(overlay);
+  _openModalOverlay(overlay);
   setTimeout(() => document.getElementById('rename-input')?.focus(), 50);
 };
 
@@ -390,7 +390,7 @@ window.guardarNombre = async function(id) {
     const r = S.records.find(r => r.id === id);
     if (r) r.cliente = newName;
     if (S.selected?.id === id) S.selected.cliente = newName;
-    document.getElementById('rename-modal')?.remove();
+    _closeModal('rename-modal');
     render();
   } catch(e) {
     alert('No se pudo actualizar el nombre.');
@@ -491,7 +491,7 @@ window.editarRedesSociales = function(id) {
     <div style="background:rgba(12,16,52,0.97);border:1px solid rgba(139,92,246,0.3);border-radius:22px;padding:28px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px -10px rgba(0,0,0,0.7);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
         <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#e8edf8;margin:0;">Redes sociales</h3>
-        <button onclick="document.getElementById('social-modal').remove()" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer;color:rgba(180,200,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <button onclick="_closeModal('social-modal')" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer;color:rgba(180,200,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -507,11 +507,11 @@ window.editarRedesSociales = function(id) {
           onblur="this.style.borderColor='rgba(139,92,246,0.25)';this.style.boxShadow='none'">
       </div>`).join('')}
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-        <button onclick="document.getElementById('social-modal').remove()" class="btn-secondary">Cancelar</button>
+        <button onclick="_closeModal('social-modal')" class="btn-secondary">Cancelar</button>
         <button onclick="guardarRedesSociales('${id}')" style="padding:11px 22px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Guardar</button>
       </div>
     </div>`;
-  document.body.appendChild(overlay);
+  _openModalOverlay(overlay);
   setTimeout(() => document.getElementById('social-instagram')?.focus(), 50);
 };
 
@@ -540,11 +540,150 @@ window.guardarRedesSociales = async function(id) {
     if (!res.ok) throw new Error();
     r.answers = newAnswers;
     if (S.selected?.id === id) S.selected.answers = newAnswers;
-    document.getElementById('social-modal')?.remove();
+    _closeModal('social-modal');
     render();
   } catch(e) {
     alert('No se pudieron guardar las redes sociales.');
   }
+};
+
+// ─── RECURSOS PERSONALIZADOS ──────────────────────────────────────────────────
+function buildRecursosCard(r) {
+  const recursos = ((r.answers || {})._recursos) || [];
+  const openIcon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+  const linkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+
+  const rows = recursos.length === 0
+    ? `<div style="text-align:center;padding:24px 0;color:rgba(150,175,230,0.3);font-size:14px;font-style:italic;">Sin recursos aún — agrega tu primer enlace</div>`
+    : recursos.map((res, i) => {
+        const isUrl = /^https?:\/\//i.test((res.url || '').trim());
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);">
+          <div style="flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(139,92,246,0.15);color:#c4b5fd;">${linkIcon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13.5px;font-weight:600;color:#e8edf8;margin-bottom:2px;">${esc(res.label)}</div>
+            <div style="font-size:12px;color:rgba(150,175,230,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(res.url || '')}</div>
+          </div>
+          ${isUrl ? `<a href="${esc(res.url)}" target="_blank" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-decoration:none;font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${openIcon} Abrir</a>` : ''}
+          <button onclick="eliminarRecurso('${r.id}',${i})" title="Eliminar" style="flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.07);cursor:pointer;color:rgba(248,113,113,0.6);display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.background='rgba(248,113,113,0.15)';this.style.color='#f87171'" onmouseout="this.style.background='rgba(248,113,113,0.07)';this.style.color='rgba(248,113,113,0.6)'">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>`;
+      }).join('');
+
+  return `
+  <div class="card-pad" style="border-radius:20px;padding:24px 28px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:rgba(150,175,230,0.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Mis recursos
+        </div>
+        <div style="font-size:12px;color:rgba(140,165,220,0.45);">Links, PDFs, Canva y materiales del cliente</div>
+      </div>
+      <button onclick="agregarRecurso('${r.id}')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1.5px solid rgba(139,92,246,0.35);background:rgba(139,92,246,0.1);color:#c4b5fd;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;" onmouseover="this.style.background='rgba(139,92,246,0.22)'" onmouseout="this.style.background='rgba(139,92,246,0.1)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">${rows}</div>
+  </div>`;
+}
+
+window.agregarRecurso = function(id) {
+  const overlay = document.createElement('div');
+  overlay.id = 'recurso-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(4,6,28,.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:rgba(12,16,52,0.97);border:1px solid rgba(139,92,246,0.3);border-radius:22px;padding:28px;width:100%;max-width:440px;box-shadow:0 30px 80px -10px rgba(0,0,0,0.7);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#e8edf8;margin:0;">Nuevo recurso</h3>
+        <button onclick="_closeModal('recurso-modal')" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer;color:rgba(180,200,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:12.5px;font-weight:700;color:rgba(150,175,230,0.65);margin-bottom:7px;">Nombre del recurso</label>
+        <input id="recurso-label" type="text" placeholder="Ej: Kit de marca Canva, PDF estrategia…"
+          style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(255,255,255,0.06);color:#e8edf8;font-family:inherit;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='rgba(139,92,246,0.65)'" onblur="this.style.borderColor='rgba(139,92,246,0.25)'">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:12.5px;font-weight:700;color:rgba(150,175,230,0.65);margin-bottom:7px;">URL o enlace</label>
+        <input id="recurso-url" type="text" placeholder="https://..."
+          style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(255,255,255,0.06);color:#e8edf8;font-family:inherit;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='rgba(139,92,246,0.65)'" onblur="this.style.borderColor='rgba(139,92,246,0.25)'"
+          onkeydown="if(event.key==='Enter')guardarRecurso('${id}');if(event.key==='Escape')_closeModal('recurso-modal')">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="_closeModal('recurso-modal')" class="btn-secondary">Cancelar</button>
+        <button onclick="guardarRecurso('${id}')" style="padding:11px 22px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Guardar</button>
+      </div>
+    </div>`;
+  _openModalOverlay(overlay);
+  setTimeout(() => document.getElementById('recurso-label')?.focus(), 50);
+};
+
+window.guardarRecurso = async function(id) {
+  const label = document.getElementById('recurso-label')?.value.trim();
+  const url   = document.getElementById('recurso-url')?.value.trim() || '';
+  if (!label) { document.getElementById('recurso-label')?.focus(); return; }
+  const r = S.records.find(rec => rec.id === id) || (S.selected?.id === id ? S.selected : null);
+  if (!r) return;
+  const recursos = [...(((r.answers || {})._recursos) || []), { label, url }];
+  const newAnswers = { ...(r.answers || {}), _recursos: recursos };
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ answers: newAnswers })
+    });
+    if (!res.ok) throw new Error();
+    r.answers = newAnswers;
+    if (S.selected?.id === id) S.selected.answers = newAnswers;
+    _closeModal('recurso-modal');
+    render();
+  } catch(e) {
+    alert('No se pudo guardar el recurso.');
+  }
+};
+
+window.eliminarRecurso = async function(id, index) {
+  const r = S.records.find(rec => rec.id === id) || (S.selected?.id === id ? S.selected : null);
+  if (!r) return;
+  const recursos = [...(((r.answers || {})._recursos) || [])];
+  recursos.splice(index, 1);
+  const newAnswers = { ...(r.answers || {}), _recursos: recursos };
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + id, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ answers: newAnswers })
+    });
+    if (!res.ok) throw new Error();
+    r.answers = newAnswers;
+    if (S.selected?.id === id) S.selected.answers = newAnswers;
+    render();
+  } catch(e) {
+    alert('No se pudo eliminar el recurso.');
+  }
+};
+
+// ─── MODAL HELPERS ────────────────────────────────────────────────────────────
+window._openModalOverlay = function(overlay) {
+  document.body.appendChild(overlay);
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+};
+window._closeModal = function(id) {
+  document.getElementById(id)?.remove();
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
 };
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
@@ -1331,6 +1470,8 @@ function buildDetail() {
     </div>
 
     ${buildSocialCard(r)}
+
+    ${buildRecursosCard(r)}
 
     <!-- Bloques de preguntas -->
     <div class="dash-cards" style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
