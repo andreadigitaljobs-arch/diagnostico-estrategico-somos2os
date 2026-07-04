@@ -177,6 +177,9 @@
     .modal-box-in  { animation: modalBoxIn  0.28s cubic-bezier(0.34,1.35,0.64,1) both; }
     .modal-box-out { animation: modalBoxOut 0.16s ease both; }
 
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ── Feedback de botones ── */
     .btn-primary:active  { transform: scale(0.96) translateY(0) !important; transition: transform 0.07s ease !important; }
     .btn-secondary:active { transform: scale(0.96) !important; transition: transform 0.07s ease !important; }
@@ -223,6 +226,8 @@
 const SUPABASE_URL      = 'https://qwmhflgtdvqoeuwboknw.supabase.co';
 const SUPABASE_SERVICE  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3bWhmbGd0ZHZxb2V1d2Jva253Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTgzOTY0MSwiZXhwIjoyMDk3NDE1NjQxfQ.YlDNh1zomDGSGqCH6YyWfNsy1MbyHmgpY3J4DRerEDw';
 const DASHBOARD_PASSWORD = 'somos2os2025'; // ← cambia esto
+const STORAGE_BASE    = SUPABASE_URL + '/storage/v1';
+const RECURSOS_BUCKET = 'recursos-s2';
 
 // ─── DATOS ────────────────────────────────────────────────────────────────────
 const BLOCKS = [
@@ -590,23 +595,76 @@ window.guardarRedesSociales = async function(id) {
   }
 };
 
+// ─── SUPABASE STORAGE ─────────────────────────────────────────────────────────
+async function ensureRecursosBucket() {
+  await fetch(STORAGE_BASE + '/bucket', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id: RECURSOS_BUCKET, name: RECURSOS_BUCKET, public: true })
+  }); // 409 = ya existe, ignoramos
+}
+
+async function uploadRecursoFile(file, clientId) {
+  await ensureRecursosBucket();
+  const ext  = file.name.split('.').pop().toLowerCase().slice(0, 10);
+  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/_{2,}/g, '_').slice(0, 80);
+  const path = encodeURIComponent(clientId) + '/' + Date.now() + '_' + safe;
+  const res  = await fetch(STORAGE_BASE + '/object/' + RECURSOS_BUCKET + '/' + path, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Error al subir el archivo');
+  }
+  return {
+    url:      SUPABASE_URL + '/storage/v1/object/public/' + RECURSOS_BUCKET + '/' + path,
+    fileExt:  ext,
+    fileName: file.name,
+    fileSize: file.size
+  };
+}
+
 // ─── RECURSOS PERSONALIZADOS ──────────────────────────────────────────────────
 function buildRecursosCard(r) {
   const recursos = ((r.answers || {})._recursos) || [];
   const openIcon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
   const linkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+  const fileIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+
+  const EXT_COLORS = { pdf:'#ef4444', png:'#22c55e', jpg:'#22c55e', jpeg:'#22c55e', gif:'#22c55e', webp:'#22c55e', doc:'#3b82f6', docx:'#3b82f6' };
 
   const rows = recursos.length === 0
-    ? `<div style="text-align:center;padding:24px 0;color:rgba(150,175,230,0.3);font-size:14px;font-style:italic;">Sin recursos aún — agrega tu primer enlace</div>`
+    ? `<div style="text-align:center;padding:24px 0;color:rgba(150,175,230,0.3);font-size:14px;font-style:italic;">Sin recursos aún — agrega tu primer enlace o sube un archivo</div>`
     : recursos.map((res, i) => {
-        const isUrl = /^https?:\/\//i.test((res.url || '').trim());
+        const isUrl    = /^https?:\/\//i.test((res.url || '').trim());
+        const isUpload = !!(res.fileExt && res.fileName);
+        const ext      = (res.fileExt || '').toLowerCase();
+        const extColor = EXT_COLORS[ext] || '#8b5cf6';
+        const subtitle = isUpload
+          ? esc(res.fileName) + (res.fileSize ? ' · ' + (res.fileSize/1048576).toFixed(1) + ' MB' : '')
+          : esc(res.url || '');
+        const badge = isUpload
+          ? `<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:${extColor};background:${extColor}22;border:1px solid ${extColor}44;padding:3px 8px;border-radius:6px;">${ext || 'FILE'}</span>`
+          : '';
+        const btnLabel = ext === 'pdf' ? 'Ver PDF' : isUpload ? 'Descargar' : 'Abrir';
+        const icon = isUpload ? fileIcon : linkIcon;
+        const iconBg = isUpload ? `background:${extColor}22;color:${extColor};` : 'background:rgba(139,92,246,0.15);color:#c4b5fd;';
         return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);">
-          <div style="flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(139,92,246,0.15);color:#c4b5fd;">${linkIcon}</div>
+          <div style="flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;${iconBg}">${icon}</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13.5px;font-weight:600;color:#e8edf8;margin-bottom:2px;">${esc(res.label)}</div>
-            <div style="font-size:12px;color:rgba(150,175,230,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(res.url || '')}</div>
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">${badge}<span style="font-size:13.5px;font-weight:600;color:#e8edf8;">${esc(res.label)}</span></div>
+            <div style="font-size:11.5px;color:rgba(150,175,230,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${subtitle}</div>
           </div>
-          ${isUrl ? `<a href="${esc(res.url)}" target="_blank" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-decoration:none;font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${openIcon} Abrir</a>` : ''}
+          ${isUrl ? `<a href="${esc(res.url)}" target="_blank" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-decoration:none;font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${openIcon} ${btnLabel}</a>` : ''}
           <button onclick="eliminarRecurso('${r.id}',${i})" title="Eliminar" style="flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.07);cursor:pointer;color:rgba(248,113,113,0.6);display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.background='rgba(248,113,113,0.15)';this.style.color='#f87171'" onmouseout="this.style.background='rgba(248,113,113,0.07)';this.style.color='rgba(248,113,113,0.6)'">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -637,43 +695,149 @@ window.agregarRecurso = function(id) {
   overlay.id = 'recurso-modal';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(4,6,28,.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
   overlay.innerHTML = `
-    <div style="background:rgba(12,16,52,0.97);border:1px solid rgba(139,92,246,0.3);border-radius:22px;padding:28px;width:100%;max-width:440px;box-shadow:0 30px 80px -10px rgba(0,0,0,0.7);">
+    <div style="background:rgba(12,16,52,0.97);border:1px solid rgba(139,92,246,0.3);border-radius:22px;padding:28px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px -10px rgba(0,0,0,0.7);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <h3 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#e8edf8;margin:0;">Nuevo recurso</h3>
         <button onclick="_closeModal('recurso-modal')" style="width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer;color:rgba(180,200,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div style="margin-bottom:14px;">
+
+      <!-- Nombre -->
+      <div style="margin-bottom:16px;">
         <label style="display:block;font-size:12.5px;font-weight:700;color:rgba(150,175,230,0.65);margin-bottom:7px;">Nombre del recurso</label>
         <input id="recurso-label" type="text" placeholder="Ej: Kit de marca Canva, PDF estrategia…"
           style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(255,255,255,0.06);color:#e8edf8;font-family:inherit;outline:none;transition:border-color .15s;"
           onfocus="this.style.borderColor='rgba(139,92,246,0.65)'" onblur="this.style.borderColor='rgba(139,92,246,0.25)'">
       </div>
-      <div style="margin-bottom:20px;">
-        <label style="display:block;font-size:12.5px;font-weight:700;color:rgba(150,175,230,0.65);margin-bottom:7px;">URL o enlace</label>
+
+      <!-- Tabs URL / Archivo -->
+      <div style="display:flex;gap:0;margin-bottom:14px;border:1.5px solid rgba(139,92,246,0.25);border-radius:11px;overflow:hidden;background:rgba(255,255,255,0.02);">
+        <button id="rtab-url" onclick="setRecursoTipo('url')" style="flex:1;padding:9px 14px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:linear-gradient(120deg,rgba(59,130,246,0.25),rgba(139,92,246,0.25));color:#c4b5fd;transition:all .15s;">🔗 URL / Link</button>
+        <button id="rtab-file" onclick="setRecursoTipo('file')" style="flex:1;padding:9px 14px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:transparent;color:rgba(150,175,230,0.45);transition:all .15s;">📎 Subir archivo</button>
+      </div>
+      <input type="hidden" id="recurso-tipo-state" value="url">
+
+      <!-- Sección URL -->
+      <div id="recurso-url-wrap" style="margin-bottom:20px;">
         <input id="recurso-url" type="text" placeholder="https://..."
           style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(255,255,255,0.06);color:#e8edf8;font-family:inherit;outline:none;transition:border-color .15s;"
           onfocus="this.style.borderColor='rgba(139,92,246,0.65)'" onblur="this.style.borderColor='rgba(139,92,246,0.25)'"
           onkeydown="if(event.key==='Enter')guardarRecurso('${id}');if(event.key==='Escape')_closeModal('recurso-modal')">
       </div>
+
+      <!-- Sección archivo -->
+      <div id="recurso-file-wrap" style="margin-bottom:20px;display:none;">
+        <label for="recurso-file" style="display:block;cursor:pointer;">
+          <div id="recurso-dropzone" style="border:2px dashed rgba(139,92,246,0.3);border-radius:13px;padding:28px 20px;text-align:center;background:rgba(139,92,246,0.04);transition:all .2s;"
+            onmouseover="this.style.borderColor='rgba(139,92,246,0.6)';this.style.background='rgba(139,92,246,0.09)'"
+            onmouseout="this.style.borderColor='rgba(139,92,246,0.3)';this.style.background='rgba(139,92,246,0.04)'">
+            <div id="recurso-file-empty">
+              <div style="font-size:32px;margin-bottom:10px;">📎</div>
+              <div style="font-size:14px;font-weight:700;color:#c4b5fd;margin-bottom:5px;">Haz clic para seleccionar</div>
+              <div style="font-size:12px;color:rgba(150,175,230,0.4);">PDF, imagen, Word · máx 10 MB</div>
+            </div>
+            <div id="recurso-file-chosen" style="display:none;">
+              <div id="recurso-file-emoji" style="font-size:32px;margin-bottom:10px;">📄</div>
+              <div id="recurso-file-name" style="font-size:14px;font-weight:700;color:#e8edf8;margin-bottom:4px;word-break:break-all;">—</div>
+              <div id="recurso-file-size" style="font-size:12px;color:rgba(150,175,230,0.5);">—</div>
+            </div>
+          </div>
+          <input id="recurso-file" type="file" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx" style="display:none;" onchange="onRecursoFileChange(this)">
+        </label>
+      </div>
+
+      <div id="recurso-upload-status" style="display:none;text-align:center;margin-bottom:12px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(150,175,230,0.7);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Subiendo archivo…
+        </div>
+      </div>
+
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button onclick="_closeModal('recurso-modal')" class="btn-secondary">Cancelar</button>
-        <button onclick="guardarRecurso('${id}')" style="padding:11px 22px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Guardar</button>
+        <button id="recurso-save-btn" onclick="guardarRecurso('${id}')" style="padding:11px 22px;background:linear-gradient(120deg,#3B82F6,#7B4EDB);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Guardar</button>
       </div>
     </div>`;
   _openModalOverlay(overlay);
   setTimeout(() => document.getElementById('recurso-label')?.focus(), 50);
 };
 
+window.setRecursoTipo = function(tipo) {
+  const urlWrap  = document.getElementById('recurso-url-wrap');
+  const fileWrap = document.getElementById('recurso-file-wrap');
+  const tabUrl   = document.getElementById('rtab-url');
+  const tabFile  = document.getElementById('rtab-file');
+  const state    = document.getElementById('recurso-tipo-state');
+  if (state) state.value = tipo;
+  if (tipo === 'url') {
+    urlWrap.style.display  = '';
+    fileWrap.style.display = 'none';
+    tabUrl.style.background  = 'linear-gradient(120deg,rgba(59,130,246,0.25),rgba(139,92,246,0.25))';
+    tabUrl.style.color   = '#c4b5fd';
+    tabFile.style.background = 'transparent';
+    tabFile.style.color  = 'rgba(150,175,230,0.45)';
+  } else {
+    urlWrap.style.display  = 'none';
+    fileWrap.style.display = '';
+    tabFile.style.background = 'linear-gradient(120deg,rgba(59,130,246,0.25),rgba(139,92,246,0.25))';
+    tabFile.style.color  = '#c4b5fd';
+    tabUrl.style.background  = 'transparent';
+    tabUrl.style.color   = 'rgba(150,175,230,0.45)';
+  }
+};
+
+window.onRecursoFileChange = function(input) {
+  const file    = input.files[0];
+  const empty   = document.getElementById('recurso-file-empty');
+  const chosen  = document.getElementById('recurso-file-chosen');
+  if (!file) { empty.style.display = ''; chosen.style.display = 'none'; return; }
+  const ext = file.name.split('.').pop().toLowerCase();
+  const emojiMap = { pdf:'📄', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', gif:'🖼️', webp:'🖼️', doc:'📝', docx:'📝' };
+  document.getElementById('recurso-file-emoji').textContent = emojiMap[ext] || '📎';
+  document.getElementById('recurso-file-name').textContent  = file.name.length > 38 ? file.name.slice(0,35)+'…' : file.name;
+  document.getElementById('recurso-file-size').textContent  = (file.size/1048576).toFixed(1)+' MB · '+ext.toUpperCase();
+  empty.style.display  = 'none';
+  chosen.style.display = '';
+  // Auto-fill label if empty
+  const labelInput = document.getElementById('recurso-label');
+  if (labelInput && !labelInput.value.trim()) {
+    labelInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ');
+  }
+};
+
 window.guardarRecurso = async function(id) {
   const label = document.getElementById('recurso-label')?.value.trim();
-  const url   = document.getElementById('recurso-url')?.value.trim() || '';
   if (!label) { document.getElementById('recurso-label')?.focus(); return; }
   const r = S.records.find(rec => rec.id === id) || (S.selected?.id === id ? S.selected : null);
   if (!r) return;
-  const recursos = [...(((r.answers || {})._recursos) || []), { label, url }];
-  const newAnswers = { ...(r.answers || {}), _recursos: recursos };
+
+  const isFileMode = document.getElementById('recurso-tipo-state')?.value === 'file';
+  const saveBtn    = document.getElementById('recurso-save-btn');
+  const statusEl   = document.getElementById('recurso-upload-status');
+  let resourceData = { label };
+
+  if (isFileMode) {
+    const file = document.getElementById('recurso-file')?.files[0];
+    if (!file) { alert('Selecciona un archivo primero.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('El archivo supera los 10 MB.\n\nTip: comprime el PDF en smallpdf.com o ilovepdf.com antes de subirlo.'); return; }
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Subiendo…'; }
+    if (statusEl) statusEl.style.display = '';
+    try {
+      const uploaded = await uploadRecursoFile(file, id);
+      resourceData = { ...resourceData, url: uploaded.url, fileExt: uploaded.fileExt, fileName: uploaded.fileName, fileSize: uploaded.fileSize };
+    } catch(e) {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; }
+      if (statusEl) statusEl.style.display = 'none';
+      alert('No se pudo subir el archivo: ' + e.message);
+      return;
+    }
+  } else {
+    resourceData.url = document.getElementById('recurso-url')?.value.trim() || '';
+  }
+
+  const recursos    = [...(((r.answers || {})._recursos) || []), resourceData];
+  const newAnswers  = { ...(r.answers || {}), _recursos: recursos };
   try {
     const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + id, {
       method: 'PATCH',
@@ -689,6 +853,8 @@ window.guardarRecurso = async function(id) {
     _closeModal('recurso-modal');
     render();
   } catch(e) {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; }
+    if (statusEl) statusEl.style.display = 'none';
     alert('No se pudo guardar el recurso.');
   }
 };
