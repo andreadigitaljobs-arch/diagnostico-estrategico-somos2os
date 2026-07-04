@@ -595,6 +595,62 @@ window.guardarRedesSociales = async function(id) {
   }
 };
 
+// ─── CARGA DINÁMICA DE SCRIPTS ────────────────────────────────────────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ─── COMPRESIÓN DE PDF ────────────────────────────────────────────────────────
+async function compressPDFFile(file, onProgress) {
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+
+  const buf    = await file.arrayBuffer();
+  const pdfDoc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+  const total  = pdfDoc.numPages;
+
+  // Render at 1.5× scale → ~108 DPI, JPEG 75% quality
+  const SCALE   = 1.5;
+  const QUALITY = 0.75;
+  const PX2PT   = 72 / 96; // px → pt conversion
+
+  const firstVp = (await pdfDoc.getPage(1)).getViewport({ scale: SCALE });
+  const wPt = firstVp.width  * PX2PT;
+  const hPt = firstVp.height * PX2PT;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: wPt > hPt ? 'l' : 'p',
+    unit: 'pt',
+    format: [wPt, hPt]
+  });
+
+  for (let i = 1; i <= total; i++) {
+    if (onProgress) onProgress(i, total);
+    const page = await pdfDoc.getPage(i);
+    const vp   = page.getViewport({ scale: SCALE });
+    const cvs  = document.createElement('canvas');
+    cvs.width  = Math.round(vp.width);
+    cvs.height = Math.round(vp.height);
+    await page.render({ canvasContext: cvs.getContext('2d'), viewport: vp }).promise;
+    const imgData = cvs.toDataURL('image/jpeg', QUALITY);
+    const pgWpt = vp.width  * PX2PT;
+    const pgHpt = vp.height * PX2PT;
+    if (i > 1) doc.addPage([pgWpt, pgHpt]);
+    doc.addImage(imgData, 'JPEG', 0, 0, pgWpt, pgHpt, undefined, 'FAST');
+  }
+
+  const blob = doc.output('blob');
+  return new File([blob], file.name, { type: 'application/pdf' });
+}
+
 // ─── SUPABASE STORAGE ─────────────────────────────────────────────────────────
 async function ensureRecursosBucket() {
   await fetch(STORAGE_BASE + '/bucket', {
@@ -750,7 +806,7 @@ window.agregarRecurso = function(id) {
       <div id="recurso-upload-status" style="display:none;text-align:center;margin-bottom:12px;">
         <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(150,175,230,0.7);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-          Subiendo archivo…
+          <span id="recurso-status-text">Preparando…</span>
         </div>
       </div>
 
@@ -818,14 +874,38 @@ window.guardarRecurso = async function(id) {
   let resourceData = { label };
 
   if (isFileMode) {
-    const file = document.getElementById('recurso-file')?.files[0];
+    let file = document.getElementById('recurso-file')?.files[0];
     if (!file) { alert('Selecciona un archivo primero.'); return; }
-    if (file.size > 10 * 1024 * 1024) { alert('El archivo supera los 10 MB.\n\nTip: comprime el PDF en smallpdf.com o ilovepdf.com antes de subirlo.'); return; }
-    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Subiendo…'; }
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Procesando…'; }
     if (statusEl) statusEl.style.display = '';
+
+    const setStatus = t => { const el = document.getElementById('recurso-status-text'); if (el) el.textContent = t; };
+    const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    // Comprimir PDFs de más de 3 MB automáticamente
+    if (isPDF && file.size > 3 * 1024 * 1024) {
+      try {
+        setStatus('Cargando compresor…');
+        file = await compressPDFFile(file, (pg, total) => setStatus(`Comprimiendo… ${pg}/${total} páginas`));
+        setStatus('Subiendo archivo comprimido…');
+      } catch(e) {
+        console.warn('Compresión falló, subiendo original:', e);
+        setStatus('Subiendo archivo…');
+      }
+    } else {
+      setStatus('Subiendo archivo…');
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; }
+      if (statusEl) statusEl.style.display = 'none';
+      alert('El archivo sigue siendo demasiado grande (>50 MB) incluso después de comprimir.\nReduce el número de páginas o la resolución de las imágenes.');
+      return;
+    }
+
     try {
       const uploaded = await uploadRecursoFile(file, id);
-      resourceData = { ...resourceData, url: uploaded.url, fileExt: uploaded.fileExt, fileName: uploaded.fileName, fileSize: uploaded.fileSize };
+      resourceData = { ...resourceData, url: uploaded.url, fileExt: uploaded.fileExt, fileName: uploaded.fileName, fileSize: file.size };
     } catch(e) {
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; }
       if (statusEl) statusEl.style.display = 'none';
