@@ -634,42 +634,76 @@ async function uploadRecursoFile(file, clientId) {
 }
 
 // ─── RECURSOS PERSONALIZADOS ──────────────────────────────────────────────────
+let _drag = { group: null, pos: null };
+
 function buildRecursosCard(r) {
   const recursos = ((r.answers || {})._recursos) || [];
-  const openIcon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
-  const linkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-  const fileIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  const openIcon  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+  const linkIcon  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+  const fileIcon  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  const dragIcon  = '<svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="2" r="1.4"/><circle cx="3" cy="7" r="1.4"/><circle cx="3" cy="12" r="1.4"/><circle cx="7" cy="2" r="1.4"/><circle cx="7" cy="7" r="1.4"/><circle cx="7" cy="12" r="1.4"/></svg>';
 
   const EXT_COLORS = { pdf:'#ef4444', png:'#22c55e', jpg:'#22c55e', jpeg:'#22c55e', gif:'#22c55e', webp:'#22c55e', doc:'#3b82f6', docx:'#3b82f6' };
 
-  const rows = recursos.length === 0
+  const withIdx = recursos.map((res, i) => ({ ...res, _i: i }));
+  const archivos = withIdx.filter(res => !!(res.fileExt && res.fileName));
+  const links    = withIdx.filter(res => !(res.fileExt && res.fileName));
+
+  function buildRow(res, group, posInGroup) {
+    const origIdx  = res._i;
+    const isUpload = !!(res.fileExt && res.fileName);
+    const ext      = (res.fileExt || '').toLowerCase();
+    const extColor = EXT_COLORS[ext] || '#8b5cf6';
+    const subtitle = isUpload
+      ? esc(res.fileName) + (res.fileSize ? ' · ' + (res.fileSize/1048576).toFixed(1) + ' MB' : '')
+      : esc(res.url || '');
+    const badge = isUpload
+      ? `<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:${extColor};background:${extColor}22;border:1px solid ${extColor}44;padding:3px 8px;border-radius:6px;">${ext || 'FILE'}</span>`
+      : '';
+    const btnLabel = ext === 'pdf' ? 'Ver PDF' : isUpload ? 'Descargar' : 'Abrir';
+    const icon     = isUpload ? fileIcon : linkIcon;
+    const iconBg   = isUpload ? `background:${extColor}22;color:${extColor};` : 'background:rgba(139,92,246,0.15);color:#c4b5fd;';
+    return `<div class="recurso-row" draggable="true"
+      ondragstart="recursosDragStart(event,'${group}',${posInGroup})"
+      ondragover="recursosDragOver(event,'${group}')"
+      ondragleave="this.style.cssText=this.dataset.baseStyle"
+      ondragend="recursosDragEnd(event)"
+      ondrop="recursosDrop(event,'${r.id}','${group}',${posInGroup})"
+      data-base-style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);cursor:default;transition:border-color .12s,background .12s;"
+      style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);cursor:default;transition:border-color .12s,background .12s;">
+      <div style="flex:none;cursor:grab;color:rgba(150,175,230,0.28);display:flex;align-items:center;padding:0 2px;touch-action:none;" title="Arrastrar para reordenar"
+        onmouseover="this.style.color='rgba(150,175,230,0.65)'" onmouseout="this.style.color='rgba(150,175,230,0.28)'">${dragIcon}</div>
+      <div style="flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;${iconBg}">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">${badge}<span style="font-size:13.5px;font-weight:600;color:#e8edf8;">${esc(res.label)}</span></div>
+        <div style="font-size:11.5px;color:rgba(150,175,230,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${subtitle}</div>
+      </div>
+      ${res.url ? `<a href="${esc(res.url)}" target="_blank" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-decoration:none;font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${openIcon} ${btnLabel}</a>` : ''}
+      <button onclick="eliminarRecurso('${r.id}',${origIdx})" title="Eliminar" style="flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.07);cursor:pointer;color:rgba(248,113,113,0.6);display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.background='rgba(248,113,113,0.15)';this.style.color='#f87171'" onmouseout="this.style.background='rgba(248,113,113,0.07)';this.style.color='rgba(248,113,113,0.6)'">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`;
+  }
+
+  function buildSection(label, icon, items, group) {
+    if (!items.length) return '';
+    return `
+    <div style="margin-bottom:4px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:0 2px;">
+        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:rgba(150,175,230,0.4);">${icon} ${label}</span>
+        <div style="flex:1;height:1px;background:rgba(139,92,246,0.15);"></div>
+        <span style="font-size:10px;color:rgba(150,175,230,0.3);">${items.length}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${items.map((res, pos) => buildRow(res, group, pos)).join('')}</div>
+    </div>`;
+  }
+
+  const body = recursos.length === 0
     ? `<div style="text-align:center;padding:24px 0;color:rgba(150,175,230,0.3);font-size:14px;font-style:italic;">Sin recursos aún — agrega tu primer enlace o sube un archivo</div>`
-    : recursos.map((res, i) => {
-        const isUrl    = /^https?:\/\//i.test((res.url || '').trim());
-        const isUpload = !!(res.fileExt && res.fileName);
-        const ext      = (res.fileExt || '').toLowerCase();
-        const extColor = EXT_COLORS[ext] || '#8b5cf6';
-        const subtitle = isUpload
-          ? esc(res.fileName) + (res.fileSize ? ' · ' + (res.fileSize/1048576).toFixed(1) + ' MB' : '')
-          : esc(res.url || '');
-        const badge = isUpload
-          ? `<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:${extColor};background:${extColor}22;border:1px solid ${extColor}44;padding:3px 8px;border-radius:6px;">${ext || 'FILE'}</span>`
-          : '';
-        const btnLabel = ext === 'pdf' ? 'Ver PDF' : isUpload ? 'Descargar' : 'Abrir';
-        const icon = isUpload ? fileIcon : linkIcon;
-        const iconBg = isUpload ? `background:${extColor}22;color:${extColor};` : 'background:rgba(139,92,246,0.15);color:#c4b5fd;';
-        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;border:1.5px solid rgba(139,92,246,0.25);background:rgba(139,92,246,0.06);">
-          <div style="flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;${iconBg}">${icon}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">${badge}<span style="font-size:13.5px;font-weight:600;color:#e8edf8;">${esc(res.label)}</span></div>
-            <div style="font-size:11.5px;color:rgba(150,175,230,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${subtitle}</div>
-          </div>
-          ${isUrl ? `<a href="${esc(res.url)}" target="_blank" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-decoration:none;font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">${openIcon} ${btnLabel}</a>` : ''}
-          <button onclick="eliminarRecurso('${r.id}',${i})" title="Eliminar" style="flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.07);cursor:pointer;color:rgba(248,113,113,0.6);display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.background='rgba(248,113,113,0.15)';this.style.color='#f87171'" onmouseout="this.style.background='rgba(248,113,113,0.07)';this.style.color='rgba(248,113,113,0.6)'">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>`;
-      }).join('');
+    : `<div style="display:flex;flex-direction:column;gap:16px;">
+        ${buildSection('Archivos & PDFs', '📁', archivos, 'archivos')}
+        ${buildSection('Links & URLs', '🔗', links, 'links')}
+       </div>`;
 
   return `
   <div class="card-pad" style="border-radius:20px;padding:24px 28px;margin-bottom:20px;">
@@ -686,7 +720,7 @@ function buildRecursosCard(r) {
         Agregar
       </button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:8px;">${rows}</div>
+    ${body}
   </div>`;
 }
 
@@ -889,6 +923,59 @@ window.eliminarRecurso = async function(id, index) {
   } catch(e) {
     alert('No se pudo eliminar el recurso.');
   }
+};
+
+window.recursosDragStart = function(e, group, pos) {
+  _drag = { group, pos };
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { if (e.target) e.target.style.opacity = '0.4'; }, 0);
+};
+
+window.recursosDragOver = function(e, group) {
+  if (group !== _drag.group) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.style.borderColor = 'rgba(139,92,246,0.75)';
+  e.currentTarget.style.background  = 'rgba(139,92,246,0.14)';
+};
+
+window.recursosDragEnd = function(e) {
+  if (e.target) { e.target.style.opacity = ''; }
+};
+
+window.recursosDrop = async function(e, clientId, group, toPos) {
+  e.preventDefault();
+  const fromPos = _drag.pos;
+  _drag = { group: null, pos: null };
+  if (group !== (e.currentTarget.__dragGroup || group) || fromPos === toPos || fromPos === null) return;
+
+  const r = S.records.find(rec => rec.id === clientId) || (S.selected?.id === clientId ? S.selected : null);
+  if (!r) return;
+
+  const recursos = [...(((r.answers || {})._recursos) || [])];
+  const withIdx  = recursos.map((res, i) => ({ ...res, _i: i }));
+  const archivos = withIdx.filter(res => !!(res.fileExt && res.fileName));
+  const links    = withIdx.filter(res => !(res.fileExt && res.fileName));
+
+  const groupArr = group === 'archivos' ? archivos : links;
+  if (fromPos < 0 || fromPos >= groupArr.length || toPos < 0 || toPos >= groupArr.length) return;
+  const [moved] = groupArr.splice(fromPos, 1);
+  groupArr.splice(toPos, 0, moved);
+
+  const newRecursos = [...archivos, ...links].map(({ _i, ...rest }) => rest);
+  const newAnswers  = { ...(r.answers || {}), _recursos: newRecursos };
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/diagnosticos?id=eq.' + clientId, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_SERVICE, 'Authorization': 'Bearer ' + SUPABASE_SERVICE, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ answers: newAnswers })
+    });
+    if (res.ok) {
+      r.answers = newAnswers;
+      if (S.selected?.id === clientId) S.selected.answers = newAnswers;
+      render();
+    }
+  } catch(err) { console.error(err); }
 };
 
 // ─── MODAL HELPERS ────────────────────────────────────────────────────────────
