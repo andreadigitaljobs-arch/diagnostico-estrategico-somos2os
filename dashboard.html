@@ -670,7 +670,8 @@ function buildRecursosCard(r) {
     if (res.url) {
       const btnBase = 'flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:none;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;font-family:inherit;transition:opacity .15s;';
       if (isImage) {
-        actionBtn = `<button onclick="verImagen(${JSON.stringify(res.url)},${JSON.stringify(res.label)})"
+        actionBtn = `<button onclick="verImagen(this.dataset.url,this.dataset.label)"
+          data-url="${esc(res.url)}" data-label="${esc(res.label)}"
           style="${btnBase}background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#86efac;"
           onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
